@@ -9,6 +9,9 @@ import OrganizationType from "./pages/auth/OrganizationType";
 import RegisterName from "./pages/auth/RegisterName";
 import Password from "./pages/auth/Password";
 import HomeLayout from "./layouts/HomeLayout";
+import EmailSent from "./pages/auth/EmailSent";
+import VerifyEmail from "./pages/auth/VerifyEmail";
+import Waitlist from "./pages/landing/Waitlist";
 
 export default function App() {
   return (
@@ -17,9 +20,12 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomeLayout />}>
           <Route index element={<Homepage />} />
+          <Route path="waitlist" element={<Waitlist />} />
         </Route>
         <Route path="/auth" element={<Outlet />}>
           <Route path="login" element={<Login />} />
+          <Route path="email-sent" element={<EmailSent />} />
+          <Route path="verify-email" element={<VerifyEmail />} />
           <Route path="sign-up/participant" element={<SignUpAsParticipant />} />
           <Route path="sign-up/researcher" element={<SignUpAsResearcher />} />
           <Route

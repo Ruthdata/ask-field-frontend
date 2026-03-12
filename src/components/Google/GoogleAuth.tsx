@@ -4,6 +4,8 @@ import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import {jwtDecode} from "jwt-decode";
 import { toast } from "react-hot-toast";
 import { ENV } from "@/config/env";
+import { useRegisterParticipantMutation } from "@/redux/api/slices/authSlice";
+
 
 interface GoogleDecodedJWT {
   iss?: string;
@@ -22,6 +24,7 @@ interface GoogleDecodedJWT {
 
 const GoogleLoginButton = () => {
   const navigate = useNavigate();
+  const [registerUser] = useRegisterParticipantMutation()
 
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -50,6 +53,7 @@ const GoogleLoginButton = () => {
           },
         };
     
+        const response = registerUser({...payload, signupPlatform: "google"})
         console.log("Google user:", payload);
     
         // send payload to backend

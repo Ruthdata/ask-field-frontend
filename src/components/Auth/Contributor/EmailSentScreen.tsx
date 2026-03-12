@@ -1,28 +1,16 @@
+import { MailIcon } from "@components/icons";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
-interface VerifyEmailScreenProps {
-  email: string;
-  onChangeEmail?: () => void;
-}
 
-const MailIcon = () => (
-  <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-    {/* Dark circle background */}
-    <circle cx="40" cy="40" r="40" fill="#2D2D2D" />
-    {/* Yellow rounded envelope */}
-    <rect x="16" y="24" width="48" height="34" rx="8" fill="#F5A623" />
-    {/* Envelope flap / M shape */}
-    <path d="M16 30l24 16 24-16" stroke="#2D2D2D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-    {/* Green checkmark badge */}
-    <circle cx="56" cy="56" r="12" fill="#22C55E" />
-    <path d="M51 56l3.5 3.5L61 51" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
-export default function VerifyEmailScreen({ email, onChangeEmail }: VerifyEmailScreenProps) {
+export default function EmailSentScreen() {
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
   const [error, setError] = useState("");
+  const [searchParams] = useSearchParams()
+
+  const email = searchParams.get("email");
 
   const handleResend = async () => {
     setResending(true);
@@ -48,7 +36,7 @@ export default function VerifyEmailScreen({ email, onChangeEmail }: VerifyEmailS
   };
 
   return (
-    <div className="w-full max-w-[460px] flex flex-col items-center text-center px-6 py-12">
+    <div className="w-full max-w-115 flex flex-col items-center text-center px-6 py-12">
       {/* Mail icon */}
       <div className="w-40 h-40 mb-8">
         <MailIcon />
@@ -94,7 +82,7 @@ export default function VerifyEmailScreen({ email, onChangeEmail }: VerifyEmailS
         >
           {resending ? "Sending..." : "Resend Email"}
         </button>
-        {onChangeEmail && (
+        {/* {onChangeEmail && (
           <>
             {" "}or{" "}
             <button
@@ -104,7 +92,7 @@ export default function VerifyEmailScreen({ email, onChangeEmail }: VerifyEmailS
               Change Email Address
             </button>
           </>
-        )}
+        )} */}
       </p>
     </div>
   );

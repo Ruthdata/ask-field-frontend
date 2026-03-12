@@ -1,33 +1,11 @@
 import React, { useState } from "react";
-import VerifyEmailScreen from "./VerifyEmailScreen";
+import VerifyEmailScreen from "./EmailSentScreen";
 import GoogleAuth from "@components/Google/GoogleAuth";
-
-
-const EyeIcon = ({ open }: { open: boolean }) => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    {open ? (
-      <>
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-        <circle cx="12" cy="12" r="3" />
-      </>
-    ) : (
-      <>
-        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
-        <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
-        <line x1="1" y1="1" x2="23" y2="23" />
-      </>
-    )}
-  </svg>
-);
+import { useRegisterParticipantMutation } from "@/redux/api/slices/authSlice";
+import toast from "react-hot-toast";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { useNavigate } from "react-router-dom";
+import { EyeIcon } from "@components/icons";
 
 const inputClass =
   "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";
@@ -41,7 +19,10 @@ export default function SignUpParticipantForm() {
   const [updates, setUpdates] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const [registerUser, { isLoading, error: registerError, data }] =
+    useRegisterParticipantMutation();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -49,6 +30,8 @@ export default function SignUpParticipantForm() {
     email: "",
     password: "",
     confirmPassword: "",
+    signupPlatform: "email",
+    receivesUpdates: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -76,51 +59,26 @@ export default function SignUpParticipantForm() {
 
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            firstName: form.firstName,
-            lastName: form.lastName,
-            email: form.email,
-            password: form.password,
-            role: "participant",
-            // Required by schema — collect in a later profile completion step
-            gender: "prefer-not-to-say",
-            dateOfBirth: new Date("2000-01-01").toISOString(),
-            identityDocument: "pending",
-          }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.success) {
-        setRegisteredEmail(form.email);
+      const res = await registerUser(form).unwrap();
+      if (res.success && res.message) {
+        toast.success(res.message);
+        navigate(`/auth/email-sent?email=${form.email}`);
       } else {
-        setError(data.message || "Registration failed. Please try again.");
+        setError("");
       }
-    } catch {
-      setError("Network error. Please check your connection and try again.");
+    } catch (err) {
+      const message =
+        ((err as FetchBaseQueryError).data as { error: string })?.error ??
+        "Network error.";
+      console.log(message);
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Swap to verification screen after successful registration
-  if (registeredEmail) {
-    return (
-      <VerifyEmailScreen
-        email={registeredEmail}
-        onChangeEmail={() => setRegisteredEmail(null)}
-      />
-    );
-  }
-
   return (
-    <div className="w-full max-w-[460px] bg-white rounded-2xl shadow-[0_2px_40px_rgba(0,0,0,0.08)] px-10 py-11">
+    <div className="w-full max-w-115 bg-white rounded-2xl shadow-[0_2px_40px_rgba(0,0,0,0.08)] px-10 py-11">
       <h1 className="font-serif text-[2.2rem] leading-tight text-gray-900 mb-3">
         Sign up as a<br />
         participant
@@ -233,7 +191,7 @@ export default function SignUpParticipantForm() {
           id="terms"
           checked={agreed}
           onChange={() => setAgreed(!agreed)}
-          className="w-4 h-4 mt-0.5 flex-shrink-0 rounded border-gray-300 accent-gray-900 cursor-pointer"
+          className="w-4 h-4 mt-0.5 shrink-0 rounded border-gray-300 accent-gray-900 cursor-pointer"
         />
         <label
           htmlFor="terms"
@@ -255,9 +213,14 @@ export default function SignUpParticipantForm() {
         <input
           type="checkbox"
           id="updates"
-          checked={updates}
-          onChange={() => setUpdates(!updates)}
-          className="w-4 h-4 mt-0.5 flex-shrink-0 rounded border-gray-300 accent-gray-900 cursor-pointer"
+          checked={form.receivesUpdates}
+          onChange={() =>
+            setForm((prev) => ({
+              ...prev,
+              receivesUpdates: !prev.receivesUpdates,
+            }))
+          }
+          className="w-4 h-4 mt-0.5 shrink-0 rounded border-gray-300 accent-gray-900 cursor-pointer"
         />
         <label
           htmlFor="updates"

@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const baseUrl = import.meta.env.VITE_BASE_URL;
+const baseUrl = import.meta.env.VITE_API_URL;
 
 
 
@@ -18,5 +18,5 @@ export const apiSlice = createApi({
     },
   }),
   tagTypes: ["Items", "Users"],
-  endpoints: () => ({}), // Features will inject their own endpoints
+  endpoints: () => ({}),
 });
