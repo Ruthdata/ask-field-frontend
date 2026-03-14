@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon } from "@components/icons";
+import { User } from "@/types/user.type";
 
 const inputClass =
   "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";
@@ -24,15 +25,15 @@ export default function SignUpParticipantForm() {
   const [registerUser, { isLoading, error: registerError, data }] =
     useRegisterParticipantMutation();
 
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    signupPlatform: "email",
-    receivesUpdates: false,
-  });
+    const [form, setForm] = useState<Partial<User> & { confirmPassword: string }>({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      signupPlatform: "email",
+      receivesUpdates: false,
+    });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });

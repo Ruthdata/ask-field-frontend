@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useVerifyEmailMutation } from "@/redux/api/slices/authSlice";
-import { ApiSuccess } from "@/types/api.type";
+import { useRef } from "react";
+
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
@@ -10,39 +11,41 @@ const VerifyEmail = () => {
   const token = searchParams.get("token") || "";
 
   const navigate = useNavigate();
-  const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading"
-  );
   const [error, setError] = useState<string | null>(null);
   const [verifyEmail, { data, isLoading }] = useVerifyEmailMutation();
 
-  useEffect(() => {
-    const verify = async () => {
-      if (!email || !token) return;
 
-      try {
-        const res = await verifyEmail({ email, token }).unwrap();
-        if (res.success) {
-          toast.success(data?.message || "Email verified successfully!");
-          setTimeout(() => navigate("/waitlist"), 3000);
-        }
-      } catch (err: any) {
-        const apiError = err?.data?.error || "Verification failed"
-        setError(apiError);
-        // setTimeout(() => navigate("/auth/sign-up/participant"), 3000);
+const hasVerified = useRef(false);
+
+useEffect(() => {
+  if (hasVerified.current) return;
+
+  const verify = async () => {
+    if (!email || !token) return;
+
+    hasVerified.current = true;
+
+    try {
+      const res = await verifyEmail({ email, token }).unwrap();
+
+      if (res.success) {
+        toast.success(res.message || "Email verified successfully!");
+        setTimeout(() => navigate("/waitlist"), 3000);
       }
-    };
+    } catch (err: any) {
+      const apiError = err?.data?.error || "Verification failed";
+      setError(apiError);
 
-    verify();
-  }, [searchParams, email, token, navigate]);
-  console.log({error})
+      setTimeout(() => navigate("/auth/sign-up/participant"), 3000);
+    }
+  };
+
+  verify();
+}, [email, token, navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center">
-      {error && <p>{error}</p>}
-      {data?.success && (
-        <p>✅ Email verified successfully! Redirecting to login...</p>
-      )}
+        <p>Please hold. Checking this account.</p>
     </div>
   );
 };

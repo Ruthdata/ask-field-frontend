@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import { FormProvider } from '@context/FormContext';
 import { Toaster } from 'react-hot-toast';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 <React.StrictMode>
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Provider store={store}>
        <FormProvider>
+       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
         <App />
+        </GoogleOAuthProvider>
        </FormProvider>
       </Provider>
     </BrowserRouter>

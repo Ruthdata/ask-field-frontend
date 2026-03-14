@@ -7,5 +7,7 @@ export interface User {
     lastName: string;
     signupPlatform: 'email' | 'google';
     receivesUpdates: boolean;
+    isVerified?: true;
+    verificationToken?: string | null;
   }
   
