@@ -28,8 +28,8 @@ useEffect(() => {
     try {
       const res = await verifyEmail({ email, token }).unwrap();
 
-      if (res.success) {
-        toast.success(res.message || "Email verified successfully!");
+      if (res.data.success) {
+        toast.success(res.data.message || "Email verified successfully!");
         setTimeout(() => navigate("/waitlist"), 3000);
       }
     } catch (err: any) {
