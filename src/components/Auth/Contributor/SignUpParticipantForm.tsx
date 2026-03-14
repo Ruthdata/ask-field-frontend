@@ -61,12 +61,13 @@ export default function SignUpParticipantForm() {
     setLoading(true);
     try {
       const res = await registerUser(form).unwrap();
-      if (res.success && res.message) {
-        toast.success(res.message);
+      if (res.data.success && res.data.message) {
+        toast.success(res.data.message);
         navigate(`/auth/email-sent?email=${form.email}`);
       } else {
         setError("");
       }
+      
     } catch (err) {
       const message =
         ((err as FetchBaseQueryError).data as { error: string })?.error ??

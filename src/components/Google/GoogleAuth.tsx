@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import { auth, googleProvider } from "../../firebase";
 import { signInWithPopup } from "firebase/auth";
 import { GoogleIcon } from "@components/icons";
+import { useGoogleAuthVerifyMutation } from "@/redux/api/slices/authSlice";
+import { useNavigate } from "react-router-dom";
+import { STORAGE_KEYS } from "@/config/constants";
 
 const GoogleAuth = () => {
   const [loading, setLoading] = useState(false);
+  const [googleAuth] = useGoogleAuthVerifyMutation();
+  const navigate = useNavigate();
 
   const loginWithGoogle = async () => {
     if (loading) return;
@@ -17,13 +22,14 @@ const GoogleAuth = () => {
 
       const token = await user.getIdToken();
 
-      await fetch("http://localhost:5000/api/participants/auth/google-auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ token })
-      });
+      const res = await googleAuth({ token }).unwrap();
+
+      if(res.data.success) {
+        const token = res.data.data.token;
+        const user = res.data.data.user;
+        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+        navigate('/waitlist')
+      }
 
     } catch (err) {
       console.error(err);

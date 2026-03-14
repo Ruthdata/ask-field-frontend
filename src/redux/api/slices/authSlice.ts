@@ -27,15 +27,23 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    verifyEmail: builder.mutation<
-      ApiSuccess<string>,
-      { token: string; email: string }
-    >({
+    verifyEmail: builder.mutation<ApiSuccess<string>,{ token: string; email: string }>({
       query: (body) => {
         return {
           url: "/participants/auth/verify-email",
           method: "GET",
           params: body,
+        };
+      },
+      // providesTags: "users"
+      invalidatesTags: ["Users"],
+    }),
+    googleAuthVerify: builder.mutation<ApiSuccess<{token: string, user: User}>,{ token: string }>({
+      query: (body) => {
+        return {
+          url: "/participants/auth/google-auth",
+          method: "POST",
+          body,
         };
       },
       // providesTags: "users"
@@ -53,5 +61,6 @@ export const {
   useRegisterParticipantMutation,
   useLoginUserMutation,
   useLazyGetUserQuery,
-  useVerifyEmailMutation
+  useVerifyEmailMutation,
+  useGoogleAuthVerifyMutation
 } = authApi;

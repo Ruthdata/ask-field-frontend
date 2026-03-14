@@ -1,10 +1,12 @@
 export type ApiSuccess<T> = {
+  data: {
     success: boolean;
-    data: T;
     message?: string;
+    data: T;
   };
+};
 
-  export type ApiError = {
-    success: false;
-    error: string;
-  };
+export type ApiError = {
+  success: false;
+  error: string;
+};
