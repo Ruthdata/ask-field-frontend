@@ -1,4 +1,9 @@
+import { STORAGE_KEYS } from "@/config/constants";
+import { useLoginUserMutation } from "@/redux/api/slices/authSlice";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const EyeIcon = ({ open }: { open: boolean }) => (
   <svg
@@ -36,6 +41,8 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({ email: "", password: "" });
+  const [loginUser, {}] = useLoginUserMutation()
+  const navigate = useNavigate()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -50,18 +57,30 @@ export default function LoginForm() {
     // Handle the form submission here (e.g., API call for login)
     try {
       // Placeholder for actual login logic
-      console.log("Login data:", form);
+      const res = await loginUser(form).unwrap()
+      if(res.data.success){
+        const message = res.data.message
+        toast.success(message || '')
+        const token = res.data.data.token;
+        const user = res.data.data.user;
+        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+        navigate('/waitlist')
+      }
       // Example of a successful login:
       // handleAuthSuccess(data, () => window.location.assign("/dashboard"));
     } catch (err) {
-      setError("Network error. Please check your connection and try again.");
+      const message =
+        ((err as FetchBaseQueryError).data as { error: string })?.error ??
+        "Network error.";
+      console.log(message);
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-[460px] bg-white rounded-2xl shadow-[0_2px_40px_rgba(0,0,0,0.08)] px-10 py-11">
+    <div className="w-full max-w-115 bg-white rounded-2xl shadow-[0_2px_40px_rgba(0,0,0,0.08)] px-10 py-11">
       <h1 className="font-serif text-[2.2rem] leading-tight text-gray-900 mb-3">Login</h1>
       <p className="text-sm text-gray-500 leading-relaxed mb-7">
         Now, login to your AskField account & start getting paid.

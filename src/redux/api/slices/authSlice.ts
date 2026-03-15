@@ -16,15 +16,14 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    loginUser: builder.mutation<ApiSuccess<{redirectUrl: string}>, Partial<User>>({
+    loginUser: builder.mutation<ApiSuccess<{token: string, user: string}>, Partial<User>>({
       query: (body) => {
         return {
-          url: "/users/login",
+          url: "/participants/auth/login",
           method: "POST",
           body,
         };
       },
-      // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
     verifyEmail: builder.mutation<ApiSuccess<string>,{ token: string; email: string }>({

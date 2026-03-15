@@ -11,7 +11,7 @@ const SignUpAsParticipant = () => {
       </div>
 
       {/* Right: Image — hidden below lg */}
-      <div className="hidden lg:block lg:w-[520px] xl:w-[600px] shrink-0">
+      <div className="hidden lg:block lg:w-130 xl:w-150 shrink-0">
         <div className="sticky top-0 h-screen overflow-hidden">
           <img
             src="/images/shared/magnifying-glass.svg"

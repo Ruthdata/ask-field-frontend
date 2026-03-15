@@ -72,7 +72,6 @@ export default function SignUpParticipantForm() {
       const message =
         ((err as FetchBaseQueryError).data as { error: string })?.error ??
         "Network error.";
-      console.log(message);
       setError(message);
     } finally {
       setLoading(false);
@@ -250,7 +249,7 @@ export default function SignUpParticipantForm() {
 
       <p className="text-center mt-4 text-xs text-gray-400">
         Already registered as a participant on AskField?{" "}
-        <a href="/login" className="text-red-400 font-medium hover:underline">
+        <a href="/auth/login" className="text-red-400 font-medium hover:underline">
           Login
         </a>
       </p>
