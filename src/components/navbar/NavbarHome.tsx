@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { storage } from "@/utils/storage";
+import { STORAGE_KEYS } from "@/config/constants";
+import { isAuthenticated } from "@/utils/auth";
 
 const NavbarHome = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  const handleLogout = () => {
+    storage.remove(STORAGE_KEYS.TOKEN);
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-gray-50 py-3 px-4 sm:px-6 z-50 shadow-sm rounded-full w-[95%] max-w-5xl">
@@ -26,22 +35,30 @@ const NavbarHome = () => {
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-3">
           <Link to="/auth/sign-up/participant">
-            <button className="px-5 py-2 text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition">
+            <button className="px-5 py-2 cursor-pointer text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition">
               Start collecting data
             </button>
           </Link>
-
           <Link to="/auth/sign-up/contributor">
-            <button className="px-5 py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition">
+            <button className="px-5 cursor-pointer py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition">
               Contribute and get paid
             </button>
           </Link>
-
-          <Link to="/auth/login">
-            <button className="px-5 py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
-              Login
+          {/* Login / Logout */}
+          {isAuthenticated() ? (
+            <button
+              onClick={handleLogout}
+              className="px-4 py-1 cursor-pointer bg-red-600 text-white rounded-full hover:bg-red-500 transition"
+            >
+              Logout
             </button>
-          </Link>
+          ) : (
+            <Link to="/auth/login">
+              <button className="px-5 cursor-pointer py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
+                Login
+              </button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}

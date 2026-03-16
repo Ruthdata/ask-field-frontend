@@ -58,11 +58,11 @@ export default function LoginForm() {
     try {
       // Placeholder for actual login logic
       const res = await loginUser(form).unwrap()
-      if(res.data.success){
-        const message = res.data.message
+      if(res.success){
+        const message = res.message
         toast.success(message || '')
-        const token = res.data.data.token;
-        const user = res.data.data.user;
+        const token = res.data.token;
+        const user = res.data.user;
         localStorage.setItem(STORAGE_KEYS.TOKEN, token);
         navigate('/waitlist')
       }

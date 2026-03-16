@@ -61,8 +61,8 @@ export default function SignUpParticipantForm() {
     setLoading(true);
     try {
       const res = await registerUser(form).unwrap();
-      if (res.data.success && res.data.message) {
-        toast.success(res.data.message);
+      if (res.success && res.message) {
+        toast.success(res.message);
         navigate(`/auth/email-sent?email=${form.email}`);
       } else {
         setError("");

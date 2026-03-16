@@ -31,7 +31,7 @@ export default function AccountTypeModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative Top Pattern - Orange hexagonal pattern */}
-        <div className="relative h-72 bg-gradient-to-br from-amber-400 via-orange-400 to-yellow-500 overflow-hidden">
+        <div className="relative h-72 bg-linear-to-br from-amber-400 via-orange-400 to-yellow-500 overflow-hidden">
           {/* Hexagonal Pattern Overlay */}
           <svg
             className="absolute inset-0 w-full h-full opacity-30"

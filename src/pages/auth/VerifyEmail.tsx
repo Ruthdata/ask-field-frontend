@@ -11,8 +11,7 @@ const VerifyEmail = () => {
   const token = searchParams.get("token") || "";
 
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
-  const [verifyEmail, { data, isLoading }] = useVerifyEmailMutation();
+  const [verifyEmail] = useVerifyEmailMutation();
 
 
 const hasVerified = useRef(false);
@@ -28,13 +27,13 @@ useEffect(() => {
     try {
       const res = await verifyEmail({ email, token }).unwrap();
 
-      if (res.data.success) {
-        toast.success(res.data.message || "Email verified successfully!");
+      console.log(res,'the verify email')
+      if (res.success) {
+        toast.success(res.message || "Email verified successfully!");
         setTimeout(() => navigate("/waitlist"), 3000);
       }
     } catch (err: any) {
       const apiError = err?.data?.error || "Verification failed";
-      setError(apiError);
 
       setTimeout(() => navigate("/auth/sign-up/participant"), 3000);
     }

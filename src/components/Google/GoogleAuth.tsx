@@ -21,12 +21,14 @@ const GoogleAuth = () => {
       const user = result.user;
 
       const token = await user.getIdToken();
+      console.log({token})
 
       const res = await googleAuth({ token }).unwrap();
 
-      if(res.data.success) {
-        const token = res.data.data.token;
-        const user = res.data.data.user;
+      console.log(res,'the response')
+      if(res.success) {
+        const token = res.data.token;
+        const user = res.data.user;
         localStorage.setItem(STORAGE_KEYS.TOKEN, token);
         navigate('/waitlist')
       }
