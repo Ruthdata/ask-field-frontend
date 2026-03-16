@@ -12,6 +12,7 @@ import HomeLayout from "./layouts/HomeLayout";
 import EmailSent from "./pages/auth/EmailSent";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import Waitlist from "./pages/landing/Waitlist";
+import PublicRoute from "./routes/PublicRoute";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route index element={<Homepage />} />
           <Route path="waitlist" element={<Waitlist />} />
         </Route>
+        <Route element={<PublicRoute />}>
         <Route path="/auth" element={<Outlet />}>
           <Route path="login" element={<Login />} />
           <Route path="email-sent" element={<EmailSent />} />
@@ -41,6 +43,7 @@ export default function App() {
             element={<RegisterName />}
           />
           <Route path="sign-up/participant/password" element={<Password />} />
+        </Route>
         </Route>
       </Routes>
     </div>
