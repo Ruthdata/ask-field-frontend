@@ -21,11 +21,9 @@ const GoogleAuth = () => {
       const user = result.user;
 
       const token = await user.getIdToken();
-      console.log({token})
 
       const res = await googleAuth({ token }).unwrap();
 
-      console.log(res,'the response')
       if(res.success) {
         const token = res.data.token;
         const user = res.data.user;

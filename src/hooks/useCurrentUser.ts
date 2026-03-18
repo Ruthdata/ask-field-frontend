@@ -4,7 +4,7 @@ import { getStoredToken } from "@/utils/auth";
 import { useState, useEffect } from "react"
 
 export const useCurrentUser = () => {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [getUser] = useLazyGetUserQuery()
@@ -16,7 +16,7 @@ export const useCurrentUser = () => {
       try {
         const response = await getUser().unwrap()
         if(response.success){
-          setUser(response.data.user)
+          setUser(response.data)
         }
       } catch {
         setError("Failed to fetch user");

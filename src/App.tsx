@@ -19,6 +19,10 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import ParticipantDashboardHome from "./pages/dashboard/participants/ParticipantDashboardHome";
 import NotFound from "./pages/error/NotFound";
 import CompleteProfile from "./pages/dashboard/participants/CompleteProfile";
+import Surveys from "./pages/dashboard/participants/Surveys";
+import Earnings from "./pages/dashboard/participants/Earnings";
+import Support from "./pages/dashboard/participants/Support";
+import Messages from "./pages/dashboard/participants/Messages";
 
 export default function App() {
   return (
@@ -57,9 +61,13 @@ export default function App() {
         </Route>
         {/* Dashboard Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path="/dashboard/participant" element={<DashboardLayout />}>
             <Route index element={<ParticipantDashboardHome />} />
-            <Route path="complete-profile" index element={<CompleteProfile />} />
+            <Route path="complete-profile" element={<CompleteProfile />} />
+            <Route path="surveys" element={<Surveys />} />
+            <Route path="earnings" element={<Earnings />} />
+            <Route path="support" element={<Support />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

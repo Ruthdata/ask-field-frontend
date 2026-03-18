@@ -1,5 +1,6 @@
 import { STORAGE_KEYS } from "@/config/constants";
 import { useLoginUserMutation } from "@/redux/api/slices/authSlice";
+import GoogleAuth from "@components/Google/GoogleAuth";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -85,6 +86,7 @@ export default function LoginForm() {
       <p className="text-sm text-gray-500 leading-relaxed mb-7">
         Now, login to your AskField account & start getting paid.
       </p>
+      <GoogleAuth />
 
       <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-gray-200" />

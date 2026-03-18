@@ -48,8 +48,8 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    getUser: builder.query<ApiSuccess<{user: User}>, void>({
-      query: () => "/participants",
+    getUser: builder.query<ApiSuccess<User>, void>({
+      query: () => "/participants/me",
       // providesTags: "users"
       providesTags: ["Users"],
     }),
