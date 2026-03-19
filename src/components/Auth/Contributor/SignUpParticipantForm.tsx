@@ -7,6 +7,7 @@ import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon } from "@components/icons";
 import { User } from "@/types/user.type";
+import CompleteProfileSuccess from "@components/Success/VerifyAccountSuccess";
 
 const inputClass =
   "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";

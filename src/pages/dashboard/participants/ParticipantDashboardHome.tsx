@@ -1,8 +1,11 @@
+import DashboardSection from '@components/Dashboard/DashboardSection'
 import React from 'react'
 
 const ParticipantDashboardHome = () => {
   return (
-    <div>ParticipantDashboardHome</div>
+    <div>
+      <DashboardSection />
+    </div>
   )
 }
 

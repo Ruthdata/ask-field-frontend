@@ -11,6 +11,8 @@ const NavbarHome = () => {
 
   const handleLogout = () => {
     storage.remove(STORAGE_KEYS.TOKEN);
+    storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
+    setOpen(false)
     navigate("/");
   };
 
@@ -88,12 +90,18 @@ const NavbarHome = () => {
               Contribute and get paid
             </button>
           </Link>
-
-          <Link to="/auth/login" onClick={() => setOpen(false)}>
-            <button className="w-full px-4 py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
-              Login
+          {isAuthenticated() ? (
+            <button onClick={handleLogout} className="cursor-pointer w-full px-4 py-2 rounded-full bg-red-600 text-white hover:bg-red-500 transition"
+            >
+              Logout
             </button>
-          </Link>
+          ) : (
+            <Link to="/auth/login">
+              <button className="px-5 w-full cursor-pointer py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
+                Login
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </nav>

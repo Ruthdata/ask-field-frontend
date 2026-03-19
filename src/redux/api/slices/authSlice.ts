@@ -1,5 +1,5 @@
 import { apiSlice } from "./appSlice";
-import { User } from "../../../types/user.type";
+import { CompleteProfile, User } from "../../../types/user.type";
 import { ApiSuccess } from "@/types/api.type";
 // import { ApiSuccess } from "../../../types/api.type";
 
@@ -16,10 +16,20 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    loginUser: builder.mutation<ApiSuccess<{token: string, user: string}>, Partial<User>>({
+    loginUser: builder.mutation<ApiSuccess<{accessToken: string, user: string, refreshToken: string}>, Partial<User>>({
       query: (body) => {
         return {
           url: "/participants/auth/login",
+          method: "POST",
+          body,
+        };
+      },
+      invalidatesTags: ["Users"],
+    }),
+    completeProfile: builder.mutation<ApiSuccess<{profile: CompleteProfile}>, Partial<CompleteProfile>>({
+      query: (body) => {
+        return {
+          url: "/participants/auth/complete-profile",
           method: "POST",
           body,
         };
@@ -37,7 +47,7 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    googleAuthVerify: builder.mutation<ApiSuccess<{token: string, user: User}>,{ token: string }>({
+    googleAuthVerify: builder.mutation<ApiSuccess<{accessToken: string, user: User, refreshToken: string}>,{ token: string }>({
       query: (body) => {
         return {
           url: "/participants/auth/google-auth",
@@ -53,6 +63,17 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       providesTags: ["Users"],
     }),
+    getRefreshToken: builder.query<ApiSuccess<{accessToken: string}>, {token: string}>({
+      query: (args) =>({
+        url: "/participants/auth/refresh-token",
+        method: "GET",
+        headers: {
+          token: args.token
+        }
+      }),
+      providesTags: ["Users"],
+      // providesTags: "users"
+    }),
   }),
 });
 
@@ -61,5 +82,7 @@ export const {
   useLoginUserMutation,
   useLazyGetUserQuery,
   useVerifyEmailMutation,
-  useGoogleAuthVerifyMutation
+  useGoogleAuthVerifyMutation,
+  useLazyGetRefreshTokenQuery,
+  useCompleteProfileMutation
 } = authApi;

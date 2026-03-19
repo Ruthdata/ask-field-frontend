@@ -62,9 +62,11 @@ export default function LoginForm() {
       if(res.success){
         const message = res.message
         toast.success(message || '')
-        const token = res.data.token;
+        const token = res.data.accessToken;
+        const refreshToken = res.data.accessToken;
         const user = res.data.user;
         localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
         navigate('/waitlist')
       }
       // Example of a successful login:

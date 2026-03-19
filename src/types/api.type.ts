@@ -8,3 +8,14 @@ export type ApiError = {
   success: false;
   error: string;
 };
+
+
+export interface JwtApiError {
+  status: number;
+  data: {
+    message: {
+      name: string;
+      // add other message properties if needed
+    };
+  };
+}

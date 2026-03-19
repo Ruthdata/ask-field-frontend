@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Menu,
   X,
@@ -8,7 +8,7 @@ import {
   HelpCircle,
   MessageSquare,
 } from "lucide-react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const navigation = [
@@ -34,17 +34,36 @@ const navigation = [
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-
   const location = useLocation();
+  const navigate = useNavigate()
   const pathname = location.pathname;
 
-  const { user, loading, getInitials, getFullName } = useCurrentUser();
+  const isCompleteProfilePage = pathname.includes("/complete-profile");
 
+  const { loading, getInitials, getFullName, user } = useCurrentUser();
+
+  useEffect(() => {
+    // Only run if we aren't loading and the user object exists
+    console.log({loading, user})
+    if (!loading && user) {
+      // If profile is complete and user is trying to access the completion page
+      if (user.isCompleteProfile && pathname.includes("/complete-profile")) {
+        navigate("/dashboard/participant");
+      }
+    }
+  }, [user, loading, pathname, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-gray-200">
+      {/* <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-gray-200"> */}
+      <aside
+        className={`hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-gray-200 transition-all ${
+          isCompleteProfilePage
+            ? "opacity-80 pointer-events-none filter-[blur(1px)]"
+            : ""
+        }`}
+      >
         {/* Logo */}
         <div className="flex items-center gap-2 px-6 py-5 border-b border-gray-200">
           <div className="w-8 h-8 rounded-lg bg-yellow-400 flex items-center justify-center">
