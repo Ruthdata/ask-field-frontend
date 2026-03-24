@@ -23,6 +23,9 @@ import Surveys from "./pages/dashboard/participants/Surveys";
 import Earnings from "./pages/dashboard/participants/Earnings";
 import Support from "./pages/dashboard/participants/Support";
 import Messages from "./pages/dashboard/participants/Messages";
+import RecoverPassword from "./pages/auth/RecoverPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import ChangePassword from "./pages/auth/ChangePassword";
 
 export default function App() {
   return (
@@ -39,6 +42,9 @@ export default function App() {
             <Route path="login" element={<Login />} />
             <Route path="email-sent" element={<EmailSent />} />
             <Route path="verify-email" element={<VerifyEmail />} />
+            <Route path="recover-password" element={<RecoverPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
+            <Route path="change-password" element={<ChangePassword />} />
             <Route
               path="sign-up/participant"
               element={<SignUpAsParticipant />}

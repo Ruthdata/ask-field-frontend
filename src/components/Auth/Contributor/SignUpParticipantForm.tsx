@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import VerifyEmailScreen from "./EmailSentScreen";
 import GoogleAuth from "@components/Google/GoogleAuth";
 import { useRegisterParticipantMutation } from "@/redux/api/slices/authSlice";
 import toast from "react-hot-toast";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon } from "@components/icons";
 import { User } from "@/types/user.type";
-import CompleteProfileSuccess from "@components/Success/VerifyAccountSuccess";
+import { formatApiError } from "@utils/helper";
 
 const inputClass =
   "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";
@@ -70,9 +68,7 @@ export default function SignUpParticipantForm() {
       }
       
     } catch (err) {
-      const message =
-        ((err as FetchBaseQueryError).data as { error: string })?.error ??
-        "Network error.";
+      const message = formatApiError(err)
       setError(message);
     } finally {
       setLoading(false);

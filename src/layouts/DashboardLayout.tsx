@@ -44,7 +44,6 @@ export default function DashboardLayout() {
 
   useEffect(() => {
     // Only run if we aren't loading and the user object exists
-    console.log({loading, user})
     if (!loading && user) {
       // If profile is complete and user is trying to access the completion page
       if (user.isCompleteProfile && pathname.includes("/complete-profile")) {

@@ -8,74 +8,13 @@ import {
   TrendingUp,
   HelpCircle,
 } from "lucide-react";
+import { useCurrentUser } from "@hooks/useCurrentUser";
+import StatCard from "./StatCard";
 
-interface StatCardProps {
-    icon: React.ReactNode;
-    iconBg: string;
-    title: string;
-    value: string | number;
-    change: string;
-    showVisibility?: boolean;
-    isVisible?: boolean;
-    onToggleVisibility?: () => void;
-}
 
-const StatCard: React.FC<StatCardProps> = ({
-    icon,
-    iconBg,
-    title,
-    value,
-    change,
-    showVisibility = false,
-    isVisible = true,
-    onToggleVisibility,
-  }) => {
-    return (
-      <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
-        <div className="flex items-start justify-between mb-4">
-          <div
-            className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center`}
-          >
-            {icon}
-          </div>
-  
-          {showVisibility && (
-            <button
-              onClick={onToggleVisibility}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label={isVisible ? "Hide balance" : "Show balance"}
-            >
-              {isVisible ? (
-                <Eye className="w-5 h-5" />
-              ) : (
-                <EyeOff className="w-5 h-5" />
-              )}
-            </button>
-          )}
-        </div>
-  
-        <div>
-          <p className="text-gray-500 text-sm mb-2">{title}</p>
-  
-          <div className="flex items-baseline gap-2">
-            {title.includes("Balance") && (
-              <span className="text-gray-900 font-semibold text-lg">NGN</span>
-            )}
-            <h3 className="text-gray-900 font-bold text-3xl">
-              {isVisible ? value : "••••"}
-            </h3>
-          </div>
-  
-          <div className="flex items-center gap-2 mt-3">
-            <TrendingUp className="w-3.5 h-3.5 text-gray-400" />
-            <p className="text-gray-400 text-xs">{change}</p>
-          </div>
-        </div>
-      </div>
-    );
-};
 
 const DashboardSection = () => {
+  const {getFirstName} = useCurrentUser()
   const [selectedPeriod, setSelectedPeriod] = useState("Last 3 days");
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -95,12 +34,12 @@ const DashboardSection = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="mb-4 sm:mb-0">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              My Earnings
+              Welcome, {getFirstName()}!
             </h1>
 
             <div className="flex items-center gap-2">
               <p className="text-gray-600">
-                Track your survey rewards and withdrawals
+              Here’s a summary of all activities happening on your AskField account.
               </p>
               <button className="text-gray-400 hover:text-gray-600">
                 <HelpCircle className="w-4 h-4" />

@@ -9,6 +9,9 @@ export interface User {
     receivesUpdates: boolean;
     isVerified?: true;
     verificationToken?: string | null;
+    verificationTokenExpires?: string | null;
+    otp?: true;
+    otpExpires?: string | null;
     isCompleteProfile: boolean;
   }
   

@@ -74,6 +74,39 @@ export const authApi = apiSlice.injectEndpoints({
       providesTags: ["Users"],
       // providesTags: "users"
     }),
+    sendOtp: builder.mutation<ApiSuccess<{}>,{ email: string }>({
+      query: (body) => {
+        return {
+          url: "/participants/auth/send-otp",
+          method: "POST",
+          body,
+        };
+      },
+      // providesTags: "users"
+      invalidatesTags: ["Users"],
+    }),
+    verifyResetPasswordOtp: builder.mutation<ApiSuccess<{token: string}>,{ email: string, code: string }>({
+      query: (body) => {
+        return {
+          url: "/participants/auth/verify-otp",
+          method: "POST",
+          body,
+        };
+      },
+      // providesTags: "users"
+      invalidatesTags: ["Users"],
+    }),
+    resetPassword: builder.mutation<ApiSuccess<string>,{ token: string; email: string, password: string }>({
+      query: (body) => {
+        return {
+          url: "/participants/auth/reset-password",
+          method: "POST",
+          body,
+        };
+      },
+      // providesTags: "users"
+      invalidatesTags: ["Users"],
+    }),
   }),
 });
 
@@ -84,5 +117,8 @@ export const {
   useVerifyEmailMutation,
   useGoogleAuthVerifyMutation,
   useLazyGetRefreshTokenQuery,
-  useCompleteProfileMutation
+  useCompleteProfileMutation,
+  useSendOtpMutation,
+  useVerifyResetPasswordOtpMutation,
+  useResetPasswordMutation
 } = authApi;

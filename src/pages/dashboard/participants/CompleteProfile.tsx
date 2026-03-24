@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { getFormattedAnswers } from "@/utils/formatDate";
 import { useCompleteProfileMutation } from "@/redux/api/slices/authSlice";
+import { formatApiError } from "@utils/helper";
 
 const CompleteProfile = () => {
   const [completeProfile] = useCompleteProfileMutation()
@@ -58,8 +59,8 @@ const CompleteProfile = () => {
         
       }
     } catch (error) {
-      toast.error('Something went wrong. Please try again later')
-      console.log(error)
+      const message = formatApiError(error)
+      toast.error(message || '')
     }
   };
 
