@@ -50,14 +50,14 @@ export default function Header() {
         <div>
           <button
             onClick={handleStartCollecting}
-            className="bg-[#3E3E3E] text-white p-3 rounded-3xl w-[243px] cursor-pointer hover:bg-[#2E2E2E] transition-colors"
+            className="bg-[#3E3E3E] text-white p-3 rounded-3xl w-60.75 cursor-pointer hover:bg-[#2E2E2E] transition-colors"
           >
             Start collecting Data
           </button>
 
           <button
             onClick={handleContribute}
-            className="bg-transparent border border-[#3E3E3E] text-[#3E3E3E] p-3 rounded-3xl ml-4 w-[243px] cursor-pointer hover:bg-gray-50 transition-colors"
+            className="bg-transparent border border-[#3E3E3E] text-[#3E3E3E] p-3 rounded-3xl ml-4 w-60.75 cursor-pointer hover:bg-gray-50 transition-colors"
           >
             Contribute and get paid
           </button>

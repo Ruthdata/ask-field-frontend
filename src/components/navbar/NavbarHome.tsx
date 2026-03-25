@@ -36,7 +36,8 @@ const NavbarHome = () => {
 
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-3">
-          <Link to="/auth/sign-up/researcher">
+          <Link to="/">
+          {/* <Link to="/auth/sign-up/researcher"> */}
             <button className="px-5 py-2 cursor-pointer text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition">
               Start collecting data
             </button>
@@ -79,7 +80,8 @@ const NavbarHome = () => {
         }`}
       >
         <div className="flex flex-col gap-3 bg-white rounded-2xl p-4 shadow-md">
-          <Link to="/auth/sign-up/researcher" onClick={() => setOpen(false)}>
+          <Link to="/" onClick={() => setOpen(false)}>
+          {/* <Link to="/auth/sign-up/researcher" onClick={() => setOpen(false)}> */}
             <button className="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition">
               Start collecting data
             </button>

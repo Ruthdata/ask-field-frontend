@@ -6,7 +6,6 @@ import { useSearchParams } from "react-router-dom";
 export default function Waitlist() {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
-  const [copied, setCopied] = useState(false);
   const {getFirstName} = useCurrentUser()
 
   return (
