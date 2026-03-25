@@ -25,7 +25,7 @@ export default function Waitlist() {
 
         {/* Description */}
         <p className="text-sm text-gray-500 leading-relaxed mb-2">
-          Thanks for signing up, <span className="font-bold">{getFirstName()}</span>
+          Thanks for signing up, <span className="font-bold text-black">{getFirstName()}</span>
           <span className="font-semibold text-gray-800">{email}</span>!
           <br />
           We&apos;ll notify you as soon as your spot is available.
