@@ -8,13 +8,13 @@ import { useCompleteProfileMutation } from "@/redux/api/slices/authSlice";
 import { formatApiError } from "@utils/helper";
 
 const CompleteProfile = () => {
-  const [completeProfile] = useCompleteProfileMutation()
+  const [completeProfile, {isLoading}] = useCompleteProfileMutation()
 
   const [showModal, setShowModal] = useState(true);
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isCompleteProfile, setIsCompleteProfile] = useState(false);
-  const { getFirstName } = useCurrentUser();
+  const { getFirstName, refetchUser } = useCurrentUser();
 
   const totalSteps = PARTICIPANT_QUESTIONS.length;
   const currentStepData = PARTICIPANT_QUESTIONS[step - 1];
@@ -48,10 +48,10 @@ const CompleteProfile = () => {
       } else {
         // const formattedAnswers = getFormattedAnswers(answers);
   
-        console.log("Final submission:", answers);
         const res = await completeProfile(answers).unwrap()
   
         if(res.success){
+          await refetchUser()
           toast.success(res.message ?? '')
           setShowModal(false);
           setIsCompleteProfile(true);
@@ -268,7 +268,7 @@ const CompleteProfile = () => {
                   onClick={handleNextStep}
                   className="px-4 py-2 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 cursor-pointer"
                 >
-                  {step === totalSteps ? "Submit" : "Save & Continue"}
+                  {isLoading ? "Loading..." : step === totalSteps ? "Submit" : "Save and Continue"}
                 </button>
               </div>
             </div>

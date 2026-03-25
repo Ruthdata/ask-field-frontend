@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 type Props = {
   open: boolean;
@@ -8,7 +8,14 @@ type Props = {
 };
 
 const CompleteProfileSuccess = ({ open, to, name }: Props) => {
+  const navigate = useNavigate()
   if (!open) return null;
+
+  const handleSubmit = () => {
+    // Force a "reload" by navigating to the same path
+    navigate("/dashboard/participant?skipCompleteProfileRedirect=true");
+  };
+
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -33,12 +40,12 @@ const CompleteProfileSuccess = ({ open, to, name }: Props) => {
               in surveys and earning rewards.
             </p>
 
-            <Link
-              to={to}
+            <button
+              onClick={handleSubmit}
               className="inline-block w-full py-3.5 bg-[#3E3E3E] text-white rounded-full text-sm font-semibold hover:bg-gray-700 transition-all"
             >
               Start your first survey
-            </Link>
+            </button>
           </div>
         </div>
 

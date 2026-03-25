@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useSearchParams } from "react-router-dom";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard/participant", icon: Home },
@@ -34,8 +35,9 @@ const navigation = [
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const [searchParams] = useSearchParams();
   const location = useLocation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const pathname = location.pathname;
 
   const isCompleteProfilePage = pathname.includes("/complete-profile");
@@ -43,11 +45,31 @@ export default function DashboardLayout() {
   const { loading, getInitials, getFullName, user } = useCurrentUser();
 
   useEffect(() => {
-    // Only run if we aren't loading and the user object exists
+    // Only run if not loading and user exists
     if (!loading && user) {
-      // If profile is complete and user is trying to access the completion page
-      if (user.isCompleteProfile && pathname.includes("/complete-profile")) {
+      const isComplete = user.isCompleteProfile;
+
+      // Get query params
+      const skipRedirect =
+        searchParams.get("skipCompleteProfileRedirect") === "true";
+
+      // If profile is complete and user is trying to access complete-profile page, redirect to dashboard
+      if (
+        isComplete &&
+        pathname === "/dashboard/participant/complete-profile"
+      ) {
         navigate("/dashboard/participant");
+        return;
+      }
+
+      // If profile is incomplete and user is trying to access any other dashboard route (except complete-profile)
+      const isDashboardRoute =
+        pathname.startsWith("/dashboard/participant") &&
+        pathname !== "/dashboard/participant/complete-profile";
+
+      if (!isComplete && isDashboardRoute && !skipRedirect) {
+        navigate("/dashboard/participant/complete-profile");
+        return;
       }
     }
   }, [user, loading, pathname, navigate]);

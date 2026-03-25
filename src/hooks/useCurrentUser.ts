@@ -15,8 +15,6 @@ export const useCurrentUser = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [getUser] = useLazyGetUserQuery();
-  const [triggerRefresh] = useLazyGetRefreshTokenQuery();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -39,6 +37,15 @@ export const useCurrentUser = () => {
     fetchUser();
   }, []);
 
+  const refetchUser = async () => {
+    try {
+      const response = await getUser().unwrap();
+      if (response.success) setUser(response.data);
+    } catch (err) {
+      console.error("Failed to refetch user", err);
+    }
+  };
+
   const getInitials = () => {
     if (!user) return "??";
     return `${user.firstName?.[0] ?? ""}${
@@ -56,5 +63,5 @@ export const useCurrentUser = () => {
     return user.firstName.charAt(0).toUpperCase() + user.firstName.slice(1);
   };
 
-  return { user, loading, error, getInitials, getFullName, getFirstName };
+  return { user, loading, error, getInitials, getFullName, getFirstName, refetchUser };
 };
