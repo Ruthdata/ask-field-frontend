@@ -1,18 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "@context/FormContext";
 import { COUNTRIES } from "@/lib/countries";
 import FormLayout from "@components/Auth/Contributor/Participant/FormLayout";
 
 export default function SignupCountry() {
-  const { formData, updateFormData } = useFormContext();
+  const { formData, updateFormData, formStep, setFormStep } = useFormContext();
   const [country, setCountry] = useState(formData.country || "");
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    if(formStep < 2){
+      navigate('/auth/sign-up/researcher')
+    }
+  },[formStep])
 
   const handleSubmit = () => {
     if (country) {
       updateFormData({ country });
-      navigate("/auth/sign-up/participant/organization-name");
+      setFormStep(3)
+      navigate("/auth/sign-up/researcher/organization-name");
     }
   };
 
@@ -23,7 +30,7 @@ export default function SignupCountry() {
   return (
     <FormLayout>
       <div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-8 mt-10">
           What is your country of residence?
         </h1>
 

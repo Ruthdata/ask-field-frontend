@@ -32,7 +32,7 @@ const StatCard: React.FC<StatCardProps> = ({
           <span>{icon}</span>
         </div>
         <div className="flex flex-col w-full">
-          <div className="gap-3 flex items-center p-2">
+          <div className="gap-3 flex items-center p-2`">
             <p className="text-gray-500 text-sm m-0">{title}</p>
 
             {isDisplayBalance && showVisibility && (

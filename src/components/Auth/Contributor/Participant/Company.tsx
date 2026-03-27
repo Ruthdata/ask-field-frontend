@@ -4,15 +4,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Company() {
-  const { formData, updateFormData } = useFormContext();
+  const { formData, updateFormData, setFormStep } = useFormContext();
   const [email, setEmail] = useState(formData.email || "");
   const [agreed, setAgreed] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = () => {
     if (email && agreed) {
+      setFormStep(2)
       updateFormData({ email });
-      navigate("/auth/sign-up/participant/country"); // Next step
+      navigate("/auth/sign-up/researcher/country"); // Next step
     }
   };
 

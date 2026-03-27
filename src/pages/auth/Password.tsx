@@ -1,27 +1,66 @@
+import { useRegisterResearcherMutation } from "@/redux/api/slices/authSlice";
 import FormLayout from "@components/Auth/Contributor/Participant/FormLayout";
+import { EyeIcon } from "@components/icons";
+import WelcomeResearcher from "@components/Success/WelcomeResearcher";
 import { useFormContext } from "@context/FormContext";
-import { useState } from "react";
+import { formatApiError } from "@utils/helper";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+const inputClass =
+  "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";
+
 export default function Password() {
-  const { formData, updateFormData } = useFormContext();
+  const { formData, formStep, setFormStep } = useFormContext();
+  const [registerResearcher, {isLoading}] = useRegisterResearcherMutation();
+  const [isComplete, setIsComplete] = useState(false)
 
   const [password, setPassword] = useState(formData.password || "");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(
     formData.confirmPassword || ""
   );
 
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    if (password && confirmPassword) {
-      updateFormData({ password, confirmPassword });
-    //   navigate("/next-route"); // add your next step here if needed
+  useEffect(() => {
+    if (formStep < 7) {
+      navigate("/auth/sign-up/researcher");
+    }
+  }, [formStep]);
+
+  const handleSubmit = async () => {
+    try {
+      if (password && confirmPassword) {
+        setFormStep(8);
+        console.log({ password });
+        const postData = { ...formData, password };
+        // updateFormData({password });
+        console.log(postData);
+        const res = await registerResearcher(postData).unwrap();
+        if (res.success) {
+          setIsComplete(true)
+        }
+        //   navigate("/next-route"); // add your next step here if needed
+      }
+    } catch (error) {
+      const message = formatApiError(error);
+      toast.error(message);
     }
   };
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const isPasswordClear = () => {
+    return !password || !confirmPassword || password != confirmPassword;
   };
 
   return (
@@ -35,26 +74,48 @@ export default function Password() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Password
           </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
-          />
+          <div className="relative">
+            <input
+              className={inputClass}
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={password}
+              onChange={handleChange}
+              style={{ paddingRight: 40 }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <EyeIcon open={showPassword} />
+            </button>
+          </div>
         </div>
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Confirm Password
           </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm password"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
-          />
+          <div className="relative">
+            <input
+              className={inputClass}
+              name="password"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              style={{ paddingRight: 40 }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <EyeIcon open={showConfirmPassword} />
+            </button>
+          </div>
         </div>
 
         <div className="flex justify-between gap-4">
@@ -67,13 +128,14 @@ export default function Password() {
 
           <button
             onClick={handleSubmit}
-            disabled={!password || !confirmPassword}
+            disabled={isPasswordClear()}
             className="w-full bg-gray-800 text-white py-3 rounded-4xl font-medium cursor-pointer hover:bg-gray-900 transition disabled:opacity-50"
           >
-            Submit
+            {isLoading ? "Loading..." : "Submit"}
           </button>
         </div>
       </div>
+      <WelcomeResearcher open={isComplete} />
     </FormLayout>
   );
 }

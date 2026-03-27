@@ -4,7 +4,7 @@ import { useRegisterParticipantMutation } from "@/redux/api/slices/authSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon } from "@components/icons";
-import { User } from "@/types/user.type";
+import { Participant } from "@/types/user.type";
 import { formatApiError } from "@utils/helper";
 
 const inputClass =
@@ -24,7 +24,7 @@ export default function SignUpParticipantForm() {
   const [registerUser, { isLoading, error: registerError, data }] =
     useRegisterParticipantMutation();
 
-    const [form, setForm] = useState<Partial<User> & { confirmPassword: string }>({
+    const [form, setForm] = useState<Partial<Participant> & { confirmPassword: string }>({
       firstName: "",
       lastName: "",
       email: "",

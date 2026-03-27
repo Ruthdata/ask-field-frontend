@@ -26,6 +26,9 @@ import Messages from "./pages/dashboard/participants/Messages";
 import RecoverPassword from "./pages/auth/RecoverPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ChangePassword from "./pages/auth/ChangePassword";
+import OrganizationName from "./pages/auth/OrganizationName";
+import JobTitle from "./pages/auth/JobTitle";
+import VerifyResearcherEmail from "./pages/auth/VerifyResearcherEmail";
 
 export default function App() {
   return (
@@ -42,6 +45,7 @@ export default function App() {
             <Route path="login" element={<Login />} />
             <Route path="email-sent" element={<EmailSent />} />
             <Route path="verify-email" element={<VerifyEmail />} />
+            <Route path="researcher/verify-email" element={<VerifyResearcherEmail />} />
             <Route path="recover-password" element={<RecoverPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
             <Route path="change-password" element={<ChangePassword />} />
@@ -51,18 +55,26 @@ export default function App() {
             />
             <Route path="sign-up/researcher" element={<SignUpAsResearcher />} />
             <Route
-              path="sign-up/participant/country"
+              path="sign-up/researcher/country"
               element={<SignupCountry />}
             />
             <Route
-              path="sign-up/participant/organization-name"
+              path="sign-up/researcher/organization-type"
               element={<OrganizationType />}
             />
             <Route
-              path="sign-up/participant/register-name"
+              path="sign-up/researcher/organization-name"
+              element={<OrganizationName />}
+            />
+            <Route
+              path="sign-up/researcher/register-name"
               element={<RegisterName />}
             />
-            <Route path="sign-up/participant/password" element={<Password />} />
+            <Route
+              path="sign-up/researcher/job-title"
+              element={<JobTitle />}
+            />
+            <Route path="sign-up/researcher/password" element={<Password />} />
           </Route>
         </Route>
         {/* Dashboard Routes */}

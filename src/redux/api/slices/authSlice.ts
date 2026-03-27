@@ -1,11 +1,11 @@
 import { apiSlice } from "./appSlice";
-import { CompleteProfile, User } from "../../../types/user.type";
+import { CompleteProfile, Participant, Researcher } from "../../../types/user.type";
 import { ApiSuccess } from "@/types/api.type";
 // import { ApiSuccess } from "../../../types/api.type";
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    registerParticipant: builder.mutation<ApiSuccess<User>, Partial<User>>({
+    registerParticipant: builder.mutation<ApiSuccess<Participant>, Partial<Participant>>({
       query: (body) => {
         return {
           url: "/participants/auth/register",
@@ -16,7 +16,18 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    loginUser: builder.mutation<ApiSuccess<{accessToken: string, user: string, refreshToken: string}>, Partial<User>>({
+    registerResearcher: builder.mutation<ApiSuccess<Researcher>, Partial<Researcher>>({
+      query: (body) => {
+        return {
+          url: "/researchers/auth/register",
+          method: "POST",
+          body,
+        };
+      },
+      // providesTags: "users"
+      invalidatesTags: ["Users"],
+    }),
+    loginUser: builder.mutation<ApiSuccess<{accessToken: string, user: string, refreshToken: string}>, Partial<Participant>>({
       query: (body) => {
         return {
           url: "/participants/auth/login",
@@ -47,7 +58,18 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    googleAuthVerify: builder.mutation<ApiSuccess<{accessToken: string, user: User, refreshToken: string}>,{ token: string }>({
+    verifyResearcherEmail: builder.mutation<ApiSuccess<string>,{ token: string; email: string }>({
+      query: (body) => {
+        return {
+          url: "/researchers/auth/verify-email",
+          method: "GET",
+          params: body,
+        };
+      },
+      // providesTags: "users"
+      invalidatesTags: ["Users"],
+    }),
+    googleAuthVerify: builder.mutation<ApiSuccess<{accessToken: string, user: Participant, refreshToken: string}>,{ token: string }>({
       query: (body) => {
         return {
           url: "/participants/auth/google-auth",
@@ -58,7 +80,7 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    getUser: builder.query<ApiSuccess<User>, void>({
+    getUser: builder.query<ApiSuccess<Participant>, void>({
       query: () => "/participants/me",
       // providesTags: "users"
       providesTags: ["Users"],
@@ -120,5 +142,8 @@ export const {
   useCompleteProfileMutation,
   useSendOtpMutation,
   useVerifyResetPasswordOtpMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useRegisterResearcherMutation,
+  useVerifyResearcherEmailMutation
+
 } = authApi;

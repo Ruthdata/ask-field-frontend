@@ -19,6 +19,8 @@ interface FormContextType {
   formData: FormData;
   updateFormData: (data: Partial<FormData>) => void;
   resetForm: () => void;
+  formStep: number,
+  setFormStep: (step: number)=> void;
 }
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
@@ -38,6 +40,7 @@ const initialFormData: FormData = {
 
 export function FormProvider({ children }: { children: ReactNode }) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [formStep, setFormStep] = useState(1)
 
   const updateFormData = (data: Partial<FormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -48,7 +51,7 @@ export function FormProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <FormContext.Provider value={{ formData, updateFormData, resetForm }}>
+    <FormContext.Provider value={{ formData, updateFormData, resetForm, formStep, setFormStep }}>
       {children}
     </FormContext.Provider>
   );

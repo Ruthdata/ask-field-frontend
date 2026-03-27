@@ -1,20 +1,27 @@
 import FormLayout from "@components/Auth/Contributor/Participant/FormLayout";
 import { useFormContext } from "@context/FormContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function OrganizationName() {
-  const { formData, updateFormData } = useFormContext();
+export default function RegisterName() {
+  const { formData, updateFormData, setFormStep, formStep } = useFormContext();
 
   const [firstName, setFirstName] = useState(formData.firstName || "");
   const [lastName, setLastName] = useState(formData.lastName || "");
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (formStep < 6) {
+      navigate("/auth/sign-up/researcher");
+    }
+  }, [formStep]);
+
   const handleSubmit = () => {
     if (firstName && lastName) {
+      setFormStep(7);
       updateFormData({ firstName, lastName });
-      navigate("/auth/sign-up/participant/password");
+      navigate("/auth/sign-up/researcher/password");
     }
   };
 
@@ -25,11 +32,11 @@ export default function OrganizationName() {
   return (
     <FormLayout>
       <div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-8 mt-16">
           What should we call you?
         </h1>
 
-        <div className="mb-6">
+        <div className="mb-6 mt-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             First Name
           </label>
