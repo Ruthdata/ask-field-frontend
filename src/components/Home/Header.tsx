@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import AccountTypeModal from "./Modal/AccountTypeModal";
 import PartnerHome from "@components/Partner/PartnerHome";
 import Design from "./Design";
+import LoginTypeModal from "./Modal/LoginTypeModal";
 
 export default function Header() {
   const navigate = useNavigate();

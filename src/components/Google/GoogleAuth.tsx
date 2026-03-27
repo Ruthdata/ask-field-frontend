@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { auth, googleProvider } from "../../firebase";
 import { signInWithPopup } from "firebase/auth";
 import { GoogleIcon } from "@components/icons";
-import { useGoogleAuthVerifyMutation } from "@/redux/api/slices/authSlice";
+import { useGoogleAuthVerifyMutation } from "@/redux/api/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import { STORAGE_KEYS } from "@/config/constants";
 

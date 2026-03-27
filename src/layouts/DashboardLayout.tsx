@@ -9,8 +9,8 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useSearchParams } from "react-router-dom";
+import { useCurrentUser } from "@hooks/useCurrentUser";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard/participant", icon: Home },
@@ -42,12 +42,12 @@ export default function DashboardLayout() {
 
   const isCompleteProfilePage = pathname.includes("/complete-profile");
 
-  const { loading, getInitials, getFullName, user } = useCurrentUser();
+  const { loading, getParticipantInitials, getParticipantFirstName, participant, getParticipantFullName } = useCurrentUser();
 
   useEffect(() => {
     // Only run if not loading and user exists
-    if (!loading && user) {
-      const isComplete = user.isCompleteProfile;
+    if (!loading && participant) {
+      const isComplete = participant.isCompleteProfile;
 
       // Get query params
       const skipRedirect =
@@ -72,7 +72,7 @@ export default function DashboardLayout() {
         return;
       }
     }
-  }, [user, loading, pathname, navigate]);
+  }, [participant, loading, pathname, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -188,13 +188,13 @@ export default function DashboardLayout() {
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
               <div className="w-5 h-5 bg-gray-300 rounded" />
               <span className="text-sm font-medium text-gray-900">
-                {loading ? "Loading..." : getFullName()}
+                {loading ? "Loading..." : getParticipantFullName()}
               </span>
             </div>
 
             {/* Avatar */}
             <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">
-              {loading ? "..." : getInitials()}
+              {loading ? "..." : getParticipantInitials()}
             </div>
           </div>
         </header>

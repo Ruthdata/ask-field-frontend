@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { useVerifyEmailMutation, useVerifyResearcherEmailMutation } from "@/redux/api/slices/authSlice";
+import { useVerifyEmailMutation, useVerifyResearcherEmailMutation } from "@/redux/api/slices/userSlice";
 import { useRef } from "react";
 import VerifyAccountSuccess from "@components/Success/VerifyAccountSuccess";
 
@@ -31,7 +31,7 @@ useEffect(() => {
 
       if (res.success) {
         toast.success(res.message || "Email verified successfully!");
-        setTimeout(() => navigate("/auth/login"), 3000);
+        setTimeout(() => navigate("/auth/login/researcher"), 3000);
       }
     } catch (err: any) {
       const apiError = err?.data?.error || "Verification failed";

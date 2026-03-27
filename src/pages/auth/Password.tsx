@@ -1,4 +1,4 @@
-import { useRegisterResearcherMutation } from "@/redux/api/slices/authSlice";
+import { useRegisterResearcherMutation } from "@/redux/api/slices/userSlice";
 import FormLayout from "@components/Auth/Contributor/Participant/FormLayout";
 import { EyeIcon } from "@components/icons";
 import WelcomeResearcher from "@components/Success/WelcomeResearcher";

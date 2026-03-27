@@ -1,7 +1,7 @@
 import {
   useSendOtpMutation,
   useVerifyResetPasswordOtpMutation,
-} from "@/redux/api/slices/authSlice";
+} from "@/redux/api/slices/userSlice";
 import OTPForm from "@components/Button/OTPForm";
 import { formatApiError } from "@utils/helper";
 import React, { useState } from "react";

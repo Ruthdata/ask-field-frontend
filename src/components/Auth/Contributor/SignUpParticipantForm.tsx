@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import GoogleAuth from "@components/Google/GoogleAuth";
-import { useRegisterParticipantMutation } from "@/redux/api/slices/authSlice";
+import { useRegisterParticipantMutation } from "@/redux/api/slices/userSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon } from "@components/icons";
@@ -246,7 +246,7 @@ export default function SignUpParticipantForm() {
 
       <p className="text-center mt-4 text-xs text-gray-400">
         Already registered as a participant on AskField?{" "}
-        <a href="/auth/login" className="text-red-400 font-medium hover:underline">
+        <a href="/auth/login/participant" className="text-red-400 font-medium hover:underline">
           Login
         </a>
       </p>

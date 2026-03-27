@@ -2,19 +2,19 @@ import React from "react";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom"; // Using react-router-dom for navigation
 
-interface AccountTypeModalProps {
+interface LoginTypeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectResearcher: () => void;
   onSelectContributor: () => void;
 }
 
-export default function AccountTypeModal({
+export default function LoginTypeModal({
   isOpen,
   onClose,
   onSelectResearcher,
   onSelectContributor,
-}: AccountTypeModalProps) {
+}: LoginTypeModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -105,22 +105,22 @@ export default function AccountTypeModal({
           {/* Buttons */}
           <div className="space-y-3">
             <div>
-              <Link to="/auth/sign-up/participant">
+              <Link to="/auth/login/participant">
                 <button
                   onClick={onSelectResearcher}
                   className="w-full py-4 px-6 bg-gray-900 text-white rounded-2xl font-semibold text-base hover:bg-gray-800 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl cursor-pointer"
                 >
-                  Sign Up as a Participant
+                  Login as a Participant
                 </button>
               </Link>
             </div>
             <div>
-              <Link to="/auth/sign-up/researcher">
+              <Link to="/auth/login/researcher">
                 <button
                   onClick={onSelectContributor}
                   className="w-full py-4 px-6 bg-white text-gray-900 rounded-2xl font-semibold text-base border-2 border-gray-900 hover:bg-gray-50 transition-all transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
-                  Sign Up as a Researcher
+                  Login as a Researcher
                 </button>
               </Link>
             </div>

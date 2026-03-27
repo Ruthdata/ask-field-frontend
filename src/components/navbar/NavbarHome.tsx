@@ -4,19 +4,50 @@ import { Menu, X } from "lucide-react";
 import { storage } from "@/utils/storage";
 import { STORAGE_KEYS } from "@/config/constants";
 import { isAuthenticated } from "@/utils/auth";
+import AccountTypeModal from "@components/Home/Modal/AccountTypeModal";
+import LoginTypeModal from "@components/Home/Modal/LoginTypeModal";
 
 const NavbarHome = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAction, setSelectedAction] = useState<
+    "researcher" | "contributor" | null
+  >(null);
+
+  const handleStartCollecting = () => {
+    setSelectedAction("researcher");
+    setIsModalOpen(true);
+  };
+
+  const handleContribute = () => {
+    setSelectedAction("contributor");
+    setIsModalOpen(true);
+  };
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
   const handleLogout = () => {
     storage.remove(STORAGE_KEYS.TOKEN);
     storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
-    setOpen(false)
+    setOpen(false);
     navigate("/");
   };
 
+  const handleSelectResearcher = () => {
+    setIsModalOpen(false);
+    navigate("/auth/sign-up/participant");
+  };
+
+  const handleSelectContributor = () => {
+    setIsModalOpen(false);
+    navigate("/auth/sign-up/contributor");
+  };
+
   return (
+    <>
     <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-gray-50 py-3 px-4 sm:px-6 z-50 shadow-sm rounded-full w-[95%] max-w-5xl">
       <div className="flex items-center justify-between">
         {/* Logo */}
@@ -37,13 +68,17 @@ const NavbarHome = () => {
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-3">
           <Link to="/">
-          {/* <Link to="/auth/sign-up/researcher"> */}
-            <button className="px-5 py-2 cursor-pointer text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition">
+            {/* <Link to="/auth/sign-up/researcher"> */}
+            <button
+              className="px-5 py-2 cursor-pointer text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition"
+            >
               Start collecting data
             </button>
           </Link>
           <Link to="/auth/sign-up/participant">
-            <button className="px-5 cursor-pointer py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition">
+            <button
+              className="px-5 cursor-pointer py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition"
+            >
               Contribute and get paid
             </button>
           </Link>
@@ -56,11 +91,9 @@ const NavbarHome = () => {
               Logout
             </button>
           ) : (
-            <Link to="/auth/login">
-              <button className="px-5 cursor-pointer py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
+              <button onClick={handleOpenModal} className="px-5 cursor-pointer py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
                 Login
               </button>
-            </Link>
           )}
         </div>
 
@@ -81,7 +114,7 @@ const NavbarHome = () => {
       >
         <div className="flex flex-col gap-3 bg-white rounded-2xl p-4 shadow-md">
           <Link to="/" onClick={() => setOpen(false)}>
-          {/* <Link to="/auth/sign-up/researcher" onClick={() => setOpen(false)}> */}
+            {/* <Link to="/auth/sign-up/researcher" onClick={() => setOpen(false)}> */}
             <button className="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition">
               Start collecting data
             </button>
@@ -93,20 +126,27 @@ const NavbarHome = () => {
             </button>
           </Link>
           {isAuthenticated() ? (
-            <button onClick={handleLogout} className="cursor-pointer w-full px-4 py-2 rounded-full bg-red-600 text-white hover:bg-red-500 transition"
+            <button
+              onClick={handleLogout}
+              className="cursor-pointer w-full px-4 py-2 rounded-full bg-red-600 text-white hover:bg-red-500 transition"
             >
               Logout
             </button>
           ) : (
-            <Link to="/auth/login">
-              <button className="px-5 w-full cursor-pointer py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
+              <button onClick={handleOpenModal} className="px-5 w-full cursor-pointer py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition">
                 Login
               </button>
-            </Link>
           )}
         </div>
       </div>
     </nav>
+      <LoginTypeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectResearcher={handleSelectResearcher}
+        onSelectContributor={handleSelectContributor}
+      />
+    </>
   );
 };
 

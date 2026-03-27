@@ -1,4 +1,4 @@
-import { useSendOtpMutation } from "@/redux/api/slices/authSlice";
+import { useSendOtpMutation } from "@/redux/api/slices/userSlice";
 import { formatApiError } from "@utils/helper";
 import React, { useState } from "react";
 import toast from "react-hot-toast";

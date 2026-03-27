@@ -6,7 +6,8 @@ import { useSearchParams } from "react-router-dom";
 export default function Waitlist() {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
-  const {getFirstName} = useCurrentUser()
+  const {getParticipantFirstName} = useCurrentUser()
+
 
   return (
     <div className="flex justify-center items-start min-h-screen bg-gray-50">
@@ -25,7 +26,7 @@ export default function Waitlist() {
 
         {/* Description */}
         <p className="text-sm text-gray-500 leading-relaxed mb-2">
-          Thanks for signing up, <span className="font-bold text-black">{getFirstName()}</span>
+          Thanks for signing up, <span className="font-bold text-black">{getParticipantFirstName()}</span>
           <span className="font-semibold text-gray-800">{email}!</span>
           <br />
           We&apos;ll notify you as soon as your spot is available.

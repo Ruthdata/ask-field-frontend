@@ -12,7 +12,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import StatCard from "./StatCard";
 
 const DashboardSection = () => {
-  const { getFirstName } = useCurrentUser();
+  const { getParticipantFirstName } = useCurrentUser();
   const [selectedPeriod, setSelectedPeriod] = useState("Last 3 days");
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -32,7 +32,7 @@ const DashboardSection = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="mb-4 sm:mb-0">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome, {getFirstName()}!
+              Welcome, {getParticipantFirstName()}!
             </h1>
 
             <div className="flex items-center gap-2">

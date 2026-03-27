@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "@/config/constants";
-import { useLoginUserMutation } from "@/redux/api/slices/authSlice";
+import { useLoginResearcherMutation } from "@/redux/api/slices/userSlice";
 import GoogleAuth from "@components/Google/GoogleAuth";
 import { EyeIcon } from "@components/icons";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
@@ -14,13 +14,13 @@ const inputClass =
   "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";
 const labelClass = "block text-xs font-semibold text-gray-600 mb-1.5";
 
-export default function LoginForm() {
+export default function LoginFormResearcher() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({ email: "", password: "" });
-  const [loginUser, {}] = useLoginUserMutation()
+  const [loginUser, {}] = useLoginResearcherMutation()
   const navigate = useNavigate()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -40,11 +40,11 @@ export default function LoginForm() {
       if(res.success){
         const message = res.message
         toast.success(message || '')
-        const token = res.data.accessToken;
-        const refreshToken = res.data.accessToken;
-        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+        const accessToken = res.data.accessToken;
+        const refreshToken = res.data.refreshToken;
+        localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
         localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-        navigate('/waitlist')
+        navigate('/researcher-pending')
       }
       // Example of a successful login:
       // handleAuthSuccess(data, () => window.location.assign("/dashboard"));

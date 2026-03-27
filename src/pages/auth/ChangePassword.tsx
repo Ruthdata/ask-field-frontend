@@ -1,4 +1,4 @@
-import { useResetPasswordMutation } from "@/redux/api/slices/authSlice";
+import { useResetPasswordMutation } from "@/redux/api/slices/userSlice";
 import { EyeIcon } from "@components/icons";
 import CompleteProfileSuccess from "@components/Success/CompleteProfileSuccess";
 import PasswordChangeSuccess from "@components/Success/PasswordChangeSuccess";
@@ -142,7 +142,7 @@ const ChangePassword = () => {
         </div>
       </div>
       <PasswordChangeSuccess
-        to="/auth/login"
+        to="/auth/login/participant"
         open={isComplete}
       />
     </div>

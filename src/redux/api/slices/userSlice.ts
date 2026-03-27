@@ -27,10 +27,20 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    loginUser: builder.mutation<ApiSuccess<{accessToken: string, user: string, refreshToken: string}>, Partial<Participant>>({
+    loginParticipant: builder.mutation<ApiSuccess<{accessToken: string, user: string, refreshToken: string}>, Partial<Participant>>({
       query: (body) => {
         return {
           url: "/participants/auth/login",
+          method: "POST",
+          body,
+        };
+      },
+      invalidatesTags: ["Users"],
+    }),
+    loginResearcher: builder.mutation<ApiSuccess<{accessToken: string, user: string, refreshToken: string}>, Partial<Participant>>({
+      query: (body) => {
+        return {
+          url: "/researchers/auth/login",
           method: "POST",
           body,
         };
@@ -80,8 +90,13 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    getUser: builder.query<ApiSuccess<Participant>, void>({
+    getParticipant: builder.query<ApiSuccess<Participant>, void>({
       query: () => "/participants/me",
+      // providesTags: "users"
+      providesTags: ["Users"],
+    }),
+    getResearcher: builder.query<ApiSuccess<Researcher>, void>({
+      query: () => "/researchers/me",
       // providesTags: "users"
       providesTags: ["Users"],
     }),
@@ -134,8 +149,10 @@ export const authApi = apiSlice.injectEndpoints({
 
 export const {
   useRegisterParticipantMutation,
-  useLoginUserMutation,
-  useLazyGetUserQuery,
+  useLoginParticipantMutation,
+  useLoginResearcherMutation,
+  useLazyGetParticipantQuery,
+  useLazyGetResearcherQuery,
   useVerifyEmailMutation,
   useGoogleAuthVerifyMutation,
   useLazyGetRefreshTokenQuery,

@@ -4,7 +4,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { getFormattedAnswers } from "@/utils/formatDate";
-import { useCompleteProfileMutation } from "@/redux/api/slices/authSlice";
+import { useCompleteProfileMutation } from "@/redux/api/slices/userSlice";
 import { formatApiError } from "@utils/helper";
 
 const CompleteProfile = () => {
@@ -14,11 +14,11 @@ const CompleteProfile = () => {
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isCompleteProfile, setIsCompleteProfile] = useState(false);
-  const { getFirstName, refetchUser } = useCurrentUser();
+  const { getParticipantFirstName, refetchUser } = useCurrentUser();
 
   const totalSteps = PARTICIPANT_QUESTIONS.length;
   const currentStepData = PARTICIPANT_QUESTIONS[step - 1];
-  const username = getFirstName();
+  const username = getParticipantFirstName();
 
   // NEXT STEP
   const handleNextStep = async() => {

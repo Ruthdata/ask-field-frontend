@@ -1,7 +1,7 @@
 import { Routes, Route, Outlet } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Homepage from "./pages/landing/Homepage";
-import Login from "./pages/auth/Login";
+import Login from "./pages/auth/LoginParticipant";
 import SignUpAsResearcher from "./pages/auth/SignUpAsResearcher";
 import SignUpAsParticipant from "./pages/auth/SignUpAsParticipant";
 import SignupCountry from "./pages/auth/SignupCountry";
@@ -29,6 +29,9 @@ import ChangePassword from "./pages/auth/ChangePassword";
 import OrganizationName from "./pages/auth/OrganizationName";
 import JobTitle from "./pages/auth/JobTitle";
 import VerifyResearcherEmail from "./pages/auth/VerifyResearcherEmail";
+import LoginParticipant from "./pages/auth/LoginParticipant";
+import LoginResearcher from "./pages/auth/LoginResearcher";
+import ResearcherPending from "./pages/landing/ResearcherPending";
 
 export default function App() {
   return (
@@ -38,11 +41,13 @@ export default function App() {
         <Route path="/" element={<HomeLayout />}>
           <Route index element={<Homepage />} />
           <Route path="waitlist" element={<Waitlist />} />
+          <Route path="researcher-pending" element={<ResearcherPending />} />
         </Route>
         {/* AuthRoutes */}
         <Route element={<PublicRoute />}>
           <Route path="/auth" element={<AuthLayout />}>
-            <Route path="login" element={<Login />} />
+            <Route path="login/participant" element={<LoginParticipant />} />
+            <Route path="login/researcher" element={<LoginResearcher />} />
             <Route path="email-sent" element={<EmailSent />} />
             <Route path="verify-email" element={<VerifyEmail />} />
             <Route path="researcher/verify-email" element={<VerifyResearcherEmail />} />
