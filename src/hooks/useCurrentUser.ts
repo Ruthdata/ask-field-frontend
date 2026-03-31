@@ -5,6 +5,7 @@ import {
 } from "@/redux/api/slices/userSlice";
 import { JwtApiError } from "@/types/api.type";
 import { Participant, Researcher } from "@/types/user.type";
+import { formatApiError } from "@utils/helper";
 import { useState, useEffect } from "react";
 
 export const useCurrentUser = () => {
@@ -14,20 +15,24 @@ export const useCurrentUser = () => {
   const [error, setError] = useState<string | null>(null);
   const [getParticipant] = useLazyGetParticipantQuery();
   const [getResearcher] = useLazyGetResearcherQuery();
+  const [currentUserType, setCurrentUserType] = useState('')
 
   useEffect(() => {
     const fetchParticipant = async () => {
       try {
         const response = await getParticipant().unwrap();
         if (response.success) {
+          if(response.data.userType){
+            setCurrentUserType(response.data.userType)
+          }
           setParticipant(response.data);
         }
         setLoading(false);
       } catch (err: any) {
         setLoading(false);
-        const error = err as JwtApiError;
+        const msg = formatApiError(err)
 
-        const errorMessage = error.data.message.name || "Failed to fetch user";
+        const errorMessage = msg || "Failed to fetch user";
         setError(errorMessage);
       }
     };
@@ -40,14 +45,17 @@ export const useCurrentUser = () => {
       try {
         const response = await getResearcher().unwrap();
         if (response.success) {
+          if(response.data.userType){
+            setCurrentUserType(response.data.userType)
+          }
           setResearcher(response.data);
         }
         setLoading(false);
       } catch (err: any) {
         setLoading(false);
-        const error = err as JwtApiError;
+        const msg = formatApiError(err)
 
-        const errorMessage = error.data.message.name || "Failed to fetch user";
+        const errorMessage = msg || "Failed to fetch user";
         setError(errorMessage);
       }
     };
@@ -91,10 +99,10 @@ export const useCurrentUser = () => {
   };
 
   const getParticipantFirstName = () => {
-    if (!researcher?.firstName) return "";
+    if (!participant?.firstName) return "";
     return (
-      researcher.firstName.charAt(0).toUpperCase() +
-      researcher.firstName.slice(1)
+      participant.firstName.charAt(0).toUpperCase() +
+      participant.firstName.slice(1)
     );
   };
   const getResearcherFirstName = () => {
@@ -107,6 +115,7 @@ export const useCurrentUser = () => {
 
   return {
     participant,
+    researcher,
     loading,
     error,
     getParticipantInitials,
@@ -116,5 +125,6 @@ export const useCurrentUser = () => {
     getResearcherFirstName,
     getParticipantFullName,
     refetchUser,
+    currentUserType
   };
 };

@@ -15,10 +15,11 @@ import Waitlist from "./pages/landing/Waitlist";
 import PublicRoute from "./routes/PublicRoute";
 import AuthLayout from "./layouts/AuthLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import DashboardLayout from "./layouts/DashboardLayout";
+import ParticipantDashboardLayout from "./layouts/ParticipantDashboardLayout";
 import ParticipantDashboardHome from "./pages/dashboard/participants/ParticipantDashboardHome";
 import NotFound from "./pages/error/NotFound";
-import CompleteProfile from "./pages/dashboard/participants/CompleteProfile";
+import CompleteParticipantProfile from "./pages/dashboard/participants/CompleteProfile";
+import CompleteResearcherProfile from "./pages/dashboard/researchers/CompleteProfile";
 import Surveys from "./pages/dashboard/participants/Surveys";
 import Earnings from "./pages/dashboard/participants/Earnings";
 import Support from "./pages/dashboard/participants/Support";
@@ -32,6 +33,9 @@ import VerifyResearcherEmail from "./pages/auth/VerifyResearcherEmail";
 import LoginParticipant from "./pages/auth/LoginParticipant";
 import LoginResearcher from "./pages/auth/LoginResearcher";
 import ResearcherPending from "./pages/landing/ResearcherPending";
+import ResearcherDashboardLayout from "./layouts/ResearcherDashboardLayout";
+import ResearcherDashboardHome from "./pages/dashboard/researchers/ResearcherDashboardHome";
+import Projects from "./pages/dashboard/researchers/Projects";
 
 export default function App() {
   return (
@@ -50,7 +54,10 @@ export default function App() {
             <Route path="login/researcher" element={<LoginResearcher />} />
             <Route path="email-sent" element={<EmailSent />} />
             <Route path="verify-email" element={<VerifyEmail />} />
-            <Route path="researcher/verify-email" element={<VerifyResearcherEmail />} />
+            <Route
+              path="researcher/verify-email"
+              element={<VerifyResearcherEmail />}
+            />
             <Route path="recover-password" element={<RecoverPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
             <Route path="change-password" element={<ChangePassword />} />
@@ -75,23 +82,25 @@ export default function App() {
               path="sign-up/researcher/register-name"
               element={<RegisterName />}
             />
-            <Route
-              path="sign-up/researcher/job-title"
-              element={<JobTitle />}
-            />
+            <Route path="sign-up/researcher/job-title" element={<JobTitle />} />
             <Route path="sign-up/researcher/password" element={<Password />} />
           </Route>
         </Route>
         {/* Dashboard Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard/participant" element={<DashboardLayout />}>
+          <Route path="/dashboard/participant" element={<ParticipantDashboardLayout />}>
             <Route index element={<ParticipantDashboardHome />} />
-            <Route path="complete-profile" element={<CompleteProfile />} />
+            <Route path="complete-profile" element={<CompleteParticipantProfile />} />
             <Route path="surveys" element={<Surveys />} />
             <Route path="earnings" element={<Earnings />} />
             <Route path="support" element={<Support />} />
             <Route path="messages" element={<Messages />} />
           </Route>
+        </Route>
+        <Route path="/dashboard/researcher" element={<ResearcherDashboardLayout />}>
+          <Route index element={<ResearcherDashboardHome />} />
+          <Route path="complete-profile" element={<CompleteResearcherProfile />} />
+          <Route path="projects" element={<Projects />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

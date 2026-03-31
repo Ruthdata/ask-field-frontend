@@ -1,4 +1,5 @@
 import { Eye, EyeOff, TrendingUp } from "lucide-react";
+import { JSX } from "react";
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -10,6 +11,7 @@ interface StatCardProps {
   isVisible?: boolean;
   isDisplayBalance?: boolean;
   onToggleVisibility?: () => void;
+  children?: JSX.Element | JSX.Element[];
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -22,6 +24,7 @@ const StatCard: React.FC<StatCardProps> = ({
   isVisible = true,
   isDisplayBalance = false,
   onToggleVisibility,
+  children
 }) => {
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
@@ -66,6 +69,7 @@ const StatCard: React.FC<StatCardProps> = ({
           </div>
         </div>
       </div>
+      {children}
     </div>
   );
 };

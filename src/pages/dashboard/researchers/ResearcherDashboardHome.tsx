@@ -1,11 +1,13 @@
-import DashboardSection from "@components/Dashboard/participant/DashboardSection";
+import DashboardSection from "@components/Dashboard/researcher/DashboardSection";
 import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 // skipCompleteProfileRedirect
 
-const ParticipantDashboardHome = () => {
+const ResearcherDashboardHome = () => {
+
   const [searchParams] = useSearchParams();
+
   useEffect(() => {
     const skipRedirect =
       searchParams.get("skipCompleteProfileRedirect") === "true";
@@ -27,4 +29,4 @@ const ParticipantDashboardHome = () => {
   );
 };
 
-export default ParticipantDashboardHome;
+export default ResearcherDashboardHome;

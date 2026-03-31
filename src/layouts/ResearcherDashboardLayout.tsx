@@ -3,36 +3,49 @@ import {
   Menu,
   X,
   Home,
-  FileText,
   DollarSign,
   HelpCircle,
+  Folder,
   MessageSquare,
+  WalletMinimal,
+  Users,
+  CircleQuestionMark,
+  MessageCircleMore,
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useCurrentUser } from "@hooks/useCurrentUser";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard/participant", icon: Home },
-  { name: "Surveys", href: "/dashboard/participant/surveys", icon: FileText },
+  { name: "Dashboard", href: "/dashboard/researcher", icon: Home },
   {
-    name: "Earnings",
-    href: "/dashboard/participant/earnings",
-    icon: DollarSign,
+    name: "My Projects",
+    href: "/dashboard/researcher/projects",
+    icon: Folder,
+  },
+  {
+    name: "Wallet",
+    href: "/dashboard/researcher/wallet",
+    icon: WalletMinimal,
+  },
+  {
+    name: "Workspace Team",
+    href: "/dashboard/researcher/workspace-team",
+    icon: Users,
   },
   {
     name: "Help & Support",
-    href: "/dashboard/participant/support",
-    icon: HelpCircle,
+    href: "/dashboard/researcher/support",
+    icon: CircleQuestionMark,
   },
   {
     name: "Messages",
-    href: "/dashboard/participant/messages",
-    icon: MessageSquare,
+    href: "/dashboard/researcher/messages",
+    icon: MessageCircleMore,
   },
 ];
 
-export default function DashboardLayout() {
+export default function ResearcherDashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [searchParams] = useSearchParams();
@@ -42,37 +55,37 @@ export default function DashboardLayout() {
 
   const isCompleteProfilePage = pathname.includes("/complete-profile");
 
-  const { loading, getParticipantInitials, getParticipantFirstName, participant, getParticipantFullName } = useCurrentUser();
+  const { loading, getResearcherInitials, getResearcherFullName, researcher } =
+    useCurrentUser();
 
   useEffect(() => {
     // Only run if not loading and user exists
-    if (!loading && participant) {
-      const isComplete = participant.isCompleteProfile;
+    if (!loading && researcher) {
+      const isComplete = researcher.isCompleteProfile;
 
       // Get query params
       const skipRedirect =
         searchParams.get("skipCompleteProfileRedirect") === "true";
 
       // If profile is complete and user is trying to access complete-profile page, redirect to dashboard
-      if (
-        isComplete &&
-        pathname === "/dashboard/participant/complete-profile"
-      ) {
-        navigate("/dashboard/participant");
+      if (isComplete && pathname === "/dashboard/researcher/complete-profile") {
+        navigate("/dashboard/researcher");
         return;
       }
 
       // If profile is incomplete and user is trying to access any other dashboard route (except complete-profile)
       const isDashboardRoute =
-        pathname.startsWith("/dashboard/participant") &&
-        pathname !== "/dashboard/participant/complete-profile";
+        pathname.startsWith("/dashboard/researcher") &&
+        pathname !== "/dashboard/researcher/complete-profile";
 
       if (!isComplete && isDashboardRoute && !skipRedirect) {
-        navigate("/dashboard/participant/complete-profile");
+        navigate("/dashboard/researcher/complete-profile");
         return;
       }
+    } else {
+      // navigate("/auth/login/researcher")
     }
-  }, [participant, loading, pathname, navigate]);
+  }, [researcher, loading, pathname, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -188,13 +201,13 @@ export default function DashboardLayout() {
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
               <div className="w-5 h-5 bg-gray-300 rounded" />
               <span className="text-sm font-medium text-gray-900">
-                {loading ? "Loading..." : getParticipantFullName()}
+                {loading ? "Loading..." : getResearcherFullName()}
               </span>
             </div>
 
             {/* Avatar */}
             <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">
-              {loading ? "..." : getParticipantInitials()}
+              {loading ? "..." : getResearcherInitials()}
             </div>
           </div>
         </header>
