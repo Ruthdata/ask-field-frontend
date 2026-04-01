@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useVerifyEmailMutation, useVerifyResearcherEmailMutation } from "@/redux/api/slices/userSlice";
 import { useRef } from "react";
-import VerifyAccountSuccess from "@components/Success/VerifyAccountSuccess";
+import VerifyAccountSuccess from "@components/Modal/Success/VerifyAccountSuccess";
 
 
 const VerifyResearcherEmail = () => {

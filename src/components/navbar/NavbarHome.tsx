@@ -4,8 +4,8 @@ import { Menu, X } from "lucide-react";
 import { storage } from "@/utils/storage";
 import { STORAGE_KEYS } from "@/config/constants";
 import { isAuthenticated } from "@/utils/auth";
-import AccountTypeModal from "@components/Home/Modal/AccountTypeModal";
-import LoginTypeModal from "@components/Home/Modal/LoginTypeModal";
+import AccountTypeModal from "@components/Modal/Home/Modal/AccountTypeModal";
+import LoginTypeModal from "@components/Modal/Home/Modal/LoginTypeModal";
 
 const NavbarHome = () => {
   const navigate = useNavigate();

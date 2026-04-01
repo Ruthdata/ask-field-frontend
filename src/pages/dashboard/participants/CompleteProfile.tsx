@@ -1,5 +1,5 @@
 import { PARTICIPANT_QUESTIONS } from "@/config/constants";
-import CompleteProfileSuccess from "@components/Success/CompleteProfileSuccess";
+import CompleteProfileSuccess from "@components/Modal/Success/CompleteProfileSuccess";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import React, { useState } from "react";
 import toast from "react-hot-toast";

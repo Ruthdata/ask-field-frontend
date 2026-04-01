@@ -1,5 +1,5 @@
 
-import Header from "@components/Home/Header";
+import Header from "@components/Modal/Home/Header";
 import AskFieldFeatures from "@components/Features/AskFieldFeatures";
 import FaqSection from "@components/Faq/FaqSection";
 

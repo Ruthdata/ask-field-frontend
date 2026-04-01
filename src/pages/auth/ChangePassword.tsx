@@ -1,7 +1,7 @@
 import { useResetPasswordMutation } from "@/redux/api/slices/userSlice";
 import { EyeIcon } from "@components/icons";
-import CompleteProfileSuccess from "@components/Success/CompleteProfileSuccess";
-import PasswordChangeSuccess from "@components/Success/PasswordChangeSuccess";
+import CompleteProfileSuccess from "@components/Modal/Success/CompleteProfileSuccess";
+import PasswordChangeSuccess from "@components/Modal/Success/PasswordChangeSuccess";
 import { formatApiError } from "@utils/helper";
 import React, { useState } from "react";
 import toast from "react-hot-toast";

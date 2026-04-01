@@ -36,6 +36,8 @@ import ResearcherPending from "./pages/landing/ResearcherPending";
 import ResearcherDashboardLayout from "./layouts/ResearcherDashboardLayout";
 import ResearcherDashboardHome from "./pages/dashboard/researchers/ResearcherDashboardHome";
 import Projects from "./pages/dashboard/researchers/Projects";
+import Project from "./pages/dashboard/researchers/Project";
+import CreateSurvey from "./pages/dashboard/researchers/CreateSurvey";
 
 export default function App() {
   return (
@@ -101,6 +103,8 @@ export default function App() {
           <Route index element={<ResearcherDashboardHome />} />
           <Route path="complete-profile" element={<CompleteResearcherProfile />} />
           <Route path="projects" element={<Projects />} />
+          <Route path="projects/:id" element={<Project />} />
+          <Route path="projects/:id/create-survey" element={<CreateSurvey />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

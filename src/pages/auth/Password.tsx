@@ -1,7 +1,7 @@
 import { useRegisterResearcherMutation } from "@/redux/api/slices/userSlice";
 import FormLayout from "@components/Auth/Contributor/Participant/FormLayout";
 import { EyeIcon } from "@components/icons";
-import WelcomeResearcher from "@components/Success/WelcomeResearcher";
+import WelcomeResearcher from "@components/Modal/Success/WelcomeResearcher";
 import { useFormContext } from "@context/FormContext";
 import { formatApiError } from "@utils/helper";
 import React, { useEffect, useState } from "react";

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Wallet, Zap, HelpCircle, MoreVertical } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import StatCard from "../StatCard";
+import SurveyHeader from "./survey/SurveyHeader";
+import SurveyBody from "./survey/SurveyBody";
 
 const DashboardSection = () => {
   const { getResearcherFirstName } = useCurrentUser();
@@ -194,49 +196,37 @@ const DashboardSection = () => {
         <div className="flex flex-col px-4 py-5 shadow-lg bg-white rounded-2xl mt-3">
           <div className="">
             <h3 className="">Your Surveys</h3>
-            <p className="text-sm mt-3 text-gray-500">Track the progress, response quality, and cost efficiency of each survey.</p>
+            <p className="text-sm mt-3 text-gray-500">
+              Track the progress, response quality, and cost efficiency of each
+              survey.
+            </p>
           </div>
           {/* List Survey */}
           <div className="mt-8">
-            {/* Survey Header */}
-            <div className="flex justify-between border border-gray-100 py-1 px-1 gap-1 rounded-tl-2xl rounded-tr-2xl">
-                <span className="bg-gray-200 text-gray-500 text-sm py-2 px-3 rounded-tl-xl rounded-tr-xl rounded-br-xl flex-2">Survey</span>
-                <span className="bg-gray-200 text-gray-500 text-sm py-2 px-3 rounded-xl flex-1">Status</span>
-                <span className="bg-gray-200 text-gray-500 text-sm py-2 px-3 rounded-xl flex-1">Responses</span>
-                <span className="bg-gray-200 text-gray-500 text-sm py-2 px-3 rounded-xl flex-1">Completion</span>
-                <span className="bg-gray-200 text-gray-500 text-sm py-2 px-3 rounded-tl-xl rounded-bl-xl rounded-tr-xl flex-[1.8]">Total Spend</span>
-            </div>
-            {/* Survey Body */}
-            <div className="flex justify-between border border-gray-100 py-1 px-1 gap-1  text-graye-500 hover:bg-gray-100 bg-graye-200 font-light rounded-xl mt-2">
-                <span className="text-sm py-2 px-3 rounded-tl-xl rounded-bl-xl flex-2 border-r border-gray-300">Mobile Banking UX Study </span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300"><div className="text-green-400 font-bold bg-green-100 w-fit py-1 px-5 rounded-2xl flex items-center gap-2"><div className="h-2 w-2 bg-green-500 rounded-full"></div> Live</div></span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300">78 / 100</span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300">92%</span>
-                <span className="text-sm py-2 px-3 rounded-tr-xl rounded-br-xl flex-[1.8] flex items-center justify-between"><span className="text-[11px]">NGN 35,100</span> <MoreVertical size={17} cursor='pointer' /></span>
-            </div>
-            <div className="flex justify-between border border-gray-100 py-1 px-1 gap-1  text-graye-500 hover:bg-gray-100 bg-gray-100 font-light rounded-xl mt-2">
-                <span className="text-sm py-2 px-3 rounded-tl-xl rounded-bl-xl flex-2 border-r border-gray-300">Mobile Banking UX Study </span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300"><div className="text-orange-500 font-bold bg-orange-100 w-fit py-1 px-5 rounded-2xl flex items-center gap-2"><div className="h-2 w-2 bg-orange-500 rounded-full"></div> Draft</div></span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300">78 / 100</span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300">92%</span>
-                <span className="text-sm py-2 px-3 rounded-tr-xl rounded-br-xl flex-[1.8] flex items-center justify-between"><span className="text-[11px]">NGN 35,100</span> <MoreVertical size={17} cursor='pointer' /></span>
-            </div>
-            <div className="flex justify-between border border-gray-100 py-1 px-1 gap-1  text-graye-500 hover:bg-gray-100 bg-gray-100 font-light rounded-xl mt-2">
-                <span className="text-sm py-2 px-3 rounded-tl-xl rounded-bl-xl flex-2 border-r border-gray-300">Mobile Banking UX Study </span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300"><div className="text-red-500 font-bold bg-red-100 w-fit py-1 px-5 rounded-2xl flex items-center gap-2"><div className="h-2 w-2 bg-red-500 rounded-full"></div> Closed</div></span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300">78 / 100</span>
-                <span className="text-sm py-2 px-3 flex-1 border-r border-gray-300">92%</span>
-                <span className="text-sm py-2 px-3 rounded-tr-xl rounded-br-xl flex-[1.8] flex items-center justify-between"><span className="text-[11px]">NGN 35,100</span> <MoreVertical size={17} cursor='pointer' /></span>
+            <div className="overflow-x-auto">
+              <div className="min-w-175">
+                {/* Header */}
+                <SurveyHeader />
+
+                {/* Row */}
+                {[1, 2, 3].map((_, i) => (
+                  <SurveyBody i={i} />
+                ))}
+              </div>
             </div>
           </div>
           {/* No Survey */}
           <div className="flex flex-col py-15 gap-4 items-center">
-            <img src="/images/no-survey.png" className="h-30 w-50" alt="no-survey" />
+            <img
+              src="/images/no-survey.png"
+              className="h-30 w-50"
+              alt="no-survey"
+            />
             <p>No surveys found :)</p>
             <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
-                <img src="/images/create-survey.svg" alt="create-survey" />
-                <span className="text-white text-[12px]">Create Survey</span>
-              </button>
+              <img src="/images/create-survey.svg" alt="create-survey" />
+              <span className="text-white text-[12px]">Create Survey</span>
+            </button>
           </div>
         </div>
       </div>
