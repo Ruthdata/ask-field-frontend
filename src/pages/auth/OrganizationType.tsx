@@ -1,30 +1,41 @@
 import { SUBJECT_AREAS } from "@/lib/countries";
 import FormLayout from "@components/Auth/Contributor/Participant/FormLayout";
 import { useFormContext } from "@context/FormContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 
 export default function OrganizationType() {
   const { formData, updateFormData, formStep, setFormStep } = useFormContext();
   const [organizationType, setOrganizationType] = useState(
-    formData.organizationType || ""
+    formData.organizationType || "",
   );
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(formData.organizationType || "");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const navigate = useNavigate();
 
-   useEffect(() => {
-      if (formStep < 5) {
-        navigate("/auth/sign-up/researcher");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (formStep < 5) navigate("/auth/sign-up/researcher");
+  }, [formStep, navigate]); // FIXED: navigate added to deps
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsDropdownOpen(false);
       }
-    }, [formStep]);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const filteredSubjects = SUBJECT_AREAS.filter(
     (subject) =>
       subject.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      subject.category.toLowerCase().includes(searchTerm.toLowerCase())
+      subject.category.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleSelect = (value: string, label: string) => {
@@ -33,16 +44,17 @@ export default function OrganizationType() {
     setIsDropdownOpen(false);
   };
 
-  const handleSubmit = () => {
-    if (organizationType) {
-      setFormStep(6)
-      updateFormData({ organizationType });
-      navigate("/auth/sign-up/researcher/register-name");
-    }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setIsDropdownOpen(true);
+    if (!e.target.value) setOrganizationType("");
   };
 
-  const handleBack = () => {
-    navigate(-1);
+  const handleSubmit = () => {
+    if (!organizationType) return;
+    updateFormData({ organizationType });
+    setFormStep(6);
+    navigate("/auth/sign-up/researcher/register-name");
   };
 
   return (
@@ -52,18 +64,14 @@ export default function OrganizationType() {
           Great! What kind of organization is it?
         </h1>
 
-        <div className="mb-6 relative">
+        <div className="mb-6 relative" ref={dropdownRef}>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Organization type/Industry
           </label>
-
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setIsDropdownOpen(true);
-            }}
+            onChange={handleSearchChange}
             onFocus={() => setIsDropdownOpen(true)}
             placeholder="Search organization type..."
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
@@ -91,12 +99,11 @@ export default function OrganizationType() {
 
         <div className="flex justify-between gap-4">
           <button
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             className="w-full bg-gray-800 text-white py-3 rounded-4xl font-medium hover:bg-gray-900 transition cursor-pointer"
           >
             Back
           </button>
-
           <button
             onClick={handleSubmit}
             disabled={!organizationType}
