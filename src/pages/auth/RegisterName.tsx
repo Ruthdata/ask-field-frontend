@@ -5,28 +5,19 @@ import { useNavigate } from "react-router-dom";
 
 export default function RegisterName() {
   const { formData, updateFormData, setFormStep, formStep } = useFormContext();
-
   const [firstName, setFirstName] = useState(formData.firstName || "");
   const [lastName, setLastName] = useState(formData.lastName || "");
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (formStep < 6) {
-      navigate("/auth/sign-up/researcher");
-    }
-  }, [formStep]);
+    if (formStep < 6) navigate("/auth/sign-up/researcher");
+  }, [formStep, navigate]); // FIXED: navigate added to deps
 
   const handleSubmit = () => {
-    if (firstName && lastName) {
-      setFormStep(7);
-      updateFormData({ firstName, lastName });
-      navigate("/auth/sign-up/researcher/password");
-    }
-  };
-
-  const handleBack = () => {
-    navigate(-1);
+    if (!firstName || !lastName) return;
+    updateFormData({ firstName, lastName });
+    setFormStep(7);
+    navigate("/auth/sign-up/researcher/password");
   };
 
   return (
@@ -64,12 +55,11 @@ export default function RegisterName() {
 
         <div className="flex justify-between gap-4">
           <button
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             className="w-full bg-gray-800 text-white py-3 rounded-4xl font-medium hover:bg-gray-900 transition cursor-pointer"
           >
             Back
           </button>
-
           <button
             onClick={handleSubmit}
             disabled={!firstName || !lastName}

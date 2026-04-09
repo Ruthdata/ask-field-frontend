@@ -4,7 +4,7 @@ import { EyeIcon } from "@components/icons";
 import WelcomeResearcher from "@components/Modal/Success/WelcomeResearcher";
 import { useFormContext } from "@context/FormContext";
 import { formatApiError } from "@utils/helper";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -12,55 +12,46 @@ const inputClass =
   "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";
 
 export default function Password() {
-  const { formData, formStep, setFormStep } = useFormContext();
-  const [registerResearcher, {isLoading}] = useRegisterResearcherMutation();
-  const [isComplete, setIsComplete] = useState(false)
-
+  const { formData, formStep, setFormStep, resetForm } = useFormContext();
+  const [registerResearcher, { isLoading }] = useRegisterResearcherMutation();
+  const [isComplete, setIsComplete] = useState(false);
   const [password, setPassword] = useState(formData.password || "");
+  const [confirmPassword, setConfirmPassword] = useState(
+    formData.confirmPassword || "",
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState(
-    formData.confirmPassword || ""
-  );
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (formStep < 7) {
-      navigate("/auth/sign-up/researcher");
-    }
-  }, [formStep]);
+    if (formStep < 7) navigate("/auth/sign-up/researcher");
+  }, [formStep, navigate]);
+
+  const passwordsMatch = password === confirmPassword;
+  const isValid =
+    password.length >= 8 && confirmPassword.length > 0 && passwordsMatch;
 
   const handleSubmit = async () => {
+    if (!isValid) return;
+
     try {
-      if (password && confirmPassword) {
+      const res = await registerResearcher({
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        password,
+        signupPlatform: "email",
+      }).unwrap();
+
+      if (res.success) {
         setFormStep(8);
-        console.log({ password });
-        const postData = { ...formData, password };
-        // updateFormData({password });
-        console.log(postData);
-        const res = await registerResearcher(postData).unwrap();
-        if (res.success) {
-          setIsComplete(true)
-        }
-        //   navigate("/next-route"); // add your next step here if needed
+        resetForm();
+        setIsComplete(true);
       }
     } catch (error) {
       const message = formatApiError(error);
       toast.error(message);
     }
-  };
-
-  const handleBack = () => {
-    navigate(-1);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const isPasswordClear = () => {
-    return !password || !confirmPassword || password != confirmPassword;
   };
 
   return (
@@ -79,9 +70,9 @@ export default function Password() {
               className={inputClass}
               name="password"
               type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder="Min. 8 characters"
               value={password}
-              onChange={handleChange}
+              onChange={(e) => setPassword(e.target.value)}
               style={{ paddingRight: 40 }}
             />
             <button
@@ -92,6 +83,11 @@ export default function Password() {
               <EyeIcon open={showPassword} />
             </button>
           </div>
+          {password && password.length < 8 && (
+            <p className="text-red-500 text-sm mt-1">
+              Password must be at least 8 characters
+            </p>
+          )}
         </div>
 
         <div className="mb-6">
@@ -101,9 +97,9 @@ export default function Password() {
           <div className="relative">
             <input
               className={inputClass}
-              name="password"
+              name="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder="Repeat your password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               style={{ paddingRight: 40 }}
@@ -116,25 +112,28 @@ export default function Password() {
               <EyeIcon open={showConfirmPassword} />
             </button>
           </div>
+          {confirmPassword && !passwordsMatch && (
+            <p className="text-red-500 text-sm mt-1">Passwords do not match</p>
+          )}
         </div>
 
         <div className="flex justify-between gap-4">
           <button
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             className="w-full bg-gray-800 text-white py-3 rounded-4xl font-medium hover:bg-gray-900 transition cursor-pointer"
           >
             Back
           </button>
-
           <button
             onClick={handleSubmit}
-            disabled={isPasswordClear()}
-            className="w-full bg-gray-800 text-white py-3 rounded-4xl font-medium cursor-pointer hover:bg-gray-900 transition disabled:opacity-50"
+            disabled={!isValid || isLoading}
+            className="w-full bg-gray-800 text-white py-3 rounded-4xl font-medium cursor-pointer hover:bg-gray-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Loading..." : "Submit"}
           </button>
         </div>
       </div>
+
       <WelcomeResearcher open={isComplete} />
     </FormLayout>
   );
