@@ -41,6 +41,10 @@ export default function Password() {
         lastName: formData.lastName,
         password,
         signupPlatform: "email",
+        jobTitle: formData.jobTitle,
+        organizationName: formData.organizationName,
+        organizationType: formData.organizationType,
+        country: formData.country,
       }).unwrap();
 
       if (res.success) {
