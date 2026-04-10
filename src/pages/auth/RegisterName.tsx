@@ -5,28 +5,21 @@ import { useNavigate } from "react-router-dom";
 
 export default function RegisterName() {
   const { formData, updateFormData, setFormStep, formStep } = useFormContext();
-
   const [firstName, setFirstName] = useState(formData.firstName || "");
   const [lastName, setLastName] = useState(formData.lastName || "");
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (formStep < 6) {
-      navigate("/auth/sign-up/researcher");
-    }
-  }, [formStep]);
+    if (formStep < 6) navigate("/auth/sign-up/researcher");
+  }, [formStep, navigate]); // FIXED: navigate added to deps
+
+  const isValid = firstName.trim().length >= 5 && lastName.trim().length >= 5;
 
   const handleSubmit = () => {
-    if (firstName && lastName) {
-      setFormStep(7);
-      updateFormData({ firstName, lastName });
-      navigate("/auth/sign-up/researcher/password");
-    }
-  };
-
-  const handleBack = () => {
-    navigate(-1);
+    if (!isValid) return;
+    updateFormData({ firstName: firstName.trim(), lastName: lastName.trim() });
+    setFormStep(7);
+    navigate("/auth/sign-up/researcher/password");
   };
 
   return (
@@ -35,7 +28,6 @@ export default function RegisterName() {
         <h1 className="text-4xl font-bold text-gray-900 mb-8 mt-16">
           What should we call you?
         </h1>
-
         <div className="mb-6 mt-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             First Name
@@ -47,6 +39,11 @@ export default function RegisterName() {
             placeholder="Enter first name"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
           />
+          {firstName && firstName.trim().length < 5 && (
+            <p className="text-red-500 text-sm mt-1">
+              First name must be at least 5 characters
+            </p>
+          )}
         </div>
 
         <div className="mb-6">
@@ -60,19 +57,23 @@ export default function RegisterName() {
             placeholder="Enter last name"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
           />
+          {lastName && lastName.trim().length < 5 && (
+            <p className="text-red-500 text-sm mt-1">
+              Last name must be at least 5 characters
+            </p>
+          )}
         </div>
 
         <div className="flex justify-between gap-4">
           <button
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             className="w-full bg-gray-800 text-white py-3 rounded-4xl font-medium hover:bg-gray-900 transition cursor-pointer"
           >
             Back
           </button>
-
           <button
             onClick={handleSubmit}
-            disabled={!firstName || !lastName}
+            disabled={!isValid}
             className="w-full bg-gray-800 text-white py-3 rounded-4xl font-medium hover:bg-gray-900 transition disabled:opacity-50 cursor-pointer"
           >
             Next

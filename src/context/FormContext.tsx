@@ -1,62 +1,59 @@
-"use client";
-
 import { createContext, useContext, useState, ReactNode } from "react";
 
-interface FormData {
+export interface ResearcherFormData {
   email: string;
   country: string;
-  companyName: string;
   firstName: string;
   lastName: string;
   jobTitle: string;
   organizationName: string;
   organizationType: string;
-  password?: string;
-  confirmPassword?: string;
+  password: string;
+  confirmPassword: string;
 }
 
 interface FormContextType {
-  formData: FormData;
-  updateFormData: (data: Partial<FormData>) => void;
+  formData: ResearcherFormData;
+  updateFormData: (data: Partial<ResearcherFormData>) => void;
   resetForm: () => void;
-  formStep: number,
-  setFormStep: (step: number)=> void;
+  formStep: number;
+  setFormStep: (step: number) => void;
 }
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
-const initialFormData: FormData = {
+const initialFormData: ResearcherFormData = {
   email: "",
   country: "",
-  companyName: "",
   firstName: "",
   lastName: "",
   jobTitle: "",
   organizationName: "",
   organizationType: "",
-  password: undefined,
-  confirmPassword: undefined,
+  password: "",
+  confirmPassword: "",
 };
 
 export function FormProvider({ children }: { children: ReactNode }) {
-  const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [formStep, setFormStep] = useState(1)
+  const [formData, setFormData] = useState<ResearcherFormData>(initialFormData);
+  const [formStep, setFormStep] = useState(1);
 
-  const updateFormData = (data: Partial<FormData>) => {
+  const updateFormData = (data: Partial<ResearcherFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
   };
 
-  const resetForm = () => {
-    setFormData(initialFormData);
-  };
+  const resetForm = () => setFormData(initialFormData);
 
   return (
-    <FormContext.Provider value={{ formData, updateFormData, resetForm, formStep, setFormStep }}>
+    <FormContext.Provider
+      value={{ formData, updateFormData, resetForm, formStep, setFormStep }}
+    >
       {children}
     </FormContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useFormContext() {
   const context = useContext(FormContext);
   if (!context) {
