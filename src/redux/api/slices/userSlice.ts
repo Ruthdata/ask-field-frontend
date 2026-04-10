@@ -1,11 +1,18 @@
 import { apiSlice } from "./appSlice";
-import { CompleteProfile, Participant, Researcher } from "../../../types/user.type";
+import {
+  CompleteProfile,
+  Participant,
+  Researcher,
+} from "../../../types/user.type";
 import { ApiSuccess } from "@/types/api.type";
 // import { ApiSuccess } from "../../../types/api.type";
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    registerParticipant: builder.mutation<ApiSuccess<Participant>, Partial<Participant>>({
+    registerParticipant: builder.mutation<
+      ApiSuccess<Participant>,
+      Partial<Participant>
+    >({
       query: (body) => {
         return {
           url: "/participants/auth/register",
@@ -16,18 +23,32 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    registerResearcher: builder.mutation<ApiSuccess<Researcher>, Partial<Researcher>>({
-      query: (body) => {
-        return {
-          url: "/researchers/auth/register",
-          method: "POST",
-          body,
-        };
-      },
-      // providesTags: "users"
+    registerResearcher: builder.mutation<
+      ApiSuccess<Researcher>,
+      {
+        email: string;
+        password: string;
+        firstName: string;
+        lastName: string;
+        jobTitle: string;
+        organizationName: string;
+        organizationType: string;
+        country: string;
+        signupPlatform: "email" | "google";
+      }
+    >({
+      query: (body) => ({
+        url: "/researchers/auth/register",
+        method: "POST",
+        body,
+      }),
       invalidatesTags: ["Users"],
     }),
-    loginParticipant: builder.mutation<ApiSuccess<{accessToken: string, user: string, refreshToken: string}>, Partial<Participant>>({
+
+    loginParticipant: builder.mutation<
+      ApiSuccess<{ accessToken: string; user: string; refreshToken: string }>,
+      Partial<Participant>
+    >({
       query: (body) => {
         return {
           url: "/participants/auth/login",
@@ -37,7 +58,10 @@ export const authApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: ["Users"],
     }),
-    loginResearcher: builder.mutation<ApiSuccess<{accessToken: string, user: string, refreshToken: string}>, Partial<Participant>>({
+    loginResearcher: builder.mutation<
+      ApiSuccess<{ accessToken: string; user: string; refreshToken: string }>,
+      Partial<Participant>
+    >({
       query: (body) => {
         return {
           url: "/researchers/auth/login",
@@ -47,7 +71,10 @@ export const authApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: ["Users"],
     }),
-    completeProfile: builder.mutation<ApiSuccess<{profile: CompleteProfile}>, Partial<CompleteProfile>>({
+    completeProfile: builder.mutation<
+      ApiSuccess<{ profile: CompleteProfile }>,
+      Partial<CompleteProfile>
+    >({
       query: (body) => {
         return {
           url: "/participants/auth/complete-profile",
@@ -57,7 +84,10 @@ export const authApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: ["Users"],
     }),
-    verifyEmail: builder.mutation<ApiSuccess<string>,{ token: string; email: string }>({
+    verifyEmail: builder.mutation<
+      ApiSuccess<string>,
+      { token: string; email: string }
+    >({
       query: (body) => {
         return {
           url: "/participants/auth/verify-email",
@@ -68,7 +98,10 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    verifyResearcherEmail: builder.mutation<ApiSuccess<string>,{ token: string; email: string }>({
+    verifyResearcherEmail: builder.mutation<
+      ApiSuccess<string>,
+      { token: string; email: string }
+    >({
       query: (body) => {
         return {
           url: "/researchers/auth/verify-email",
@@ -79,7 +112,14 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    googleAuthVerify: builder.mutation<ApiSuccess<{accessToken: string, user: Participant, refreshToken: string}>,{ token: string }>({
+    googleAuthVerify: builder.mutation<
+      ApiSuccess<{
+        accessToken: string;
+        user: Participant;
+        refreshToken: string;
+      }>,
+      { token: string }
+    >({
       query: (body) => {
         return {
           url: "/participants/auth/google-auth",
@@ -100,18 +140,21 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       providesTags: ["Users"],
     }),
-    getRefreshToken: builder.query<ApiSuccess<{accessToken: string}>, {token: string}>({
-      query: (args) =>({
+    getRefreshToken: builder.query<
+      ApiSuccess<{ accessToken: string }>,
+      { token: string }
+    >({
+      query: (args) => ({
         url: "/participants/auth/refresh-token",
         method: "GET",
         headers: {
-          token: args.token
-        }
+          token: args.token,
+        },
       }),
       providesTags: ["Users"],
       // providesTags: "users"
     }),
-    sendOtp: builder.mutation<ApiSuccess<{}>,{ email: string }>({
+    sendOtp: builder.mutation<ApiSuccess<{}>, { email: string }>({
       query: (body) => {
         return {
           url: "/participants/auth/send-otp",
@@ -122,7 +165,10 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    verifyResetPasswordOtp: builder.mutation<ApiSuccess<{token: string}>,{ email: string, code: string }>({
+    verifyResetPasswordOtp: builder.mutation<
+      ApiSuccess<{ token: string }>,
+      { email: string; code: string }
+    >({
       query: (body) => {
         return {
           url: "/participants/auth/verify-otp",
@@ -133,7 +179,10 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       invalidatesTags: ["Users"],
     }),
-    resetPassword: builder.mutation<ApiSuccess<string>,{ token: string; email: string, password: string }>({
+    resetPassword: builder.mutation<
+      ApiSuccess<string>,
+      { token: string; email: string; password: string }
+    >({
       query: (body) => {
         return {
           url: "/participants/auth/reset-password",
@@ -161,6 +210,5 @@ export const {
   useVerifyResetPasswordOtpMutation,
   useResetPasswordMutation,
   useRegisterResearcherMutation,
-  useVerifyResearcherEmailMutation
-
+  useVerifyResearcherEmailMutation,
 } = authApi;
