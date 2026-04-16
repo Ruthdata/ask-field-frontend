@@ -13,15 +13,17 @@ const PublicRoute = () => {
 
   if (isAuthenticated()) {
     const userType = getUserType();
-    // Redirect to the correct dashboard based on role
     return (
       <Navigate
-        to={userType === "researcher" ? "/dashboard/researcher" : "/waitlist"}
+        to={
+          userType === "researcher"
+            ? "/dashboard/researcher"
+            : "/dashboard/participant"
+        }
         replace
       />
     );
   }
-
   return <Outlet />;
 };
 
