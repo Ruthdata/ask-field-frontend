@@ -3,6 +3,7 @@ export const APP_NAME = "My React App";
 export const STORAGE_KEYS = {
   TOKEN: "x-ask-token",
   REFRESH_TOKEN: "refresh-x-ask-token",
+  USER_TYPE: "x-ask-user-type",  
 };
 
 export const PARTICIPANT_QUESTIONS = [

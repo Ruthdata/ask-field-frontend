@@ -89,22 +89,42 @@ export default function App() {
           </Route>
         </Route>
         {/* Dashboard Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard/participant" element={<ParticipantDashboardLayout />}>
+        {/* Participant Dashboard */}
+        <Route element={<ProtectedRoute requiredRole="participant" />}>
+          <Route
+            path="/dashboard/participant"
+            element={<ParticipantDashboardLayout />}
+          >
             <Route index element={<ParticipantDashboardHome />} />
-            <Route path="complete-profile" element={<CompleteParticipantProfile />} />
+            <Route
+              path="complete-profile"
+              element={<CompleteParticipantProfile />}
+            />
             <Route path="surveys" element={<Surveys />} />
             <Route path="earnings" element={<Earnings />} />
             <Route path="support" element={<Support />} />
             <Route path="messages" element={<Messages />} />
           </Route>
         </Route>
-        <Route path="/dashboard/researcher" element={<ResearcherDashboardLayout />}>
-          <Route index element={<ResearcherDashboardHome />} />
-          <Route path="complete-profile" element={<CompleteResearcherProfile />} />
-          <Route path="projects" element={<Projects />} />
-          <Route path="projects/:id" element={<Project />} />
-          <Route path="projects/:id/create-survey" element={<CreateSurvey />} />
+
+        {/* Researcher Dashboard */}
+        <Route element={<ProtectedRoute requiredRole="researcher" />}>
+          <Route
+            path="/dashboard/researcher"
+            element={<ResearcherDashboardLayout />}
+          >
+            <Route index element={<ResearcherDashboardHome />} />
+            <Route
+              path="complete-profile"
+              element={<CompleteResearcherProfile />}
+            />
+            <Route path="projects" element={<Projects />} />
+            <Route path="projects/:id" element={<Project />} />
+            <Route
+              path="projects/:id/create-survey"
+              element={<CreateSurvey />}
+            />
+          </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
