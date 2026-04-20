@@ -34,7 +34,6 @@ export interface RegisterResearcherResponse {
   };
 }
 
-// What lives in the multi-step form context
 export interface ResearcherFormData {
   email: string;
   country: string;
@@ -45,4 +44,17 @@ export interface ResearcherFormData {
   organizationType: string;
   password: string;
   confirmPassword: string;
+}
+
+export interface DashboardStats {
+  activeSurveys: number;
+  liveSurveys: number;
+  draftSurveys: number;
+  closedSurveys: number;
+  researchSpent: number;
+}
+
+export interface DashboardStatsResponse {
+  message: string;
+  data: DashboardStats;
 }
