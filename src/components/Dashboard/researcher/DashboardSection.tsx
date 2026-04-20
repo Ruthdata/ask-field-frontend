@@ -1,23 +1,17 @@
 import React, { useState } from "react";
-import { Wallet, Zap, HelpCircle, MoreVertical } from "lucide-react";
+import { Wallet, Zap, HelpCircle } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import StatCard from "../StatCard";
 import SurveyHeader from "./survey/SurveyHeader";
 import SurveyBody from "./survey/SurveyBody";
+import { useGetDashboardStatsQuery } from "@/redux/api/researcherApi";
 
 const DashboardSection = () => {
   const { getResearcherFirstName } = useCurrentUser();
-  const [selectedPeriod, setSelectedPeriod] = useState("Last 3 days");
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const periods = [
-    "Last 24 hours",
-    "Last 3 days",
-    "Last 7 days",
-    "Last 30 days",
-    "All time",
-  ];
+  const { data, isLoading } = useGetDashboardStatsQuery();
+  const stats = data?.data;
 
   return (
     <div className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -26,9 +20,8 @@ const DashboardSection = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="mb-4 sm:mb-0">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome, {getResearcherFirstName()}!
+              Hi {getResearcherFirstName()}
             </h1>
-
             <div className="flex items-center gap-2">
               <p className="text-gray-600">
                 Monitor your surveys and manage your research spend from one
@@ -39,44 +32,6 @@ const DashboardSection = () => {
               </button>
             </div>
           </div>
-
-          {/* Dropdown */}
-          {/* <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50"
-            >
-              <span className="text-gray-900 font-medium">
-                {selectedPeriod}
-              </span>
-              <ChevronDown
-                className={`w-4 h-4 text-gray-600 ${
-                  isDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
-                {periods.map((period) => (
-                  <button
-                    key={period}
-                    onClick={() => {
-                      setSelectedPeriod(period);
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 ${
-                      selectedPeriod === period
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div> */}
         </div>
 
         {/* Cards */}
@@ -85,12 +40,16 @@ const DashboardSection = () => {
             icon={<Wallet className="w-6 h-6 text-yellow-600" />}
             iconBg="bg-yellow-50"
             title="Active Surveys"
-            value="0"
-            change="Since last 3 days"
+            value={isLoading ? "..." : (stats?.activeSurveys ?? 0)}
+            change={
+              isLoading
+                ? ""
+                : `${stats?.liveSurveys ?? 0} Live  •  ${stats?.draftSurveys ?? 0} Draft  •  ${stats?.closedSurveys ?? 0} Closed`
+            }
             showVisibility={false}
-            isDisplayBalance={true}
-            isVisible={isBalanceVisible}
-            onToggleVisibility={() => setIsBalanceVisible(!isBalanceVisible)}
+            isDisplayBalance={false}
+            isVisible={true}
+            onToggleVisibility={() => {}}
           >
             <div className="border-t border-t-olive-200 pt-4">
               <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
@@ -103,12 +62,17 @@ const DashboardSection = () => {
           <StatCard
             icon={<Zap className="w-6 h-6 text-yellow-600" />}
             iconBg="bg-yellow-50"
-            title="Research spend"
-            value="0.00"
-            change="Since last 3 days"
-            isVisible={true}
-            onToggleVisibility={() => {}}
+            title="Research Spend"
+            value={
+              isLoading
+                ? "..."
+                : (stats?.researchSpent?.toLocaleString() ?? "0.00")
+            }
+            change="30%"
+            isVisible={isBalanceVisible}
+            onToggleVisibility={() => setIsBalanceVisible(!isBalanceVisible)}
             showVisibility={true}
+            isDisplayBalance={true}
           >
             <div className="border-t border-t-olive-200 pt-4">
               <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
@@ -210,7 +174,7 @@ const DashboardSection = () => {
 
                 {/* Row */}
                 {[1, 2, 3].map((_, i) => (
-                  <SurveyBody i={i} />
+                  <SurveyBody key={i} i={i} />
                 ))}
               </div>
             </div>
