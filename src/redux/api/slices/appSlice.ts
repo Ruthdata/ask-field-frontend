@@ -48,25 +48,26 @@ const baseQueryWithInterceptor: BaseQueryFn<
             headers: { token: refreshToken },
           },
           api,
-          extraOptions
+          extraOptions,
         );
 
-        const responseData = response.data as ApiSuccess<{ accessToken: string }>;
-        
-        
+        const responseData = response.data as ApiSuccess<{
+          accessToken: string;
+        }>;
+
         const accessToken = responseData.data.accessToken;
-        
+
         if (accessToken) {
-          console.log(accessToken, 'inside')
-          storage.set(STORAGE_KEYS.TOKEN, accessToken)
+          console.log(accessToken, "inside");
+          storage.set(STORAGE_KEYS.TOKEN, accessToken);
           window.location.reload();
         } else {
-          storage.remove(STORAGE_KEYS.REFRESH_TOKEN)
-          window.location.href = '/'
+          storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
+          window.location.href = "/";
         }
       } else {
-        storage.remove(STORAGE_KEYS.REFRESH_TOKEN)
-        window.location.href = '/';
+        storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
+        window.location.href = "/";
       }
     }
   }
@@ -76,7 +77,7 @@ const baseQueryWithInterceptor: BaseQueryFn<
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: baseQueryWithInterceptor, // Use the intercepted version
-  tagTypes: ["Items", "Users"],
+  baseQuery: baseQueryWithInterceptor,
+  tagTypes: ["Items", "Users", "Researchers", "Projects", "Surveys"],
   endpoints: () => ({}),
 });

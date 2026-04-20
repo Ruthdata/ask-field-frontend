@@ -7,6 +7,7 @@ import {
 import { ApiSuccess } from "@/types/api.type";
 // import { ApiSuccess } from "../../../types/api.type";
 
+
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     registerParticipant: builder.mutation<
