@@ -4,6 +4,9 @@ export interface Project {
   title: string;
   participantView: string;
   pinned: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
   pinnedAt: Date | null;
 }
 
@@ -31,15 +34,30 @@ export interface ListProjectsPayload {
 }
 
 export interface ProjectResponse {
+  success?: boolean;
   message: string;
   data: Project;
 }
 
-export interface ListProjectsResponse {
-  message: string;
+export interface ProjectPagination {
+  total: number;
+  page: string;
+  limit: string;
+  pages: number;
+}
+
+export interface ListProjectsData {
   data: Project[];
+  pagination: ProjectPagination;
+}
+
+export interface ListProjectsResponse {
+  success?: boolean;
+  message: string;
+  data: ListProjectsData;
 }
 
 export interface ProjectMessageResponse {
+  success?: boolean;
   message: string;
 }
