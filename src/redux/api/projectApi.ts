@@ -1,4 +1,4 @@
-import { apiSlice } from "./appSlice";
+import { apiSlice } from "./slices/appSlice";
 import {
   CreateProjectPayload,
   RenameProjectPayload,
