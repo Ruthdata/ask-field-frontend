@@ -1,5 +1,5 @@
 import { apiSlice } from "./slices/appSlice";
-import { DashboardStatsResponse } from "../../../types/researcher";
+import { DashboardStatsResponse } from "@/types/researcher";
 
 export const researcherApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
