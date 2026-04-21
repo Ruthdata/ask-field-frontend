@@ -34,6 +34,8 @@ export interface CreateDraftSurveyPayload {
 
 export interface DraftSurvey {
   surveyId: string;
+  _id?: string;
+  id?: string;
   projectId: string;
   userId: string;
   surveyName: string;
@@ -42,7 +44,7 @@ export interface DraftSurvey {
 
 export interface UpdateDraftSurveyPayload {
   surveyId: string;
-  body: Partial<Survey>;
+  body: Partial<Survey> | Record<string, unknown>;
 }
 
 export type PublishSurveyPayload = string;
@@ -63,10 +65,71 @@ export interface SurveysListResponse {
 }
 
 export interface CreateDraftSurveyResponse {
+  success?: boolean;
+  error?: string;
   message: string;
   data: DraftSurvey;
 }
 
 export interface SurveyMessageResponse {
   message: string;
+}
+
+export type SurveyTypeOption = "external" | "aiTaskBuilder";
+
+export type StudyLabelOption =
+  | "survey"
+  | "decision making"
+  | "writing"
+  | "interview"
+  | "ai task"
+  | "none";
+
+export interface SurveyStepTwoData {
+  surveyName: string;
+  internalSurveyName: string;
+  surveyDescription: string;
+  contentWarning: string;
+  surveyLabel: StudyLabelOption | "";
+  usableDevices: string[];
+  surveyEquipment: string;
+}
+
+export interface CompletionPath {
+  id: string;
+  name: string;
+  handleSubmission: string;
+  addToParticipantGroup: string;
+  redirectUrl: string;
+  completionCode: string;
+}
+
+export interface SurveyStepThreeData {
+  surveyURL: string;
+  toRecordId: string;
+  completionPaths: CompletionPath[];
+}
+
+export interface SurveyStepFourData {
+  howToFindParticipant: string;
+  numberOfParticipants: string;
+  howToScreenParticipants: string;
+  surveyDistribution: string;
+  surveyCrendentials: string;
+  totalSubmission: string;
+  inputRejection: string;
+}
+
+export interface SurveyStepFiveData {
+  surveyDuration: string;
+  surveyAmount: string;
+}
+
+export interface SurveyFormData {
+  surveyType: SurveyTypeOption | null;
+  draftSurveyId?: string;
+  stepTwoData: SurveyStepTwoData;
+  stepThreeData: SurveyStepThreeData;
+  stepFourData: SurveyStepFourData;
+  stepFiveData: SurveyStepFiveData;
 }
