@@ -41,7 +41,8 @@ export default function LoginFormParticipant() {
         localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
         localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
         localStorage.setItem(STORAGE_KEYS.USER_TYPE, "participant"); // add this
-        navigate("/waitlist");
+        // navigate("/waitlist");
+        navigate("/dashboard/participant");
       }
       // Example of a successful login:
       // handleAuthSuccess(data, () => window.location.assign("/dashboard"));
