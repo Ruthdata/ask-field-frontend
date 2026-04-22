@@ -1,9 +1,11 @@
-import { useState } from "react";
+type ProjectStatusTab = "live" | "drafts" | "closed";
 
-const ProjectSelectTab = () => {
-  const [activeTab, setActiveTab] = useState<
-    "live" | "drafts" | "closed"
-  >("live");
+type Props = {
+  activeTab: ProjectStatusTab;
+  setActiveTab: (value: ProjectStatusTab) => void;
+};
+
+const ProjectSelectTab = ({ activeTab, setActiveTab }: Props) => {
 
   const tabs = [
     { key: "live", label: "Live Surveys" },
@@ -18,7 +20,7 @@ const ProjectSelectTab = () => {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key as any)}
+            onClick={() => setActiveTab(tab.key as ProjectStatusTab)}
             className={`relative pb-1 pt-6 text-sm sm:text-base px-5 cursor-pointer mb-5 font-medium transition
               ${
                 activeTab === tab.key
