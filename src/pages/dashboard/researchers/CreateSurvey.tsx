@@ -8,6 +8,7 @@ import StepFive from "@components/Dashboard/researcher/survey/create-survey-step
 import { useGetProjectByIdQuery } from "@/redux/api/projectApi";
 import {
   useCreateDraftSurveyMutation,
+  useGetUserSurveyQuery,
   usePublishDraftSurveyMutation,
   useUpdateDraftSurveyMutation,
 } from "@/redux/api/surveyApi";
@@ -15,14 +16,20 @@ import { formatApiError } from "@/utils/helper";
 import {
   CompletionPath,
   CreateDraftSurveyResponse,
+  StudyLabelOption,
   Survey,
   SurveyResponse,
   SurveyFormData,
   SurveyStepThreeData,
 } from "@/types/survey";
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 
 const totalSteps = 5;
 
@@ -54,7 +61,8 @@ const stepTwoField: FieldConfig[] = [
     isRequired: true,
     type: "textarea",
     fullWidth: true,
-    placeholder: "Enter any sensitive topics participants should know about, or type None if not applicable",
+    placeholder:
+      "Enter any sensitive topics participants should know about, or type None if not applicable",
   },
 ];
 
@@ -101,7 +109,7 @@ const initialFormData: SurveyFormData = {
 const getGeneratedPathData = (
   projectId: string,
   surveyId: string,
-  pathIndex: number
+  pathIndex: number,
 ) => {
   const baseUrl =
     import.meta.env.VITE_APP_URL ||
@@ -116,7 +124,7 @@ const getGeneratedPathData = (
 const syncCompletionPaths = (
   stepThreeData: SurveyStepThreeData,
   projectId: string,
-  surveyId: string
+  surveyId: string,
 ): SurveyStepThreeData => ({
   ...stepThreeData,
   completionPaths: stepThreeData.completionPaths.map((path, index) => ({
@@ -127,13 +135,13 @@ const syncCompletionPaths = (
 
 const extractSurveyId = (response: CreateDraftSurveyResponse) => {
   if (response.success === false) {
-    throw new Error(response.error || response.message || "Unable to create draft survey.");
+    throw new Error(
+      response.error || response.message || "Unable to create draft survey.",
+    );
   }
 
   const surveyId =
-    response?.data?.surveyId ||
-    response?.data?._id ||
-    response?.data?.id;
+    response?.data?.surveyId || response?.data?._id || response?.data?.id;
 
   if (!surveyId) {
     throw new Error("Draft survey was created without a valid survey id.");
@@ -142,10 +150,99 @@ const extractSurveyId = (response: CreateDraftSurveyResponse) => {
   return surveyId;
 };
 
+const getSurveyIdentifier = (survey: Partial<Survey>) =>
+  survey.surveyId || survey._id || "";
+
+const createCompletionPathFromSurvey = (survey: Survey): CompletionPath => ({
+  ...createEmptyCompletionPath(1),
+  handleSubmission: survey.handleSubmission || "",
+  addToParticipantGroup: survey.addToParticipantGroup || "general",
+});
+
+const mapSurveyToFormData = (
+  survey: Survey,
+  projectId: string,
+): SurveyFormData => {
+  const validStudyLabels: StudyLabelOption[] = [
+    "survey",
+    "decision making",
+    "writing",
+    "interview",
+    "ai task",
+    "none",
+  ];
+  const surveyId = getSurveyIdentifier(survey);
+  const completionPath = createCompletionPathFromSurvey(survey);
+  const stepThreeData =
+    surveyId && projectId
+      ? syncCompletionPaths(
+          {
+            surveyURL: survey.surveyURL || "",
+            toRecordId: survey.toRecordId || "",
+            completionPaths: [completionPath],
+          },
+          projectId,
+          surveyId,
+        )
+      : {
+          surveyURL: survey.surveyURL || "",
+          toRecordId: survey.toRecordId || "",
+          completionPaths: [completionPath],
+        };
+
+  return {
+    surveyType:
+      survey.surveyType === "external" || survey.surveyType === "aiTaskBuilder"
+        ? survey.surveyType
+        : null,
+    draftSurveyId: surveyId || undefined,
+    stepTwoData: {
+      surveyName: survey.surveyName || "",
+      internalSurveyName: survey.internalSurveyName || "",
+      surveyDescription: survey.surveyDescription || "",
+      contentWarning: survey.contentWarning || "",
+      surveyLabel: validStudyLabels.includes(
+        survey.surveyLabel as StudyLabelOption,
+      )
+        ? (survey.surveyLabel as StudyLabelOption)
+        : "",
+      usableDevices: survey.usableDevices || [],
+      surveyEquipment: survey.surveyEquipment || "",
+    },
+    stepThreeData,
+    stepFourData: {
+      howToFindParticipant: survey.howToFindParticipant || "",
+      numberOfParticipants:
+        survey.numberOfParticipants !== undefined
+          ? String(survey.numberOfParticipants)
+          : "",
+      howToScreenParticipants: survey.howToScreenParticipants || "",
+      surveyDistribution: survey.surveyDistribution || "",
+      surveyCrendentials: survey.surveyCrendentials || "",
+      totalSubmission:
+        survey.totalSubmission !== undefined
+          ? String(survey.totalSubmission)
+          : "",
+      inputRejection:
+        survey.inputRejection !== undefined
+          ? String(survey.inputRejection)
+          : "",
+    },
+    stepFiveData: {
+      surveyDuration:
+        survey.surveyDuration !== undefined
+          ? String(survey.surveyDuration)
+          : "",
+      surveyAmount:
+        survey.surveyAmount !== undefined ? String(survey.surveyAmount) : "",
+    },
+  };
+};
+
 const buildSurveyPayload = (
   formData: SurveyFormData,
   projectId: string,
-  uptoStep: number
+  uptoStep: number,
 ): Record<string, unknown> => {
   const primaryPath = formData.stepThreeData.completionPaths[0];
 
@@ -183,7 +280,7 @@ const buildSurveyPayload = (
 
     if (formData.stepFourData.numberOfParticipants !== "") {
       body.numberOfParticipants = Number(
-        formData.stepFourData.numberOfParticipants
+        formData.stepFourData.numberOfParticipants,
       );
     }
 
@@ -248,13 +345,26 @@ const getMissingPublishFields = (survey: Partial<Survey>) => {
 const CreateSurvey = () => {
   const navigate = useNavigate();
   const { id: projectId = "" } = useParams();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<SurveyFormData>(initialFormData);
+  const [hydratedSurveyId, setHydratedSurveyId] = useState<string | null>(null);
+  const editSurveyId = searchParams.get("surveyId")?.trim() || "";
+  const isEditingDraft = Boolean(editSurveyId);
 
   const { data: projectData } = useGetProjectByIdQuery(projectId, {
     skip: !projectId,
   });
   const project = projectData?.data;
+  const {
+    data: surveyToEditResponse,
+    isLoading: isLoadingSurveyToEdit,
+    isError: isSurveyToEditError,
+    refetch: refetchSurveyToEdit,
+  } = useGetUserSurveyQuery(editSurveyId, {
+    skip: !editSurveyId,
+  });
+  const surveyToEdit = surveyToEditResponse?.data;
 
   const [createDraftSurvey, { isLoading: isCreatingDraft }] =
     useCreateDraftSurveyMutation();
@@ -265,6 +375,30 @@ const CreateSurvey = () => {
 
   const isSaving = isCreatingDraft || isUpdatingDraft;
   const isSubmitting = isSaving || isPublishingDraft;
+
+  useEffect(() => {
+    if (!isEditingDraft || !surveyToEdit || hydratedSurveyId === editSurveyId) {
+      return;
+    }
+
+    if (surveyToEdit.status !== "draft") {
+      toast.error(
+        "Only draft surveys can be updated from this page right now.",
+      );
+      navigate(`/dashboard/researcher/projects/${projectId}`);
+      return;
+    }
+
+    setFormData(mapSurveyToFormData(surveyToEdit, projectId));
+    setHydratedSurveyId(editSurveyId);
+  }, [
+    editSurveyId,
+    hydratedSurveyId,
+    isEditingDraft,
+    navigate,
+    projectId,
+    surveyToEdit,
+  ]);
 
   const updateFormData = (data: Partial<SurveyFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -388,7 +522,11 @@ const CreateSurvey = () => {
     setFormData((prev) => ({
       ...prev,
       draftSurveyId: surveyId,
-      stepThreeData: syncCompletionPaths(prev.stepThreeData, projectId, surveyId),
+      stepThreeData: syncCompletionPaths(
+        prev.stepThreeData,
+        projectId,
+        surveyId,
+      ),
     }));
 
     return surveyId;
@@ -396,7 +534,7 @@ const CreateSurvey = () => {
 
   const persistDraft = async (
     uptoStep: number,
-    showToast = false
+    showToast = false,
   ): Promise<{ surveyId: string; survey?: Survey }> => {
     const surveyId = await ensureDraft();
     const body = buildSurveyPayload(formData, projectId, uptoStep);
@@ -474,15 +612,15 @@ const CreateSurvey = () => {
       const publishPayload = buildSurveyPayload(
         formData,
         projectId,
-        5
+        5,
       ) as Partial<Survey>;
       const missingFields = getMissingPublishFields(publishPayload);
 
       if (missingFields.length > 0) {
         toast.error(
           `Please complete these fields before publishing: ${missingFields.join(
-            ", "
-          )}.`
+            ", ",
+          )}.`,
         );
         return;
       }
@@ -497,10 +635,13 @@ const CreateSurvey = () => {
           survey.surveyDuration !== publishPayload.surveyDuration ||
           survey.surveyAmount !== publishPayload.surveyAmount)
       ) {
-        console.warn("Draft save response does not match the local publish payload.", {
-          publishPayload,
-          surveyResponse: survey,
-        });
+        console.warn(
+          "Draft save response does not match the local publish payload.",
+          {
+            publishPayload,
+            surveyResponse: survey,
+          },
+        );
       }
 
       const response = await publishDraftSurvey(surveyId).unwrap();
@@ -511,13 +652,87 @@ const CreateSurvey = () => {
     }
   };
 
-  const participantCount = Number(formData.stepFourData.numberOfParticipants) || 0;
+  const participantCount =
+    Number(formData.stepFourData.numberOfParticipants) || 0;
   const duration = Number(formData.stepFiveData.surveyDuration) || 1;
   const amount = Number(formData.stepFiveData.surveyAmount) || 0;
   const subtotal = participantCount * amount;
   const platformFee = subtotal > 0 ? 5 : 0;
   const vat = subtotal > 0 ? 5 : 0;
   const total = subtotal + platformFee + vat;
+
+  if (
+    isEditingDraft &&
+    isLoadingSurveyToEdit &&
+    hydratedSurveyId !== editSurveyId
+  ) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-2 sm:px-3 lg:px-4 py-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-5 text-sm text-gray-600">
+            <Link
+              to="/dashboard/researcher/projects"
+              className="hover:underline"
+            >
+              My Projects
+            </Link>
+            {" / "}
+            <Link
+              to={`/dashboard/researcher/projects/${projectId}`}
+              className="hover:underline"
+            >
+              {project?.title || "Project"}
+            </Link>
+            {" / "}
+            <span className="text-yellow-500">Edit Study</span>
+          </div>
+
+          <div className="rounded-2xl bg-white px-6 py-10 shadow-sm">
+            <p className="text-sm text-gray-500">Loading draft survey...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isEditingDraft && isSurveyToEditError) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-2 sm:px-3 lg:px-4 py-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-5 text-sm text-gray-600">
+            <Link
+              to="/dashboard/researcher/projects"
+              className="hover:underline"
+            >
+              My Projects
+            </Link>
+            {" / "}
+            <Link
+              to={`/dashboard/researcher/projects/${projectId}`}
+              className="hover:underline"
+            >
+              {project?.title || "Project"}
+            </Link>
+            {" / "}
+            <span className="text-yellow-500">Edit Study</span>
+          </div>
+
+          <div className="rounded-2xl bg-white px-6 py-10 shadow-sm">
+            <p className="text-sm text-red-500">
+              We couldn&apos;t load this draft survey right now.
+            </p>
+            <button
+              type="button"
+              onClick={() => refetchSurveyToEdit()}
+              className="mt-4 rounded-3xl border border-gray-300 px-4 py-2 text-sm text-gray-700 cursor-pointer"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 px-2 sm:px-3 lg:px-4 py-6">
@@ -534,7 +749,9 @@ const CreateSurvey = () => {
             {project?.title || "Project"}
           </Link>
           {" / "}
-          <span className="text-yellow-500">New Study</span>
+          <span className="text-yellow-500">
+            {isEditingDraft ? "Edit Study" : "New Study"}
+          </span>
         </div>
 
         <div className="flex flex-col xl:flex-row gap-5">
@@ -553,7 +770,9 @@ const CreateSurvey = () => {
             {step === 2 && (
               <StepTwo
                 stepTwoData={formData.stepTwoData}
-                setStepTwoData={(stepTwoData) => updateFormData({ stepTwoData })}
+                setStepTwoData={(stepTwoData) =>
+                  updateFormData({ stepTwoData })
+                }
                 step={step}
                 totalSteps={totalSteps}
                 onNext={handleNext}
@@ -566,7 +785,9 @@ const CreateSurvey = () => {
             {step === 3 && (
               <StepThree
                 stepData={formData.stepThreeData}
-                setStepData={(stepThreeData) => updateFormData({ stepThreeData })}
+                setStepData={(stepThreeData) =>
+                  updateFormData({ stepThreeData })
+                }
                 step={step}
                 totalSteps={totalSteps}
                 onBack={handleBack}
@@ -618,7 +839,9 @@ const CreateSurvey = () => {
               </div>
               <div className="flex justify-between items-center border-t border-gray-100 pt-3">
                 <span className="font-medium">Total</span>
-                <span className="font-semibold">${subtotal.toLocaleString()} USD</span>
+                <span className="font-semibold">
+                  ${subtotal.toLocaleString()} USD
+                </span>
               </div>
             </div>
 
@@ -633,7 +856,9 @@ const CreateSurvey = () => {
               </div>
               <div className="flex justify-between items-center border-t border-gray-100 pt-3">
                 <span className="font-medium">Total</span>
-                <span className="font-semibold">${total.toLocaleString()} USD</span>
+                <span className="font-semibold">
+                  ${total.toLocaleString()} USD
+                </span>
               </div>
             </div>
 
