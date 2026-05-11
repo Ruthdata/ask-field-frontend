@@ -5,13 +5,19 @@ import StatCard from "../StatCard";
 import SurveyHeader from "./survey/SurveyHeader";
 import SurveyBody from "./survey/SurveyBody";
 import { useGetDashboardStatsQuery } from "@/redux/api/researcherApi";
+import { Survey } from "@/types/survey";
+import { Link, useNavigate } from "react-router-dom";
+
+const getSurveyIdentifier = (survey: Survey) => survey.surveyId || survey._id || "";
 
 const DashboardSection = () => {
   const { getResearcherFirstName } = useCurrentUser();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const navigate = useNavigate();
 
   const { data, isLoading } = useGetDashboardStatsQuery();
   const stats = data?.data;
+  const surveys: Survey[] = [];
 
   return (
     <div className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -52,10 +58,13 @@ const DashboardSection = () => {
             onToggleVisibility={() => {}}
           >
             <div className="border-t border-t-olive-200 pt-4">
-              <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
+              <Link
+                to="/dashboard/researcher/projects"
+                className="bg-[#3E3E3E] flex w-fit items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer"
+              >
                 <img src="/images/create-survey.svg" alt="create-survey" />
                 <span className="text-white text-[12px]">Create Survey</span>
-              </button>
+              </Link>
             </div>
           </StatCard>
 
@@ -75,10 +84,13 @@ const DashboardSection = () => {
             isDisplayBalance={true}
           >
             <div className="border-t border-t-olive-200 pt-4">
-              <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
+              <Link
+                to="/dashboard/researcher/wallet"
+                className="bg-[#3E3E3E] flex w-fit items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer"
+              >
                 <img src="/images/add-fund.svg" alt="add-fund" />
                 <span className="text-white text-[12px]">Add Funds</span>
-              </button>
+              </Link>
             </div>
           </StatCard>
         </div>
@@ -89,7 +101,11 @@ const DashboardSection = () => {
           <div className="bg-white mt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 p-4">
               {/* Each exploration */}
-              <div className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4">
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard/researcher/ai-task-builder")}
+                className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4 text-left bg-white"
+              >
                 <div className="h-30 w-full relative rounded-3xl overflow-hidden">
                   <img
                     src="/images/ai-taskbuilder.png"
@@ -104,7 +120,7 @@ const DashboardSection = () => {
                     workflow.
                   </p>
                 </div>
-              </div>
+              </button>
               {/* Each exploration */}
               <div className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4">
                 <div className="h-30 w-full relative rounded-3xl overflow-hidden">
@@ -123,7 +139,11 @@ const DashboardSection = () => {
                 </div>
               </div>
               {/* Each exploration */}
-              <div className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4">
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard/researcher/pricing-calculator")}
+                className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4 text-left bg-white"
+              >
                 <div className="h-30 w-full relative rounded-3xl overflow-hidden">
                   <img
                     src="/images/pricing-calculator.png"
@@ -137,7 +157,7 @@ const DashboardSection = () => {
                     Estimate the cost of your study before starting research.
                   </p>
                 </div>
-              </div>
+              </button>
               {/* Each exploration */}
               <div className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4">
                 <div className="h-30 w-full relative rounded-3xl overflow-hidden">
@@ -172,26 +192,36 @@ const DashboardSection = () => {
                 {/* Header */}
                 <SurveyHeader />
 
-                {/* Row */}
-                {[1, 2, 3].map((_, i) => (
-                  <SurveyBody key={i} i={i} />
+                {surveys.map((survey) => (
+                  <SurveyBody
+                    key={getSurveyIdentifier(survey)}
+                    survey={survey}
+                  />
                 ))}
               </div>
             </div>
           </div>
-          {/* No Survey */}
-          <div className="flex flex-col py-15 gap-4 items-center">
-            <img
-              src="/images/no-survey.png"
-              className="h-30 w-50"
-              alt="no-survey"
-            />
-            <p>No surveys found :)</p>
-            <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
-              <img src="/images/create-survey.svg" alt="create-survey" />
-              <span className="text-white text-[12px]">Create Survey</span>
-            </button>
-          </div>
+          {surveys.length === 0 && (
+            <div className="flex flex-col py-15 gap-4 items-center">
+              <img
+                src="/images/no-survey.png"
+                className="h-30 w-50"
+                alt="no-survey"
+              />
+              <p>No surveys found :)</p>
+              <p className="max-w-md text-center text-xs text-gray-500">
+                The API currently only returns surveys inside a project, so use
+                My Projects to view or create studies for now.
+              </p>
+              <Link
+                to="/dashboard/researcher/projects"
+                className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer"
+              >
+                <img src="/images/create-survey.svg" alt="create-survey" />
+                <span className="text-white text-[12px]">Create Survey</span>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>
