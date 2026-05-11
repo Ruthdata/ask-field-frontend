@@ -85,6 +85,9 @@ const initialFormData: SurveyFormData = {
     surveyLabel: "",
     usableDevices: [],
     surveyEquipment: "",
+    minimumAge: "",
+    maximumAge: "",
+    gender: "",
   },
   stepThreeData: {
     surveyURL: "",
@@ -208,6 +211,11 @@ const mapSurveyToFormData = (
         : "",
       usableDevices: survey.usableDevices || [],
       surveyEquipment: survey.surveyEquipment || "",
+      minimumAge:
+        survey.minimumAge !== undefined ? String(survey.minimumAge) : "",
+      maximumAge:
+        survey.maximumAge !== undefined ? String(survey.maximumAge) : "",
+      gender: survey.gender || "",
     },
     stepThreeData,
     stepFourData: {
@@ -262,6 +270,18 @@ const buildSurveyPayload = (
     body.surveyLabel = formData.stepTwoData.surveyLabel;
     body.usableDevices = formData.stepTwoData.usableDevices;
     body.surveyEquipment = formData.stepTwoData.surveyEquipment;
+
+    if (formData.stepTwoData.minimumAge !== "") {
+      body.minimumAge = Number(formData.stepTwoData.minimumAge);
+    }
+
+    if (formData.stepTwoData.maximumAge !== "") {
+      body.maximumAge = Number(formData.stepTwoData.maximumAge);
+    }
+
+    if (formData.stepTwoData.gender) {
+      body.gender = formData.stepTwoData.gender;
+    }
   }
 
   if (uptoStep >= 3) {
@@ -318,6 +338,8 @@ const getMissingPublishFields = (survey: Partial<Survey>) => {
     missing.push("usable devices");
   }
   if (!survey.surveyEquipment) missing.push("study requirement");
+  if (!survey.minimumAge) missing.push("minimum age");
+  if (!survey.maximumAge) missing.push("maximum age");
   if (!survey.surveyURL) missing.push("study URL");
   if (!survey.toRecordId) missing.push("record ID method");
   if (!survey.handleSubmission) missing.push("submission handling");
@@ -432,6 +454,21 @@ const CreateSurvey = () => {
 
       if (!formData.stepTwoData.surveyEquipment) {
         return "Please choose a study requirement.";
+      }
+
+      const minimumAge = Number(formData.stepTwoData.minimumAge);
+      const maximumAge = Number(formData.stepTwoData.maximumAge);
+
+      if (!minimumAge) {
+        return "Please select the minimum participant age.";
+      }
+
+      if (!maximumAge) {
+        return "Please select the maximum participant age.";
+      }
+
+      if (minimumAge > maximumAge) {
+        return "Minimum age cannot be greater than maximum age.";
       }
     }
 
