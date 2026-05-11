@@ -10,6 +10,9 @@ export interface Survey {
   surveyLabel: string;
   usableDevices: string[];
   surveyEquipment: string;
+  minimumAge?: number;
+  maximumAge?: number;
+  gender?: string;
   contentWarning: string;
   surveyURL: string;
   toRecordId: string;
@@ -54,6 +57,14 @@ export interface GetSurveysByProjectPayload {
   status: "published" | "draft" | "closed";
 }
 
+export type SurveyListPayload =
+  | Survey[]
+  | {
+      data?: Survey[];
+      items?: Survey[];
+      results?: Survey[];
+    };
+
 export interface SurveyResponse {
   message: string;
   data: Survey;
@@ -61,7 +72,7 @@ export interface SurveyResponse {
 
 export interface SurveysListResponse {
   message: string;
-  data: Survey[];
+  data: SurveyListPayload;
 }
 
 export interface CreateDraftSurveyResponse {
@@ -93,6 +104,9 @@ export interface SurveyStepTwoData {
   surveyLabel: StudyLabelOption | "";
   usableDevices: string[];
   surveyEquipment: string;
+  minimumAge: string;
+  maximumAge: string;
+  gender: string;
 }
 
 export interface CompletionPath {

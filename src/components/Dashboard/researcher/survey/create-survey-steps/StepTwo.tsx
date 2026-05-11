@@ -25,6 +25,10 @@ type StepTwoProps = {
 
 const deviceOptions = ["Mobile", "Tablet", "Desktop"];
 const equipmentOptions = ["Audio", "Camera", "Microphone", "Software Download"];
+const ageOptions = Array.from({ length: 83 }, (_, index) => String(index + 18));
+const genderOptions = ["Male", "Female"];
+const selectClass =
+  "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-white";
 
 const StepTwo = ({
   stepTwoData,
@@ -40,6 +44,10 @@ const StepTwo = ({
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    setStepTwoData({ ...stepTwoData, [name]: value });
+  };
+
+  const updateStepTwoField = (name: keyof SurveyStepTwoData, value: string) => {
     setStepTwoData({ ...stepTwoData, [name]: value });
   };
 
@@ -158,6 +166,70 @@ const StepTwo = ({
           These options help participants understand what is needed before they
           join. Use later recruitment settings to decide who is eligible.
         </p>
+      </div>
+
+      <div className="mt-8 pt-8 border-t border-gray-100">
+        <h2 className="text-base sm:text-lg font-semibold">
+          Participant Requirements
+        </h2>
+
+        <div className="mt-4 border border-gray-100 rounded-2xl p-5 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-gray-700">
+                Min Age<span className="text-red-500">*</span>
+              </label>
+              <select
+                value={stepTwoData.minimumAge}
+                onChange={(e) =>
+                  updateStepTwoField("minimumAge", e.target.value)
+                }
+                className={`${selectClass} mt-2`}
+              >
+                <option value="">-- Select --</option>
+                {ageOptions.map((age) => (
+                  <option key={age} value={age}>
+                    {age}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-700">
+                Max Age<span className="text-red-500">*</span>
+              </label>
+              <select
+                value={stepTwoData.maximumAge}
+                onChange={(e) =>
+                  updateStepTwoField("maximumAge", e.target.value)
+                }
+                className={`${selectClass} mt-2`}
+              >
+                <option value="">-- Select --</option>
+                {ageOptions.map((age) => (
+                  <option key={age} value={age}>
+                    {age}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <label className="block mt-4 text-sm text-gray-700">Gender</label>
+          <select
+            value={stepTwoData.gender}
+            onChange={(e) => updateStepTwoField("gender", e.target.value)}
+            className={`${selectClass} mt-2`}
+          >
+            <option value="">-- Select or search --</option>
+            {genderOptions.map((gender) => (
+              <option key={gender} value={gender}>
+                {gender}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100 flex-col md:flex-row gap-5">
