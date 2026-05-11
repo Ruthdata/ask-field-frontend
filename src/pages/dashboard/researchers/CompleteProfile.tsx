@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, JSX, useEffect, useRef } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCurrentUser } from "@hooks/useCurrentUser";
+import { useNavigate } from "react-router-dom";
 
 type Step = {
   id: number;
@@ -9,11 +10,31 @@ type Step = {
 };
 
 const stepsData: Step[] = [
-  { id: 1, title: "Verify Email", icon: "/images/dashboard/completed-step.svg" },
-  { id: 2, title: "What are you here to do", icon: "/images/dashboard/chat-step.svg" },
-  { id: 3, title: "What type of research are you interested in", icon: "/images/dashboard/chat-step.svg" },
-  { id: 4, title: "Where did you hear about us", icon: "/images/dashboard/chat-step.svg" },
-  { id: 5, title: "Set your office address", icon: "/images/dashboard/location.svg" },
+  {
+    id: 1,
+    title: "Verify Email",
+    icon: "/images/dashboard/completed-step.svg",
+  },
+  {
+    id: 2,
+    title: "What are you here to do",
+    icon: "/images/dashboard/chat-step.svg",
+  },
+  {
+    id: 3,
+    title: "What type of research are you interested in",
+    icon: "/images/dashboard/chat-step.svg",
+  },
+  {
+    id: 4,
+    title: "Where did you hear about us",
+    icon: "/images/dashboard/chat-step.svg",
+  },
+  {
+    id: 5,
+    title: "Set your office address",
+    icon: "/images/dashboard/location.svg",
+  },
 ];
 
 type SelectedOptions = Record<number, string[]>;
@@ -29,9 +50,12 @@ type FormData = {
 };
 
 export default function CompleteProfile(): JSX.Element {
-  const [activeStep, setActiveStep] = useState<number | null>(0); 
-  const [showModal, setShowModal] = useState<boolean>(true);
+  const [activeStep, setActiveStep] = useState<number | null>(0);
+  const [showModal, setShowModal] = useState<boolean>(
+    localStorage.getItem("researcher_profile_complete") !== "true",
+  );
   const { researcher } = useCurrentUser();
+  const navigate = useNavigate();
 
   const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({});
   const [formData, setFormData] = useState<FormData>({
@@ -41,11 +65,13 @@ export default function CompleteProfile(): JSX.Element {
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const percentage: number = Math.round((completedSteps.size / stepsData.length) * 100);
+  const percentage: number = Math.round(
+    (completedSteps.size / stepsData.length) * 100,
+  );
 
   useEffect(() => {
     if (researcher?.isVerified) {
-      setCompletedSteps((prev) => new Set(prev).add(0)); 
+      setCompletedSteps((prev) => new Set(prev).add(0));
       setActiveStep(1);
     }
   }, [researcher?.isVerified]);
@@ -61,7 +87,9 @@ export default function CompleteProfile(): JSX.Element {
     setSelectedOptions((prev) => {
       const current = prev[step] || [];
       const exists = current.includes(option);
-      const newOptions = exists ? current.filter((i) => i !== option) : [...current, option];
+      const newOptions = exists
+        ? current.filter((i) => i !== option)
+        : [...current, option];
 
       setCompletedSteps((prevSet) => {
         const updated = new Set(prevSet);
@@ -80,46 +108,57 @@ export default function CompleteProfile(): JSX.Element {
 
     setCompletedSteps((prevSet) => {
       const updated = new Set(prevSet);
-      const hasValue = Object.values({ ...formData, [name]: value }).some((val) => val && val !== "");
+      const hasValue = Object.values({ ...formData, [name]: value }).some(
+        (val) => val && val !== "",
+      );
       if (hasValue) updated.add(4);
       else updated.delete(4);
       return updated;
     });
   };
 
-  // Save address: highlight first empty field
   const handleSaveAddress = (): void => {
-    // Step 2–4 option selections
-    const optionSteps = [1, 2, 3]; // zero-based indices
+    const optionSteps = [1, 2, 3];
     const addressStepIndex = 4;
-    const requiredAddressFields: (keyof FormData)[] = ["firstName", "lastName", "organization", "street", "city", "country"];
-  
-    // 1️⃣ Check for incomplete option steps first
+    const requiredAddressFields: (keyof FormData)[] = [
+      "firstName",
+      "lastName",
+      "organization",
+      "street",
+      "city",
+      "country",
+    ];
+
     for (const step of optionSteps) {
       const selected = selectedOptions[step] || [];
       if (selected.length === 0) {
         setActiveStep(step);
-        return; // stop at first incomplete step
+        return;
       }
     }
-  
-    // 2️⃣ Check address step for missing fields
-    const emptyField = requiredAddressFields.find((field) => !formData[field] || formData[field] === "");
+
+    const emptyField = requiredAddressFields.find(
+      (field) => !formData[field] || formData[field] === "",
+    );
     if (emptyField) {
       setActiveStep(addressStepIndex);
       inputRefs.current[emptyField]?.focus();
       return;
     }
-  
-    // ✅ All steps complete
+
     const allData = {
       purposeHere: selectedOptions[1] || [],
       researchType: selectedOptions[2] || [],
       researchInterest: selectedOptions[3] || [],
       ...formData,
     };
-  
+
     console.log("Complete Profile Data:", allData);
+    
+    setCompletedSteps(new Set([0, 1, 2, 3, 4]));
+    localStorage.setItem("researcher_profile_complete", "true");
+    setShowModal(false);
+    navigate("/dashboard/researcher");
   };
 
   const renderStepContent = (index: number): JSX.Element | null => {
@@ -131,25 +170,47 @@ export default function CompleteProfile(): JSX.Element {
             <div className="flex-1">
               <p className="text-sm mb-4">
                 We’ve sent a verification link to{" "}
-                <span className="font-medium text-yellow-400">{researcher?.email}</span>. Click it to verify your email.
+                <span className="font-medium text-yellow-400">
+                  {researcher?.email}
+                </span>
+                . Click it to verify your email.
               </p>
               <p className="text-sm text-gray-500 mb-6">
                 It typically takes 3 mins. Check spam if it doesn’t arrive.
               </p>
               <div className="flex gap-3">
-                {isVerified && <button className="px-4 py-2 border cursor-pointer rounded-4xl text-sm">Resend Email</button>}
-                <button onClick={handleNext} className="px-4 py-2 border rounded-4xl text-sm bg-[#3E3E3E] text-white">Next</button>
+                {isVerified && (
+                  <button className="px-4 py-2 border cursor-pointer rounded-4xl text-sm">
+                    Resend Email
+                  </button>
+                )}
+                <button
+                  onClick={handleNext}
+                  className="px-4 py-2 border rounded-4xl text-sm bg-[#3E3E3E] text-white"
+                >
+                  Next
+                </button>
               </div>
             </div>
             <div className="flex-1">
-              <img src="/images/verify-email.png" alt="verify" className="w-full h-48 object-contain" />
+              <img
+                src="/images/verify-email.png"
+                alt="verify"
+                className="w-full h-48 object-contain"
+              />
             </div>
           </div>
         );
       case 1:
       case 2:
       case 3: {
-        const options: string[] = ["UI/UX", "Marketing", "Education", "Healthcare", "Finance"];
+        const options: string[] = [
+          "UI/UX",
+          "Marketing",
+          "Education",
+          "Healthcare",
+          "Finance",
+        ];
         return (
           <div>
             <div className="flex flex-wrap gap-3 mb-6">
@@ -160,7 +221,9 @@ export default function CompleteProfile(): JSX.Element {
                     key={item}
                     onClick={() => toggleOption(index, item)}
                     className={`px-4 py-2 rounded-full text-sm cursor-pointer border transition ${
-                      isSelected ? "bg-yellow-400 text-white border-yellow-400" : "bg-gray-100 hover:bg-gray-200"
+                      isSelected
+                        ? "bg-yellow-400 text-white border-yellow-400"
+                        : "bg-gray-100 hover:bg-gray-200"
                     }`}
                   >
                     {item}
@@ -181,19 +244,32 @@ export default function CompleteProfile(): JSX.Element {
       case 4:
         return (
           <div className="grid grid-cols-2 gap-4">
-            {["firstName", "lastName", "organization", "street", "address2", "city", "country"].map((field, i) => (
+            {[
+              "firstName",
+              "lastName",
+              "organization",
+              "street",
+              "address2",
+              "city",
+              "country",
+            ].map((field, i) => (
               <input
                 key={field}
                 name={field}
                 placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                 value={formData[field as keyof FormData] || ""}
                 onChange={handleInputChange}
-                ref={(el) => { inputRefs.current[field] = el; }}
-                className={`input ${!formData[field as keyof FormData] && i < 6 ? "border-red-500" : ""}`} 
+                ref={(el) => {
+                  inputRefs.current[field] = el;
+                }}
+                className={`input ${!formData[field as keyof FormData] && i < 6 ? "border-red-500" : ""}`}
               />
             ))}
             <div className="col-span-2">
-              <button onClick={handleSaveAddress} className="bg-black text-white px-4 py-2 rounded-lg text-sm cursor-pointer">
+              <button
+                onClick={handleSaveAddress}
+                className="bg-black text-white px-4 py-2 rounded-lg text-sm cursor-pointer"
+              >
                 Save Address
               </button>
             </div>
@@ -209,17 +285,24 @@ export default function CompleteProfile(): JSX.Element {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 pr-6 md:pr-1">
           <div className="bg-white rounded-2xl md:w-[78%] w-[95%] h-[90vh] p-8 shadow-xl flex flex-col overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-6">Help us set up your account</h2>
+            <h2 className="text-xl font-semibold mb-6">
+              Help us set up your account
+            </h2>
 
             <div className="relative w-fit mb-6">
               <div className="rounded-full px-1 pe-2 py-1 text-sm bg-gray-200 shadow flex justify-between gap-2 items-center">
-                <span className="bg-[#FF0000] text-white text-[10px] rounded-4xl px-3 py-1">{percentage}%</span>{" "}
+                <span className="bg-[#FF0000] text-white text-[10px] rounded-4xl px-3 py-1">
+                  {percentage}%
+                </span>{" "}
                 <span className="text-[13px] text-gray-400">Complete</span>
               </div>
             </div>
 
             <div className="w-full h-2 bg-yellow-100 rounded-full mb-8">
-              <div className="h-full bg-yellow-400 rounded-full transition-all" style={{ width: `${percentage}%` }} />
+              <div
+                className="h-full bg-yellow-400 rounded-full transition-all"
+                style={{ width: `${percentage}%` }}
+              />
             </div>
 
             <div className="flex flex-col gap-6">
@@ -229,22 +312,37 @@ export default function CompleteProfile(): JSX.Element {
 
                 return (
                   <div key={step.id} className="relative">
-                    {isActive && <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-yellow-400"></div>}
+                    {isActive && (
+                      <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-yellow-400"></div>
+                    )}
 
                     <div
-                      onClick={() => !isDisabled && setActiveStep((prev) => (prev === index ? null : index))}
+                      onClick={() =>
+                        !isDisabled &&
+                        setActiveStep((prev) => (prev === index ? null : index))
+                      }
                       className={`flex items-center justify-between cursor-pointer ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center overflow-hidden`}>
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center overflow-hidden`}
+                        >
                           <img src={step.icon} alt="" />
                         </div>
                         <p className="font-medium">{step.title}</p>
                       </div>
-                      {isActive ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      {isActive ? (
+                        <ChevronUp size={18} />
+                      ) : (
+                        <ChevronDown size={18} />
+                      )}
                     </div>
 
-                    {isActive && <div className="ml-12 mt-3 p-4 bg-gray-50 rounded-xl">{renderStepContent(index)}</div>}
+                    {isActive && (
+                      <div className="ml-12 mt-3 p-4 bg-gray-50 rounded-xl">
+                        {renderStepContent(index)}
+                      </div>
+                    )}
                   </div>
                 );
               })}

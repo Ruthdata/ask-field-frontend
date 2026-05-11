@@ -8,8 +8,6 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-
-
 const inputClass =
   "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";
 const labelClass = "block text-xs font-semibold text-gray-600 mb-1.5";
@@ -20,8 +18,8 @@ export default function LoginFormParticipant() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({ email: "", password: "" });
-  const [loginUser, {}] = useLoginParticipantMutation()
-  const navigate = useNavigate()
+  const [loginUser, {}] = useLoginParticipantMutation();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,20 +34,20 @@ export default function LoginFormParticipant() {
     // Handle the form submission here (e.g., API call for login)
     try {
       // Placeholder for actual login logic
-      const res = await loginUser(form).unwrap()
-      if(res.success){
-        const message = res.message
-        toast.success(message || '')
+      const res = await loginUser(form).unwrap();
+      if (res.success) {
         const accessToken = res.data.accessToken;
         const refreshToken = res.data.refreshToken;
         localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
         localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-        navigate('/waitlist')
+        localStorage.setItem(STORAGE_KEYS.USER_TYPE, "participant"); // add this
+        // navigate("/waitlist");
+        navigate("/dashboard/participant");
       }
       // Example of a successful login:
       // handleAuthSuccess(data, () => window.location.assign("/dashboard"));
     } catch (err) {
-      const message = formatApiError(err)
+      const message = formatApiError(err);
       setError(message);
     } finally {
       setLoading(false);
@@ -58,7 +56,9 @@ export default function LoginFormParticipant() {
 
   return (
     <div className="w-full max-w-115 bg-white rounded-2xl shadow-[0_2px_40px_rgba(0,0,0,0.08)] px-10 py-11">
-      <h1 className="font-serif text-[2.2rem] leading-tight text-gray-900 mb-3">Login</h1>
+      <h1 className="font-serif text-[2.2rem] leading-tight text-gray-900 mb-3">
+        Login
+      </h1>
       <p className="text-sm text-gray-500 leading-relaxed mb-7">
         Now, login to your AskField account & start getting paid.
       </p>
@@ -124,13 +124,18 @@ export default function LoginFormParticipant() {
           onChange={() => setRememberMe(!rememberMe)}
           className="w-4 h-4 rounded border-gray-300 accent-gray-900 cursor-pointer"
         />
-        <label htmlFor="remember" className="text-xs text-gray-500 cursor-pointer">
+        <label
+          htmlFor="remember"
+          className="text-xs text-gray-500 cursor-pointer"
+        >
           Remember me
         </label>
       </div>
 
       {error && (
-        <p className="text-xs text-red-500 mb-3 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+        <p className="text-xs text-red-500 mb-3 bg-red-50 px-3 py-2 rounded-lg">
+          {error}
+        </p>
       )}
 
       <button
@@ -143,7 +148,10 @@ export default function LoginFormParticipant() {
 
       <p className="text-center mt-4 text-xs text-gray-400">
         Don't have an account as a participant?{" "}
-        <a href="/auth/sign-up/participant" className="text-red-400 font-medium hover:underline">
+        <a
+          href="/auth/sign-up/participant"
+          className="text-red-400 font-medium hover:underline"
+        >
           Sign Up
         </a>
       </p>

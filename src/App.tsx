@@ -1,7 +1,6 @@
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Homepage from "./pages/landing/Homepage";
-import Login from "./pages/auth/LoginParticipant";
 import SignUpAsResearcher from "./pages/auth/SignUpAsResearcher";
 import SignUpAsParticipant from "./pages/auth/SignUpAsParticipant";
 import SignupCountry from "./pages/auth/SignupCountry";
@@ -38,6 +37,12 @@ import ResearcherDashboardHome from "./pages/dashboard/researchers/ResearcherDas
 import Projects from "./pages/dashboard/researchers/Projects";
 import Project from "./pages/dashboard/researchers/Project";
 import CreateSurvey from "./pages/dashboard/researchers/CreateSurvey";
+import AiTaskBuilder from "./pages/dashboard/researchers/AiTaskBuilder";
+import PricingCalculator from "./pages/dashboard/researchers/PricingCalculator";
+import Wallet from "./pages/dashboard/researchers/Wallet";
+import WorkspaceTeam from "./pages/dashboard/researchers/WorkspaceTeam";
+import ResearcherSupport from "./pages/dashboard/researchers/HelpSupport";
+import ResearcherMessages from "./pages/dashboard/researchers/Messages";
 
 export default function App() {
   return (
@@ -89,22 +94,48 @@ export default function App() {
           </Route>
         </Route>
         {/* Dashboard Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard/participant" element={<ParticipantDashboardLayout />}>
+        {/* Participant Dashboard */}
+        <Route element={<ProtectedRoute requiredRole="participant" />}>
+          <Route
+            path="/dashboard/participant"
+            element={<ParticipantDashboardLayout />}
+          >
             <Route index element={<ParticipantDashboardHome />} />
-            <Route path="complete-profile" element={<CompleteParticipantProfile />} />
+            <Route
+              path="complete-profile"
+              element={<CompleteParticipantProfile />}
+            />
             <Route path="surveys" element={<Surveys />} />
             <Route path="earnings" element={<Earnings />} />
             <Route path="support" element={<Support />} />
             <Route path="messages" element={<Messages />} />
           </Route>
         </Route>
-        <Route path="/dashboard/researcher" element={<ResearcherDashboardLayout />}>
-          <Route index element={<ResearcherDashboardHome />} />
-          <Route path="complete-profile" element={<CompleteResearcherProfile />} />
-          <Route path="projects" element={<Projects />} />
-          <Route path="projects/:id" element={<Project />} />
-          <Route path="projects/:id/create-survey" element={<CreateSurvey />} />
+
+        {/* Researcher Dashboard */}
+        <Route element={<ProtectedRoute requiredRole="researcher" />}>
+          <Route
+            path="/dashboard/researcher"
+            element={<ResearcherDashboardLayout />}
+          >
+            <Route index element={<ResearcherDashboardHome />} />
+            <Route
+              path="complete-profile"
+              element={<CompleteResearcherProfile />}
+            />
+            <Route path="projects" element={<Projects />} />
+            <Route path="projects/:id" element={<Project />} />
+            <Route
+              path="projects/:id/create-survey"
+              element={<CreateSurvey />}
+            />
+            <Route path="ai-task-builder" element={<AiTaskBuilder />} />
+            <Route path="pricing-calculator" element={<PricingCalculator />} />
+            <Route path="wallet" element={<Wallet />} />
+            <Route path="workspace-team" element={<WorkspaceTeam />} />
+            <Route path="support" element={<ResearcherSupport />} />
+            <Route path="messages" element={<ResearcherMessages />} />
+          </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

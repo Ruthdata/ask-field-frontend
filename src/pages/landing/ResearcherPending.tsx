@@ -1,4 +1,3 @@
-import { MailIcon } from "@components/icons";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useSearchParams } from "react-router-dom";
 

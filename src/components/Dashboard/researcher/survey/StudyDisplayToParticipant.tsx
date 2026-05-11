@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import { StudyLabelOption } from "@/types/survey";
 
 type StudyLabel = {
-  name: "survey" | "decision making" | "writing" | "interview" | "ai task" | "none";
+  name: StudyLabelOption;
   icon: string;
 };
 
-const StudyDisplayToParticipant = () => {
-  const [selectedLabel, setSelectedLabel] = useState<StudyLabel | null>(null);
+type Props = {
+  selectedLabel: StudyLabelOption | "";
+  onChange: (value: StudyLabelOption) => void;
+};
+
+const StudyDisplayToParticipant = ({ selectedLabel, onChange }: Props) => {
 
   const labels: StudyLabel[] = [
     { name: "survey", icon: "/images/survey-label.svg" },
@@ -20,7 +24,7 @@ const StudyDisplayToParticipant = () => {
   const optionStyles = (label: StudyLabel) =>
     `border rounded-2xl p-5 flex flex-col items-center justify-center relative cursor-pointer transition
      ${
-       selectedLabel?.name === label.name
+       selectedLabel === label.name
          ? "border-yellow-400 ring-2 ring-yellow-400 shadow-lg bg-yellow-50"
          : "border-gray-200 hover:shadow-lg"
      }`;
@@ -38,17 +42,17 @@ const StudyDisplayToParticipant = () => {
           <div
             key={label.name}
             className={optionStyles(label)}
-            onClick={() => setSelectedLabel(label)}
+            onClick={() => onChange(label.name)}
           >
             {/* Radio indicator */}
             <div
               className={`h-5 w-5 rounded-full mb-2 flex items-center justify-center absolute top-3 left-3 ${
-                selectedLabel?.name === label.name
+                selectedLabel === label.name
                   ? "border-yellow-400 border-2"
                   : "border-gray-300 border"
               }`}
             >
-              {selectedLabel?.name === label.name && (
+              {selectedLabel === label.name && (
                 <div className="h-2.5 w-2.5 bg-yellow-400 rounded-full" />
               )}
             </div>

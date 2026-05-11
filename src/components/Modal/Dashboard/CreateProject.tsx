@@ -1,15 +1,18 @@
 import { X } from "lucide-react";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { useCreateProjectMutation } from "@/redux/api/projectApi";
+import { formatApiError } from "@/utils/helper";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
   open: boolean;
-  to: string;
   onClose: () => void;
 };
 
-const CreateProject = ({ open, to, onClose }: Props) => {
+const CreateProject = ({ open, onClose }: Props) => {
   const navigate = useNavigate();
+  const [createProject, { isLoading }] = useCreateProjectMutation();
   const [selected, setSelected] = useState<"individual" | "collection" | null>(
     null
   );
@@ -17,10 +20,42 @@ const CreateProject = ({ open, to, onClose }: Props) => {
 
   if (!open) return null;
 
-  const handleSubmit = () => {
-    console.log("Selected option:", selected);
+  const handleClose = () => {
+    resetForm();
     onClose();
-    navigate(to);
+  };
+
+  const resetForm = () => {
+    setSelected(null);
+    setTitle("");
+  };
+
+  const handleSubmit = async () => {
+    const trimmedTitle = title.trim();
+
+    if (!trimmedTitle) {
+      toast.error("Please enter a project title.");
+      return;
+    }
+
+    if (!selected) {
+      toast.error("Please choose how participants should see the project.");
+      return;
+    }
+
+    try {
+      const response = await createProject({
+        title: trimmedTitle,
+        participantView: selected,
+      }).unwrap();
+
+      toast.success(response.message || "Project created successfully.");
+      resetForm();
+      onClose();
+      navigate(`/dashboard/researcher/projects/${response.data._id}`);
+    } catch (error) {
+      toast.error(formatApiError(error));
+    }
   };
 
   const optionStyles = (type: "individual" | "collection") =>
@@ -46,10 +81,10 @@ const CreateProject = ({ open, to, onClose }: Props) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-3 sm:px-4">
       <div className="bg-white relative rounded-2xl shadow-xl w-full max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto animate-fadeIn p-4 sm:p-6">
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 transition"
         >
-          <X size={20} cursor={'pointer'} />
+          <X size={20} cursor={"pointer"} />
         </button>
 
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold">
@@ -113,10 +148,10 @@ const CreateProject = ({ open, to, onClose }: Props) => {
         <div className="mt-6">
           <button
             onClick={handleSubmit}
-            disabled={!selected || !title}
-            className="w-full sm:w-1/2 bg-[#3E3E3E] disabled:opacity-50 text-sm px-4 py-3 rounded-2xl text-white cursor-pointer"
+            disabled={isLoading || !selected || !title.trim()}
+            className="w-full sm:w-1/2 bg-[#3E3E3E] disabled:opacity-50 disabled:cursor-not-allowed text-sm px-4 py-3 rounded-2xl text-white cursor-pointer"
           >
-            Create Project
+            {isLoading ? "Creating..." : "Create Project"}
           </button>
         </div>
       </div>

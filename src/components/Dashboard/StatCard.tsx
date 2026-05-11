@@ -24,7 +24,7 @@ const StatCard: React.FC<StatCardProps> = ({
   isVisible = true,
   isDisplayBalance = false,
   onToggleVisibility,
-  children
+  children,
 }) => {
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
@@ -61,10 +61,32 @@ const StatCard: React.FC<StatCardProps> = ({
                 {isVisible ? value : "••••"}
               </h3>
             </div>
-
-            <div className="flex items-center gap-2 mt-3">
-              <TrendingUp className="w-3.5 h-3.5 text-gray-400" />
-              <p className="text-gray-400 text-xs">{change}</p>
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
+              {title === "Active Surveys" ? (
+                <div className="flex gap-3 text-xs">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+                    <span className="text-green-600">
+                      {change.split("•")[0]}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block" />
+                    <span className="text-yellow-600">
+                      {change.split("•")[1]}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+                    <span className="text-red-600">{change.split("•")[2]}</span>
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <TrendingUp className="w-3.5 h-3.5 text-green-500" />
+                  <p className="text-green-500 text-xs">{change}</p>
+                </>
+              )}
             </div>
           </div>
         </div>

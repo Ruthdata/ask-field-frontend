@@ -3,72 +3,51 @@ import {
   useLazyGetParticipantQuery,
   useLazyGetResearcherQuery,
 } from "@/redux/api/slices/userSlice";
-import { JwtApiError } from "@/types/api.type";
 import { Participant, Researcher } from "@/types/user.type";
 import { formatApiError } from "@utils/helper";
+import { getUserType } from "@/utils/auth";
 import { useState, useEffect } from "react";
 
 export const useCurrentUser = () => {
-  const [participant, setParticipant] = useState<Participant | null>();
-  const [researcher, setResearcher] = useState<Researcher | null>();
+  const [participant, setParticipant] = useState<Participant | null>(null);
+  const [researcher, setResearcher] = useState<Researcher | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [getParticipant] = useLazyGetParticipantQuery();
   const [getResearcher] = useLazyGetResearcherQuery();
-  const [currentUserType, setCurrentUserType] = useState('')
+
+  const userType = getUserType(); // reads from localStorage
 
   useEffect(() => {
-    const fetchParticipant = async () => {
+    const fetchUser = async () => {
       try {
-        const response = await getParticipant().unwrap();
-        if (response.success) {
-          if(response.data.userType){
-            setCurrentUserType(response.data.userType)
-          }
-          setParticipant(response.data);
+        if (userType === "researcher") {
+          const response = await getResearcher().unwrap();
+          if (response.success) setResearcher(response.data);
+        } else if (userType === "participant") {
+          const response = await getParticipant().unwrap();
+          if (response.success) setParticipant(response.data);
         }
-        setLoading(false);
       } catch (err: any) {
+        const msg = formatApiError(err);
+        setError(msg || "Failed to fetch user");
+      } finally {
         setLoading(false);
-        const msg = formatApiError(err)
-
-        const errorMessage = msg || "Failed to fetch user";
-        setError(errorMessage);
       }
     };
 
-    fetchParticipant();
-  }, []);
-  
-  useEffect(() => {
-    const fetchResearcher = async () => {
-      try {
-        const response = await getResearcher().unwrap();
-        if (response.success) {
-          if(response.data.userType){
-            setCurrentUserType(response.data.userType)
-          }
-          setResearcher(response.data);
-        }
-        setLoading(false);
-      } catch (err: any) {
-        setLoading(false);
-        const msg = formatApiError(err)
-
-        const errorMessage = msg || "Failed to fetch user";
-        setError(errorMessage);
-      }
-    };
-
-    fetchResearcher();
-  }, []);
+    fetchUser();
+  }, [userType]);
 
   const refetchUser = async () => {
     try {
-      const response1 = await getParticipant().unwrap();
-      const response2 = await getResearcher().unwrap();
-      if (response1.success) setParticipant(response1.data);
-      if (response2.success) setResearcher(response2.data);
+      if (userType === "researcher") {
+        const response = await getResearcher().unwrap();
+        if (response.success) setResearcher(response.data);
+      } else {
+        const response = await getParticipant().unwrap();
+        if (response.success) setParticipant(response.data);
+      }
     } catch (err) {
       console.error("Failed to refetch user", err);
     }
@@ -76,26 +55,22 @@ export const useCurrentUser = () => {
 
   const getParticipantInitials = () => {
     if (!participant) return "??";
-    return `${participant.firstName?.[0] ?? ""}${
-      participant.lastName?.[0] ?? ""
-    }`.toUpperCase();
+    return `${participant.firstName?.[0] ?? ""}${participant.lastName?.[0] ?? ""}`.toUpperCase();
   };
 
   const getResearcherInitials = () => {
     if (!researcher) return "??";
-    return `${researcher.firstName?.[0] ?? ""}${
-      researcher.lastName?.[0] ?? ""
-    }`.toUpperCase();
+    return `${researcher.firstName?.[0] ?? ""}${researcher.lastName?.[0] ?? ""}`.toUpperCase();
   };
 
   const getParticipantFullName = () => {
     if (!participant) return "";
-    return `${participant?.firstName} ${participant.lastName}`;
+    return `${participant.firstName} ${participant.lastName}`;
   };
 
   const getResearcherFullName = () => {
     if (!researcher) return "";
-    return `${researcher?.firstName} ${researcher.lastName}`;
+    return `${researcher.firstName} ${researcher.lastName}`;
   };
 
   const getParticipantFirstName = () => {
@@ -105,6 +80,7 @@ export const useCurrentUser = () => {
       participant.firstName.slice(1)
     );
   };
+
   const getResearcherFirstName = () => {
     if (!researcher?.firstName) return "";
     return (
@@ -118,6 +94,7 @@ export const useCurrentUser = () => {
     researcher,
     loading,
     error,
+    currentUserType: userType,
     getParticipantInitials,
     getParticipantFirstName,
     getResearcherInitials,
@@ -125,6 +102,5 @@ export const useCurrentUser = () => {
     getResearcherFirstName,
     getParticipantFullName,
     refetchUser,
-    currentUserType
   };
 };

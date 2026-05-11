@@ -1,23 +1,23 @@
 import React, { useState } from "react";
-import { Wallet, Zap, HelpCircle, MoreVertical } from "lucide-react";
+import { Wallet, Zap, HelpCircle } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import StatCard from "../StatCard";
 import SurveyHeader from "./survey/SurveyHeader";
 import SurveyBody from "./survey/SurveyBody";
+import { useGetDashboardStatsQuery } from "@/redux/api/researcherApi";
+import { Survey } from "@/types/survey";
+import { Link, useNavigate } from "react-router-dom";
+
+const getSurveyIdentifier = (survey: Survey) => survey.surveyId || survey._id || "";
 
 const DashboardSection = () => {
   const { getResearcherFirstName } = useCurrentUser();
-  const [selectedPeriod, setSelectedPeriod] = useState("Last 3 days");
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const periods = [
-    "Last 24 hours",
-    "Last 3 days",
-    "Last 7 days",
-    "Last 30 days",
-    "All time",
-  ];
+  const { data, isLoading } = useGetDashboardStatsQuery();
+  const stats = data?.data;
+  const surveys: Survey[] = [];
 
   return (
     <div className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -26,9 +26,8 @@ const DashboardSection = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="mb-4 sm:mb-0">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome, {getResearcherFirstName()}!
+              Hi {getResearcherFirstName()}
             </h1>
-
             <div className="flex items-center gap-2">
               <p className="text-gray-600">
                 Monitor your surveys and manage your research spend from one
@@ -39,44 +38,6 @@ const DashboardSection = () => {
               </button>
             </div>
           </div>
-
-          {/* Dropdown */}
-          {/* <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50"
-            >
-              <span className="text-gray-900 font-medium">
-                {selectedPeriod}
-              </span>
-              <ChevronDown
-                className={`w-4 h-4 text-gray-600 ${
-                  isDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
-                {periods.map((period) => (
-                  <button
-                    key={period}
-                    onClick={() => {
-                      setSelectedPeriod(period);
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 ${
-                      selectedPeriod === period
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div> */}
         </div>
 
         {/* Cards */}
@@ -85,36 +46,51 @@ const DashboardSection = () => {
             icon={<Wallet className="w-6 h-6 text-yellow-600" />}
             iconBg="bg-yellow-50"
             title="Active Surveys"
-            value="0"
-            change="Since last 3 days"
+            value={isLoading ? "..." : (stats?.activeSurveys ?? 0)}
+            change={
+              isLoading
+                ? ""
+                : `${stats?.liveSurveys ?? 0} Live  •  ${stats?.draftSurveys ?? 0} Draft  •  ${stats?.closedSurveys ?? 0} Closed`
+            }
             showVisibility={false}
-            isDisplayBalance={true}
-            isVisible={isBalanceVisible}
-            onToggleVisibility={() => setIsBalanceVisible(!isBalanceVisible)}
+            isDisplayBalance={false}
+            isVisible={true}
+            onToggleVisibility={() => {}}
           >
             <div className="border-t border-t-olive-200 pt-4">
-              <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
+              <Link
+                to="/dashboard/researcher/projects"
+                className="bg-[#3E3E3E] flex w-fit items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer"
+              >
                 <img src="/images/create-survey.svg" alt="create-survey" />
                 <span className="text-white text-[12px]">Create Survey</span>
-              </button>
+              </Link>
             </div>
           </StatCard>
 
           <StatCard
             icon={<Zap className="w-6 h-6 text-yellow-600" />}
             iconBg="bg-yellow-50"
-            title="Research spend"
-            value="0.00"
-            change="Since last 3 days"
-            isVisible={true}
-            onToggleVisibility={() => {}}
+            title="Research Spend"
+            value={
+              isLoading
+                ? "..."
+                : (stats?.researchSpent?.toLocaleString() ?? "0.00")
+            }
+            change="30%"
+            isVisible={isBalanceVisible}
+            onToggleVisibility={() => setIsBalanceVisible(!isBalanceVisible)}
             showVisibility={true}
+            isDisplayBalance={true}
           >
             <div className="border-t border-t-olive-200 pt-4">
-              <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
+              <Link
+                to="/dashboard/researcher/wallet"
+                className="bg-[#3E3E3E] flex w-fit items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer"
+              >
                 <img src="/images/add-fund.svg" alt="add-fund" />
                 <span className="text-white text-[12px]">Add Funds</span>
-              </button>
+              </Link>
             </div>
           </StatCard>
         </div>
@@ -125,7 +101,11 @@ const DashboardSection = () => {
           <div className="bg-white mt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 p-4">
               {/* Each exploration */}
-              <div className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4">
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard/researcher/ai-task-builder")}
+                className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4 text-left bg-white"
+              >
                 <div className="h-30 w-full relative rounded-3xl overflow-hidden">
                   <img
                     src="/images/ai-taskbuilder.png"
@@ -140,7 +120,7 @@ const DashboardSection = () => {
                     workflow.
                   </p>
                 </div>
-              </div>
+              </button>
               {/* Each exploration */}
               <div className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4">
                 <div className="h-30 w-full relative rounded-3xl overflow-hidden">
@@ -159,7 +139,11 @@ const DashboardSection = () => {
                 </div>
               </div>
               {/* Each exploration */}
-              <div className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4">
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard/researcher/pricing-calculator")}
+                className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4 text-left bg-white"
+              >
                 <div className="h-30 w-full relative rounded-3xl overflow-hidden">
                   <img
                     src="/images/pricing-calculator.png"
@@ -173,7 +157,7 @@ const DashboardSection = () => {
                     Estimate the cost of your study before starting research.
                   </p>
                 </div>
-              </div>
+              </button>
               {/* Each exploration */}
               <div className="py-4 flex flex-col justify-center gap-2 shadow-lg rounded-2xl cursor-pointer px-4">
                 <div className="h-30 w-full relative rounded-3xl overflow-hidden">
@@ -208,26 +192,36 @@ const DashboardSection = () => {
                 {/* Header */}
                 <SurveyHeader />
 
-                {/* Row */}
-                {[1, 2, 3].map((_, i) => (
-                  <SurveyBody i={i} />
+                {surveys.map((survey) => (
+                  <SurveyBody
+                    key={getSurveyIdentifier(survey)}
+                    survey={survey}
+                  />
                 ))}
               </div>
             </div>
           </div>
-          {/* No Survey */}
-          <div className="flex flex-col py-15 gap-4 items-center">
-            <img
-              src="/images/no-survey.png"
-              className="h-30 w-50"
-              alt="no-survey"
-            />
-            <p>No surveys found :)</p>
-            <button className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer">
-              <img src="/images/create-survey.svg" alt="create-survey" />
-              <span className="text-white text-[12px]">Create Survey</span>
-            </button>
-          </div>
+          {surveys.length === 0 && (
+            <div className="flex flex-col py-15 gap-4 items-center">
+              <img
+                src="/images/no-survey.png"
+                className="h-30 w-50"
+                alt="no-survey"
+              />
+              <p>No surveys found :)</p>
+              <p className="max-w-md text-center text-xs text-gray-500">
+                The API currently only returns surveys inside a project, so use
+                My Projects to view or create studies for now.
+              </p>
+              <Link
+                to="/dashboard/researcher/projects"
+                className="bg-[#3E3E3E] flex items-center justify-center py-2 px-6 gap-3 rounded-3xl cursor-pointer"
+              >
+                <img src="/images/create-survey.svg" alt="create-survey" />
+                <span className="text-white text-[12px]">Create Survey</span>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

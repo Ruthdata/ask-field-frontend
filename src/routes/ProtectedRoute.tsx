@@ -1,10 +1,20 @@
-// components/ProtectedRoute.tsx
-
 import { Navigate, Outlet } from "react-router-dom";
-import { isAuthenticated } from "../utils/auth";
+import { isAuthenticated, getUserType } from "../utils/auth";
 
-const ProtectedRoute = () => {
-  return isAuthenticated() ? <Outlet /> : <Navigate to="/auth/login" replace />;
+interface ProtectedRouteProps {
+  requiredRole?: "researcher" | "participant";
+}
+
+const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
+  if (!isAuthenticated()) {
+    return <Navigate to="/auth/login/participant" replace />;
+  }
+
+  if (requiredRole && getUserType() !== requiredRole) {
+    return <Navigate to={`/auth/login/${requiredRole}`} replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

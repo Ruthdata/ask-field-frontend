@@ -59,21 +59,19 @@ export default function ResearcherDashboardLayout() {
     useCurrentUser();
 
   useEffect(() => {
-    // Only run if not loading and user exists
     if (!loading && researcher) {
-      const isComplete = researcher.isCompleteProfile;
+      const isComplete =
+        researcher.isCompleteProfile ||
+        localStorage.getItem("researcher_profile_complete") === "true";
 
-      // Get query params
       const skipRedirect =
         searchParams.get("skipCompleteProfileRedirect") === "true";
 
-      // If profile is complete and user is trying to access complete-profile page, redirect to dashboard
       if (isComplete && pathname === "/dashboard/researcher/complete-profile") {
         navigate("/dashboard/researcher");
         return;
       }
 
-      // If profile is incomplete and user is trying to access any other dashboard route (except complete-profile)
       const isDashboardRoute =
         pathname.startsWith("/dashboard/researcher") &&
         pathname !== "/dashboard/researcher/complete-profile";
@@ -82,8 +80,6 @@ export default function ResearcherDashboardLayout() {
         navigate("/dashboard/researcher/complete-profile");
         return;
       }
-    } else {
-      // navigate("/auth/login/researcher")
     }
   }, [researcher, loading, pathname, navigate]);
 
