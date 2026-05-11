@@ -1,40 +1,146 @@
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import Homepage from "./pages/landing/Homepage";
+import SignUpAsResearcher from "./pages/auth/SignUpAsResearcher";
+import SignUpAsParticipant from "./pages/auth/SignUpAsParticipant";
+import SignupCountry from "./pages/auth/SignupCountry";
+import OrganizationType from "./pages/auth/OrganizationType";
+import RegisterName from "./pages/auth/RegisterName";
+import Password from "./pages/auth/Password";
+import HomeLayout from "./layouts/HomeLayout";
+import EmailSent from "./pages/auth/EmailSent";
+import VerifyEmail from "./pages/auth/VerifyEmail";
+import Waitlist from "./pages/landing/Waitlist";
+import PublicRoute from "./routes/PublicRoute";
+import AuthLayout from "./layouts/AuthLayout";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import ParticipantDashboardLayout from "./layouts/ParticipantDashboardLayout";
+import ParticipantDashboardHome from "./pages/dashboard/participants/ParticipantDashboardHome";
+import NotFound from "./pages/error/NotFound";
+import CompleteParticipantProfile from "./pages/dashboard/participants/CompleteProfile";
+import CompleteResearcherProfile from "./pages/dashboard/researchers/CompleteProfile";
+import Surveys from "./pages/dashboard/participants/Surveys";
+import Earnings from "./pages/dashboard/participants/Earnings";
+import Support from "./pages/dashboard/participants/Support";
+import Messages from "./pages/dashboard/participants/Messages";
+import RecoverPassword from "./pages/auth/RecoverPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import ChangePassword from "./pages/auth/ChangePassword";
+import OrganizationName from "./pages/auth/OrganizationName";
+import JobTitle from "./pages/auth/JobTitle";
+import VerifyResearcherEmail from "./pages/auth/VerifyResearcherEmail";
+import LoginParticipant from "./pages/auth/LoginParticipant";
+import LoginResearcher from "./pages/auth/LoginResearcher";
+import ResearcherPending from "./pages/landing/ResearcherPending";
+import ResearcherDashboardLayout from "./layouts/ResearcherDashboardLayout";
+import ResearcherDashboardHome from "./pages/dashboard/researchers/ResearcherDashboardHome";
+import Projects from "./pages/dashboard/researchers/Projects";
+import Project from "./pages/dashboard/researchers/Project";
+import CreateSurvey from "./pages/dashboard/researchers/CreateSurvey";
+import AiTaskBuilder from "./pages/dashboard/researchers/AiTaskBuilder";
+import PricingCalculator from "./pages/dashboard/researchers/PricingCalculator";
+import Wallet from "./pages/dashboard/researchers/Wallet";
+import WorkspaceTeam from "./pages/dashboard/researchers/WorkspaceTeam";
+import ResearcherSupport from "./pages/dashboard/researchers/HelpSupport";
+import ResearcherMessages from "./pages/dashboard/researchers/Messages";
+import CompleteSurvey from "./pages/landing/CompleteSurvey";
 
-export default function CompleteSurvey() {
-  const { getParticipantFirstName } = useCurrentUser();
-
+export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6 py-10">
-      <div className="w-full max-w-2xl bg-white border border-gray-100 shadow-sm rounded-[2rem] p-10 md:p-14 text-center">
-        
-        {/* Success Icon */}
-        <div className="w-24 h-24 rounded-full bg-yellow-400 text-white flex items-center justify-center text-4xl mx-auto mb-8">
-          ✓
-        </div>
+    <div style={{ margin: "auto", fontFamily: "Inter, system-ui, Arial" }}>
+      <Toaster />
+      <Routes>
+        <Route path="/" element={<HomeLayout />}>
+          <Route index element={<Homepage />} />
+          <Route path="waitlist" element={<Waitlist />} />
+          <Route path="complete-survey" element={<CompleteSurvey />} />
+          <Route path="researcher-pending" element={<ResearcherPending />} />
+        </Route>
+        {/* AuthRoutes */}
+        <Route element={<PublicRoute />}>
+          <Route path="/auth" element={<AuthLayout />}>
+            <Route path="login/participant" element={<LoginParticipant />} />
+            <Route path="login/researcher" element={<LoginResearcher />} />
+            <Route path="email-sent" element={<EmailSent />} />
+            <Route path="verify-email" element={<VerifyEmail />} />
+            <Route
+              path="researcher/verify-email"
+              element={<VerifyResearcherEmail />}
+            />
+            <Route path="recover-password" element={<RecoverPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
+            <Route path="change-password" element={<ChangePassword />} />
+            <Route
+              path="sign-up/participant"
+              element={<SignUpAsParticipant />}
+            />
+            <Route path="sign-up/researcher" element={<SignUpAsResearcher />} />
+            <Route
+              path="sign-up/researcher/country"
+              element={<SignupCountry />}
+            />
+            <Route
+              path="sign-up/researcher/organization-type"
+              element={<OrganizationType />}
+            />
+            <Route
+              path="sign-up/researcher/organization-name"
+              element={<OrganizationName />}
+            />
+            <Route
+              path="sign-up/researcher/register-name"
+              element={<RegisterName />}
+            />
+            <Route path="sign-up/researcher/job-title" element={<JobTitle />} />
+            <Route path="sign-up/researcher/password" element={<Password />} />
+          </Route>
+        </Route>
+        {/* Dashboard Routes */}
+        {/* Participant Dashboard */}
+        <Route element={<ProtectedRoute requiredRole="participant" />}>
+          <Route
+            path="/dashboard/participant"
+            element={<ParticipantDashboardLayout />}
+          >
+            <Route index element={<ParticipantDashboardHome />} />
+            <Route
+              path="complete-profile"
+              element={<CompleteParticipantProfile />}
+            />
+            <Route path="surveys" element={<Surveys />} />
+            <Route path="earnings" element={<Earnings />} />
+            <Route path="support" element={<Support />} />
+            <Route path="messages" element={<Messages />} />
+          </Route>
+        </Route>
 
-        {/* Heading */}
-        <h1 className="font-serif text-5xl md:text-6xl font-bold text-gray-900 mb-5">
-          Thank You!
-        </h1>
-
-        {/* Message */}
-        <p className="text-gray-500 text-lg leading-relaxed max-w-xl mx-auto">
-          Thanks for taking the time to complete the survey,
-          <span className="font-semibold text-black">
-            {" "}
-            {getParticipantFirstName()}
-          </span>
-          .
-          <br />
-          Your feedback means a lot to us and helps us improve the experience
-          for everyone.
-        </p>
-
-        {/* Footer Note */}
-        <div className="mt-10 inline-flex items-center px-5 py-3 rounded-full bg-gray-100 text-sm text-gray-600">
-          Your response has been recorded successfully.
-        </div>
-      </div>
+        {/* Researcher Dashboard */}
+        <Route element={<ProtectedRoute requiredRole="researcher" />}>
+          <Route
+            path="/dashboard/researcher"
+            element={<ResearcherDashboardLayout />}
+          >
+            <Route index element={<ResearcherDashboardHome />} />
+            <Route
+              path="complete-profile"
+              element={<CompleteResearcherProfile />}
+            />
+            <Route path="projects" element={<Projects />} />
+            <Route path="projects/:id" element={<Project />} />
+            <Route
+              path="projects/:id/create-survey"
+              element={<CreateSurvey />}
+            />
+            <Route path="ai-task-builder" element={<AiTaskBuilder />} />
+            <Route path="pricing-calculator" element={<PricingCalculator />} />
+            <Route path="wallet" element={<Wallet />} />
+            <Route path="workspace-team" element={<WorkspaceTeam />} />
+            <Route path="support" element={<ResearcherSupport />} />
+            <Route path="messages" element={<ResearcherMessages />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </div>
   );
 }
