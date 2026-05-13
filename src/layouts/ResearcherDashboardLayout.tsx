@@ -11,6 +11,7 @@ import {
   Users,
   CircleQuestionMark,
   MessageCircleMore,
+  ClipboardCheck,
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
@@ -27,6 +28,11 @@ const navigation = [
     name: "Wallet",
     href: "/dashboard/researcher/wallet",
     icon: WalletMinimal,
+  },
+  {
+    name: "Survey Actions",
+    href: "/dashboard/researcher/survey-actions",
+    icon: ClipboardCheck,
   },
   {
     name: "Workspace Team",

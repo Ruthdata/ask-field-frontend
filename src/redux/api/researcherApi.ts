@@ -31,14 +31,14 @@ export const researcherApi = apiSlice.injectEndpoints({
     approveSurveyAction: builder.mutation<SurveyActionResponse, string>({
       query: (surveyActionId) => ({
         url: `/surveys/approve-survey-action/${surveyActionId}`,
-        method: "PATCH",
+        method: "PUT",
       }),
       invalidatesTags: ["Surveys"],
     }),
     rejectSurveyAction: builder.mutation<SurveyActionResponse, string>({
       query: (surveyActionId) => ({
-        url: `/surveys/reject-survey-actions/${surveyActionId}`,
-        method: "PATCH",
+        url: `/surveys/reject-survey-action/${surveyActionId}`,
+        method: "PUT",
       }),
       invalidatesTags: ["Surveys"],
     }),

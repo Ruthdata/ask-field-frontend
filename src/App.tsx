@@ -43,6 +43,7 @@ import Wallet from "./pages/dashboard/researchers/Wallet";
 import WorkspaceTeam from "./pages/dashboard/researchers/WorkspaceTeam";
 import ResearcherSupport from "./pages/dashboard/researchers/HelpSupport";
 import ResearcherMessages from "./pages/dashboard/researchers/Messages";
+import SurveyActions from "./pages/dashboard/researchers/SurveyActions";
 import CompleteSurvey from "./pages/landing/CompleteSurvey";
 
 export default function App() {
@@ -134,6 +135,7 @@ export default function App() {
             <Route path="ai-task-builder" element={<AiTaskBuilder />} />
             <Route path="pricing-calculator" element={<PricingCalculator />} />
             <Route path="wallet" element={<Wallet />} />
+            <Route path="survey-actions" element={<SurveyActions />} />
             <Route path="workspace-team" element={<WorkspaceTeam />} />
             <Route path="support" element={<ResearcherSupport />} />
             <Route path="messages" element={<ResearcherMessages />} />

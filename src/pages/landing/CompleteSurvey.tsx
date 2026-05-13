@@ -26,13 +26,14 @@ export default function SurveyThankYouPage() {
         ? sessionStorage.getItem(`${SURVEY_ACTION_BY_SURVEY_KEY}:${surveyId}`)
         : null) ||
       sessionStorage.getItem(SURVEY_ACTION_STORAGE_KEY);
+    const verifySurveyId = surveyId || surveyActionId;
 
     if (hasVerifiedSurveyAction.current) return;
 
-    if (!surveyActionId) {
+    if (!verifySurveyId) {
       if (surveyId || token || responseId) {
         setSubmissionMessage(
-          "Your response was received, but we could not find the survey action to submit for review.",
+          "Your response was received, but we could not find the survey to submit for review.",
         );
       }
       return;
@@ -40,7 +41,7 @@ export default function SurveyThankYouPage() {
 
     hasVerifiedSurveyAction.current = true;
 
-    verifySurveyAction(surveyActionId)
+    verifySurveyAction(verifySurveyId)
       .unwrap()
       .then((response) => {
         sessionStorage.removeItem(SURVEY_ACTION_STORAGE_KEY);

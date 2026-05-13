@@ -156,9 +156,9 @@ export const authApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Surveys"],
     }),
     verifySurveyAction: builder.mutation<SurveyActionResponse, string>({
-      query: (surveyActionId) => ({
-        url: `/surveys/verify-survey-action/${surveyActionId}`,
-        method: "PATCH",
+      query: (surveyId) => ({
+        url: `/surveys/verify-survey-action/${surveyId}`,
+        method: "GET",
       }),
       invalidatesTags: ["Surveys"],
     }),
