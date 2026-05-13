@@ -1,13 +1,25 @@
 import { MailIcon } from "@components/icons";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
+import { getUserType, isAuthenticated } from "@/utils/auth";
 
 export default function Waitlist() {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
   const {getParticipantFirstName} = useCurrentUser()
 
+  if (isAuthenticated()) {
+    return (
+      <Navigate
+        to={
+          getUserType() === "researcher"
+            ? "/dashboard/researcher"
+            : "/dashboard/participant"
+        }
+        replace
+      />
+    );
+  }
 
   return (
     <div className="flex justify-center items-start min-h-screen bg-gray-50">

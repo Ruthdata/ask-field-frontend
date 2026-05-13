@@ -30,7 +30,8 @@ const GoogleAuth = () => {
         console.log(res.data,'the google auth')
         localStorage.setItem(STORAGE_KEYS.TOKEN, token);
         localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-        navigate('/waitlist')
+        localStorage.setItem(STORAGE_KEYS.USER_TYPE, "participant");
+        navigate('/dashboard/participant')
       }
 
     } catch (err) {

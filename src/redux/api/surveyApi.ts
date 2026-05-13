@@ -4,6 +4,7 @@ import {
   CreateDraftSurveyResponse,
   UpdateDraftSurveyPayload,
   GetSurveysByProjectPayload,
+  GetAllSurveysPayload,
   SurveyResponse,
   SurveysListResponse,
 } from "@/types/survey";
@@ -54,6 +55,15 @@ export const surveyApi = apiSlice.injectEndpoints({
       providesTags: ["Surveys"], 
     }),
 
+    getAllSurveys: builder.query<SurveysListResponse, GetAllSurveysPayload>({
+      query: ({ status }) => ({
+        url: "/surveys/get-all-surveys",
+        method: "GET",
+        params: { status },
+      }),
+      providesTags: ["Surveys"],
+    }),
+
     getUserSurvey: builder.query<SurveyResponse, string>({
       query: (surveyId) => ({
         url: `/surveys/get-user-survey/${surveyId}`,
@@ -71,6 +81,8 @@ export const {
   useUpdateDraftSurveyMutation,
   useGetSurveysByProjectQuery,
   useLazyGetSurveysByProjectQuery,
+  useGetAllSurveysQuery,
+  useLazyGetAllSurveysQuery,
   useGetUserSurveyQuery,
   useLazyGetUserSurveyQuery,
 } = surveyApi;

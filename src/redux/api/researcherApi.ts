@@ -1,5 +1,9 @@
 import { apiSlice } from "./slices/appSlice";
 import { DashboardStatsResponse } from "@/types/researcher";
+import {
+  SurveyActionResponse,
+  SurveyActionsListResponse,
+} from "@/types/survey";
 
 export const researcherApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,8 +14,44 @@ export const researcherApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Researchers"],
     }),
+    listSurveyActions: builder.query<SurveyActionsListResponse, void>({
+      query: () => ({
+        url: "/surveys/list-survey-actions",
+        method: "GET",
+      }),
+      providesTags: ["Surveys"],
+    }),
+    getSurveyAction: builder.query<SurveyActionResponse, string>({
+      query: (surveyActionId) => ({
+        url: `/surveys/get-survey-actions/${surveyActionId}`,
+        method: "GET",
+      }),
+      providesTags: ["Surveys"],
+    }),
+    approveSurveyAction: builder.mutation<SurveyActionResponse, string>({
+      query: (surveyActionId) => ({
+        url: `/surveys/approve-survey-action/${surveyActionId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Surveys"],
+    }),
+    rejectSurveyAction: builder.mutation<SurveyActionResponse, string>({
+      query: (surveyActionId) => ({
+        url: `/surveys/reject-survey-actions/${surveyActionId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Surveys"],
+    }),
   }),
 });
 
-export const { useGetDashboardStatsQuery, useLazyGetDashboardStatsQuery } =
-  researcherApi;
+export const {
+  useGetDashboardStatsQuery,
+  useLazyGetDashboardStatsQuery,
+  useListSurveyActionsQuery,
+  useLazyListSurveyActionsQuery,
+  useGetSurveyActionQuery,
+  useLazyGetSurveyActionQuery,
+  useApproveSurveyActionMutation,
+  useRejectSurveyActionMutation,
+} = researcherApi;

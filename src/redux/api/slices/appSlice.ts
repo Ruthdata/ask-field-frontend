@@ -8,17 +8,38 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { storage } from "@/utils/storage";
 import { ApiSuccess } from "@/types/api.type";
+import {
+  clearAuthStorage,
+  isJwtLikeToken,
+  normalizeAuthToken,
+} from "@/utils/token";
 
 const baseUrl = import.meta.env.VITE_API_URL;
+
+const getJwtErrorName = (data: unknown) => {
+  if (!data || typeof data !== "object") return null;
+
+  const message = (data as { message?: unknown }).message;
+  if (message && typeof message === "object" && "name" in message) {
+    return String((message as { name?: unknown }).name);
+  }
+
+  return null;
+};
 
 // Create the standard base query
 const baseQuery = fetchBaseQuery({
   baseUrl: baseUrl,
   prepareHeaders: (headers) => {
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-    if (token) {
+    const storedToken = storage.get(STORAGE_KEYS.TOKEN);
+    const token = normalizeAuthToken(storedToken);
+
+    if (token && isJwtLikeToken(token)) {
       headers.set("authorization", `Bearer ${token}`);
+    } else if (storedToken) {
+      storage.remove(STORAGE_KEYS.TOKEN);
     }
+
     return headers;
   },
 });
@@ -34,12 +55,20 @@ const baseQueryWithInterceptor: BaseQueryFn<
   // 1. Check if the request failed with 401 (Unauthorized)
   if (result.error && result.error.status === 401) {
     const errorData = result.error.data as any;
+    const errorName = getJwtErrorName(errorData);
+
+    if (errorName === "JsonWebTokenError") {
+      clearAuthStorage();
+      return result;
+    }
 
     // 2. Check for your specific "TokenExpiredError" message
-    if (errorData?.message.name === "TokenExpiredError") {
-      const refreshToken = storage.get(STORAGE_KEYS.REFRESH_TOKEN);
+    if (errorName === "TokenExpiredError") {
+      const refreshToken = normalizeAuthToken(
+        storage.get(STORAGE_KEYS.REFRESH_TOKEN),
+      );
 
-      if (refreshToken) {
+      if (refreshToken && isJwtLikeToken(refreshToken)) {
         // 1. Trigger the refresh
         const response = await baseQuery(
           {
@@ -53,20 +82,19 @@ const baseQueryWithInterceptor: BaseQueryFn<
 
         const responseData = response.data as ApiSuccess<{
           accessToken: string;
-        }>;
+        }> | undefined;
 
-        const accessToken = responseData.data.accessToken;
+        const accessToken = normalizeAuthToken(responseData?.data?.accessToken);
 
-        if (accessToken) {
-          console.log(accessToken, "inside");
+        if (accessToken && isJwtLikeToken(accessToken)) {
           storage.set(STORAGE_KEYS.TOKEN, accessToken);
-          window.location.reload();
+          result = await baseQuery(args, api, extraOptions);
         } else {
-          storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
+          clearAuthStorage();
           window.location.href = "/";
         }
       } else {
-        storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
+        clearAuthStorage();
         window.location.href = "/";
       }
     }

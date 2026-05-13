@@ -1,11 +1,10 @@
 import { STORAGE_KEYS } from "@/config/constants";
 import { useLoginParticipantMutation } from "@/redux/api/slices/userSlice";
+import { isJwtLikeToken, normalizeAuthToken } from "@/utils/token";
 import GoogleAuth from "@components/Google/GoogleAuth";
 import { EyeIcon } from "@components/icons";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { formatApiError } from "@utils/helper";
 import React, { useState } from "react";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const inputClass =
@@ -36,10 +35,20 @@ export default function LoginFormParticipant() {
       // Placeholder for actual login logic
       const res = await loginUser(form).unwrap();
       if (res.success) {
-        const accessToken = res.data.accessToken;
-        const refreshToken = res.data.refreshToken;
+        const accessToken = normalizeAuthToken(res.data.accessToken);
+        const refreshToken = normalizeAuthToken(res.data.refreshToken);
+
+        if (!accessToken || !isJwtLikeToken(accessToken)) {
+          setError(
+            "Login failed: the server did not return a valid access token.",
+          );
+          return;
+        }
+
         localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
-        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+        if (refreshToken) {
+          localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+        }
         localStorage.setItem(STORAGE_KEYS.USER_TYPE, "participant"); // add this
         // navigate("/waitlist");
         navigate("/dashboard/participant");

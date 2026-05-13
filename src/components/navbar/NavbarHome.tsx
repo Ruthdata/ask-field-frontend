@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { storage } from "@/utils/storage";
 import { STORAGE_KEYS } from "@/config/constants";
-import { isAuthenticated } from "@/utils/auth";
+import { getUserType, isAuthenticated } from "@/utils/auth";
 import AccountTypeModal from "@components/Modal/Home/Modal/AccountTypeModal";
 import LoginTypeModal from "@components/Modal/Home/Modal/LoginTypeModal";
 
@@ -22,8 +22,16 @@ const NavbarHome = () => {
   };
 
   const handleContribute = () => {
-    setSelectedAction("contributor");
-    setIsModalOpen(true);
+    if (isAuthenticated()) {
+      navigate(
+        getUserType() === "researcher"
+          ? "/dashboard/researcher"
+          : "/dashboard/participant"
+      );
+      return;
+    }
+
+    navigate("/auth/sign-up/participant");
   };
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -74,11 +82,12 @@ const NavbarHome = () => {
                 Start collecting data
               </button>
             </Link>
-            <Link to="/auth/sign-up/participant">
-              <button className="px-5 cursor-pointer py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition">
+            <button
+              onClick={handleContribute}
+              className="px-5 cursor-pointer py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition"
+            >
                 Contribute and get paid
-              </button>
-            </Link>
+            </button>
             {/* Login / Logout */}
             {isAuthenticated() ? (
               <button
@@ -120,11 +129,15 @@ const NavbarHome = () => {
               </button>
             </Link>
 
-            <Link to="/auth/sign-up/participant" onClick={() => setOpen(false)}>
-              <button className="w-full px-4 py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition">
-                Contribute and get paid
-              </button>
-            </Link>
+            <button
+              onClick={() => {
+                setOpen(false);
+                handleContribute();
+              }}
+              className="w-full px-4 py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition"
+            >
+              Contribute and get paid
+            </button>
             {isAuthenticated() ? (
               <button
                 onClick={handleLogout}

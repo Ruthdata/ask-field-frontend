@@ -46,7 +46,7 @@ useEffect(() => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center">
         <p>Please hold. Checking this account.</p>
-      <VerifyAccountSuccess open={isOpenWaitlistSuccessModal} to='/waitlist' />
+      <VerifyAccountSuccess open={isOpenWaitlistSuccessModal} to='/dashboard/participant' />
     </div>
   );
 };

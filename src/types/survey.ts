@@ -57,6 +57,10 @@ export interface GetSurveysByProjectPayload {
   status: "published" | "draft" | "closed";
 }
 
+export interface GetAllSurveysPayload {
+  status: "published" | "draft" | "closed";
+}
+
 export type SurveyListPayload =
   | Survey[]
   | {
@@ -74,6 +78,39 @@ export interface SurveysListResponse {
   message: string;
   data: SurveyListPayload;
 }
+
+export type SurveyActionStatus =
+  | "in-progress"
+  | "submitted"
+  | "approved"
+  | "rejected";
+
+export interface SurveyAction {
+  _id?: string;
+  surveyActionId?: string;
+  surveyId: string;
+  participantId: string;
+  status: SurveyActionStatus;
+  startedAt: string;
+  submittedAt?: string;
+  timeSpent?: number;
+}
+
+export interface CreateSurveyActionPayload {
+  surveyId: string;
+}
+
+export type SurveyActionResponse = {
+  success: boolean;
+  message: string;
+  data: SurveyAction;
+};
+
+export type SurveyActionsListResponse = {
+  success: boolean;
+  message: string;
+  data: SurveyAction[];
+};
 
 export interface CreateDraftSurveyResponse {
   success?: boolean;

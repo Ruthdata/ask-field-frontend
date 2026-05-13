@@ -27,7 +27,7 @@ const VerifyAccountSuccess = ({ open, to }: Props) => {
         </p>
 
         <p className="text-lg text-gray-400 mb-8">
-          You are on the waitlist.
+          You can now continue to your dashboard.
         </p>
 
         {/* Button */}

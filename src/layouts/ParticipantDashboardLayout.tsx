@@ -43,43 +43,51 @@ export default function ParticipantDashboardLayout() {
 
   const isCompleteProfilePage = pathname.includes("/complete-profile");
 
-  const { loading, getParticipantInitials, participant, getParticipantFullName } = useCurrentUser();
-  
+  const {
+    loading,
+    getParticipantInitials,
+    participant,
+    getParticipantFullName,
+  } = useCurrentUser();
 
   useEffect(() => {
-    // Only run if not loading and user exists
-    if (!loading && participant) {
-      if(participant.userType == 'researcher'){
-        navigate('/dashboard/researcher')
-      }
-      const isComplete = participant.isCompleteProfile;
+    if (loading) return;
 
-      // Get query params
-      const skipRedirect =
-        searchParams.get("skipCompleteProfileRedirect") === "true";
+    if (!participant) {
+      navigate("/auth/login/participant");
+      return;
+    }
 
-      // If profile is complete and user is trying to access complete-profile page, redirect to dashboard
-      if (
-        isComplete &&
-        pathname === "/dashboard/participant/complete-profile"
-      ) {
-        navigate("/dashboard/participant");
-        return;
-      }
+    if (participant.userType === "researcher") {
+      navigate("/dashboard/researcher");
+      return;
+    }
 
-      // If profile is incomplete and user is trying to access any other dashboard route (except complete-profile)
-      const isDashboardRoute =
-        pathname.startsWith("/dashboard/participant") &&
-        pathname !== "/dashboard/participant/complete-profile";
+    const isComplete = participant.isCompleteProfile;
 
-      if (!isComplete && isDashboardRoute && !skipRedirect) {
-        navigate("/dashboard/participant/complete-profile");
-        return;
-      }
-    }else{
-      navigate("/auth/login/participant")
-      }
-  }, [participant, loading, pathname, navigate]);
+    // Get query params
+    const skipRedirect =
+      searchParams.get("skipCompleteProfileRedirect") === "true";
+
+    // If profile is complete and user is trying to access complete-profile page, redirect to dashboard
+    if (
+      isComplete &&
+      pathname === "/dashboard/participant/complete-profile"
+    ) {
+      navigate("/dashboard/participant");
+      return;
+    }
+
+    // If profile is incomplete and user is trying to access any other dashboard route (except complete-profile)
+    const isDashboardRoute =
+      pathname.startsWith("/dashboard/participant") &&
+      pathname !== "/dashboard/participant/complete-profile";
+
+    if (!isComplete && isDashboardRoute && !skipRedirect) {
+      navigate("/dashboard/participant/complete-profile");
+      return;
+    }
+  }, [participant, loading, pathname, navigate, searchParams]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

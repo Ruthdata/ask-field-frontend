@@ -5,6 +5,10 @@ import {
   Researcher,
 } from "../../../types/user.type";
 import { ApiSuccess } from "@/types/api.type";
+import {
+  CreateSurveyActionPayload,
+  SurveyActionResponse,
+} from "@/types/survey";
 // import { ApiSuccess } from "../../../types/api.type";
 
 
@@ -136,6 +140,28 @@ export const authApi = apiSlice.injectEndpoints({
       // providesTags: "users"
       providesTags: ["Users"],
     }),
+    checkSurveyEligibility: builder.query<SurveyActionResponse, string>({
+      query: (surveyId) => `/surveys/check-eligibility/${surveyId}`,
+      providesTags: ["Surveys"],
+    }),
+    createSurveyAction: builder.mutation<
+      SurveyActionResponse,
+      CreateSurveyActionPayload
+    >({
+      query: (body) => ({
+        url: "/surveys/create-survey-action",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Surveys"],
+    }),
+    verifySurveyAction: builder.mutation<SurveyActionResponse, string>({
+      query: (surveyActionId) => ({
+        url: `/surveys/verify-survey-action/${surveyActionId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Surveys"],
+    }),
     getResearcher: builder.query<ApiSuccess<Researcher>, void>({
       query: () => "/researchers/me",
       // providesTags: "users"
@@ -207,6 +233,10 @@ export const {
   useGoogleAuthVerifyMutation,
   useLazyGetRefreshTokenQuery,
   useCompleteProfileMutation,
+  useCheckSurveyEligibilityQuery,
+  useLazyCheckSurveyEligibilityQuery,
+  useCreateSurveyActionMutation,
+  useVerifySurveyActionMutation,
   useSendOtpMutation,
   useVerifyResetPasswordOtpMutation,
   useResetPasswordMutation,
