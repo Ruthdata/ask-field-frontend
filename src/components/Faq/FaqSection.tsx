@@ -15,37 +15,51 @@ const FaqSection = () => {
     {
       id: 1,
       number: "01/",
-      title: "What is askField?",
+      title: "What is joinStudy?",
       content:
-        "With this data management solution, we now have full control over our data, and the insights we've gained have had a huge impact on our decision-making process. It has empowered us to make informed choices that improve our overall operations and drive growth. We couldn't be more satisfied",
+        "joinStudy is a participant recruitment platform that helps researchers find, screen, and manage research participants globally.",
     },
     {
       id: 2,
       number: "02/",
-      title: "How does askField ensure data quality?",
+      title: "Who can use joinStudy?",
       content:
-        "With this data management solution, we now have full control over our data, and the insights we've gained have had a huge impact on our decision-making process. It has empowered us to make informed choices that improve our overall operations and drive growth. We couldn't be more satisfied",
+        "Researchers, academic teams, product teams, NGOs, AI companies, and organizations that need participants for ethical research studies.",
     },
     {
       id: 3,
       number: "03/",
-      title: "Can I customize my surveys on askField?",
+      title: "Can participants outside the Global South join?",
       content:
-        "With this data management solution, we now have full control over our data, and the insights we've gained have had a huge impact on our decision-making process. It has empowered us to make informed choices that improve our overall operations and drive growth. We couldn't be more satisfied",
+        "Yes. joinStudy supports global participation. The platform has strong access to underrepresented Global South communities but is not limited to them.",
     },
     {
       id: 4,
       number: "04/",
-      title: "What support options are available?",
+      title: "What types of studies can researchers run?",
       content:
-        "With this data management solution, we now have full control over our data, and the insights we've gained have had a huge impact on our decision-making process. It has empowered us to make informed choices that improve our overall operations and drive growth. We couldn't be more satisfied",
+        "Surveys, interviews, focus groups, usability tests, academic studies, product research, AI evaluation studies, and field/community research.",
     },
     {
       id: 5,
       number: "05/",
-      title: "How secure is my data with askField?",
+      title: "Do participants get paid?",
       content:
-        "With this data management solution, we now have full control over our data, and the insights we've gained have had a huge impact on our decision-making process. It has empowered us to make informed choices that improve our overall operations and drive growth. We couldn't be more satisfied",
+        "Many studies include compensation. Each study should clearly show the amount, currency, method, and timing before participants apply.",
+    },
+    {
+      id: 6,
+      number: "06/",
+      title: "How does joinStudy protect participants?",
+      content:
+        "Studies should clearly explain purpose, eligibility, time commitment, compensation, and data use. Participants choose which studies to apply for.",
+    },
+    {
+      id: 7,
+      number: "07/",
+      title: "Does joinStudy support IRB or ethics review?",
+      content:
+        "Researchers can include consent and ethics information for their studies. Academic researchers can upload or describe ethics approval where required.",
     },
   ];
 
