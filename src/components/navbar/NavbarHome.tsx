@@ -69,8 +69,8 @@ const NavbarHome = () => {
               className="mr-2"
             />
             <span className="text-xl sm:text-2xl font-semibold">
-              <span className="text-yellow-400">ask</span>
-              <span className="text-gray-900">Field</span>
+              <span className="text-yellow-400">join</span>
+              <span className="text-gray-900">Study</span>
             </span>
           </Link>
 
@@ -79,14 +79,14 @@ const NavbarHome = () => {
             <Link to="/">
               {/* <Link to="/auth/sign-up/researcher"> */}
               <button className="px-5 py-2 cursor-pointer text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition">
-                Start collecting data
+                Find Participant
               </button>
             </Link>
             <button
               onClick={handleContribute}
               className="px-5 cursor-pointer py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition"
             >
-                Contribute and get paid
+                Join Paid Studies
             </button>
             {/* Login / Logout */}
             {isAuthenticated() ? (
