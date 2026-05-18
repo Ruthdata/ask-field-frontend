@@ -11,17 +11,12 @@ export default function Header() {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAction, setSelectedAction] = useState<
-    "researcher" | "contributor" | null
-  >(null);
 
   const handleStartCollecting = () => {
-    setSelectedAction("researcher");
     setIsModalOpen(true);
   };
 
   const handleContribute = () => {
-    setSelectedAction("contributor");
     setIsModalOpen(true);
   };
 
@@ -116,18 +111,15 @@ export default function Header() {
             </span>
           </div>
 
-          <h1 className="text-5xl font-bold leading-tight">
-            High Quality <span className="text-amber-500 italic">Data</span>
-            <span className="text-black not-italic">,</span>
-          </h1>
-
-          <h1 className="text-5xl font-bold leading-tight">
-            Collected in Hours Not Days
+          <h1 className="max-w-3xl text-4xl sm:text-5xl lg:text-4xl font-bold leading-tight">
+            Recruit verified participants for research, product testing, and AI
+            data studies.
           </h1>
 
           <Text className="text-base font-normal max-w-lg mt-4 mb-6 text-gray-600">
-            Unlock reliable data for your research projects with our fast survey
-            tools - built for precision, speed and actionable results.
+            Find, screen, and manage qualified participants globally with clear
+            eligibility, consent, compensation, and study details built into the
+            workflow.
           </Text>
 
           <div className="flex gap-4">
@@ -135,14 +127,14 @@ export default function Header() {
               onClick={handleStartCollecting}
               className="bg-[#3E3E3E] text-white px-8 py-3 rounded-3xl cursor-pointer hover:bg-[#2E2E2E] transition-colors font-medium"
             >
-              Start collecting data
+              Find Participant
             </button>
 
             <button
               onClick={handleContribute}
               className="bg-transparent border border-[#3E3E3E] text-[#3E3E3E] px-8 py-3 rounded-3xl cursor-pointer hover:bg-white/60 transition-colors font-medium"
             >
-              Contribute and get paid
+              Join Paid Studies
             </button>
           </div>
 
