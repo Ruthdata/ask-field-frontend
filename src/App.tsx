@@ -45,10 +45,12 @@ import ResearcherSupport from "./pages/dashboard/researchers/HelpSupport";
 import ResearcherMessages from "./pages/dashboard/researchers/Messages";
 import SurveyActions from "./pages/dashboard/researchers/SurveyActions";
 import CompleteSurvey from "./pages/landing/CompleteSurvey";
+import RouteSEO from "./components/SEO/RouteSEO";
 
 export default function App() {
   return (
     <div style={{ margin: "auto", fontFamily: "Inter, system-ui, Arial" }}>
+      <RouteSEO />
       <Toaster />
       <Routes>
         <Route path="/" element={<HomeLayout />}>
