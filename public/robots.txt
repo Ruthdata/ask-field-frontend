@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /auth/email-sent
+Disallow: /auth/verify-email
+Disallow: /auth/researcher/verify-email
+Disallow: /auth/recover-password
+Disallow: /auth/reset-password
+Disallow: /auth/change-password
+Disallow: /complete-survey
+Disallow: /researcher-pending
+
+Sitemap: https://joinstudy.co/sitemap.xml

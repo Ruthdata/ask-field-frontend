@@ -1,5 +1,6 @@
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
+  readonly VITE_FRONTEND_URL: string;
   readonly VITE_GOOGLE_CLIENT_ID: string;
   readonly NODE_ENV: string;
 }
@@ -21,6 +22,7 @@ function getEnv(key: keyof ImportMetaEnv): string {
 
 export const ENV = {
   API_URL: import.meta.env.VITE_API_URL,
+  FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL,
   GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID,
   NODE_ENV: import.meta.env.NODE_ENV,
 } as const;
