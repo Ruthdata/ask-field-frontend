@@ -42,7 +42,7 @@ export default function LoginFormResearcher() {
         localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
         localStorage.setItem(STORAGE_KEYS.USER_TYPE, "researcher");
         // navigate("/researcher-pending");
-        navigate('/dashboard/researcher');
+        navigate("/dashboard/researcher");
       }
       // Example of a successful login:
       // handleAuthSuccess(data, () => window.location.assign("/dashboard"));
@@ -60,7 +60,7 @@ export default function LoginFormResearcher() {
         Login
       </h1>
       <p className="text-sm text-gray-500 leading-relaxed mb-7">
-        Now, login to your AskField account & start getting paid.
+        Now, login to your joinStudy account & start getting paid.
       </p>
       <GoogleAuth />
 

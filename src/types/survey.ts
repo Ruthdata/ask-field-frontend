@@ -21,6 +21,7 @@ export interface Survey {
   howToFindParticipant: string;
   numberOfParticipants: number;
   howToScreenParticipants: string;
+  screenerIds?: string[];
   surveyDistribution: string;
   status: "draft" | "published" | "closed";
   surveyCrendentials: string;
@@ -165,6 +166,7 @@ export interface SurveyStepFourData {
   howToFindParticipant: string;
   numberOfParticipants: string;
   howToScreenParticipants: string;
+  screenerIds: string[];
   surveyDistribution: string;
   surveyCrendentials: string;
   totalSubmission: string;

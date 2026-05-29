@@ -23,6 +23,7 @@ const PricingCalculator = () => {
     const platformFees = participantReward * 0.3;
 
     return {
+      rewardPerSubmission: hourlyReward * durationInHours,
       participantReward,
       platformFees,
       total: participantReward + platformFees,
@@ -99,6 +100,12 @@ const PricingCalculator = () => {
         <aside className="h-fit rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
           <div className="space-y-4 text-xs">
             <div className="flex items-center justify-between gap-4">
+              <span className="text-gray-500">Reward/Submission</span>
+              <strong className="text-gray-950">
+                {formatUsd(totals.rewardPerSubmission)}
+              </strong>
+            </div>
+            <div className="flex items-center justify-between gap-4">
               <span className="text-gray-500">Participant Reward</span>
               <strong className="text-gray-950">
                 {formatUsd(totals.participantReward)}
@@ -111,7 +118,7 @@ const PricingCalculator = () => {
               </strong>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-gray-500">Cost/Participants</span>
+              <span className="text-gray-500">Estimated Total</span>
               <strong className="text-gray-950">
                 {formatUsd(totals.total)}
               </strong>

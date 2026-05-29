@@ -43,7 +43,8 @@ export default function SignUpAsResearcher() {
         </div>
 
         <p className="text-sm text-gray-600 mb-4">
-          We'll occasionally send you emails about AskField features and offers.
+          We'll occasionally send you emails about joinStudy features and
+          offers.
         </p>
 
         <div className="flex items-start mb-6">
@@ -55,7 +56,7 @@ export default function SignUpAsResearcher() {
             className="mt-1 mr-2 w-4 h-4 text-amber-500 border-gray-300 rounded focus:ring-amber-500"
           />
           <label htmlFor="terms" className="text-sm text-gray-600">
-            I agree to AskField{" "}
+            I agree to joinStudy{" "}
             <span className="text-amber-500 hover:text-amber-600 font-medium cursor-pointer">
               Research Terms
             </span>{" "}
