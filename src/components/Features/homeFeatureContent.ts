@@ -22,6 +22,7 @@ export interface HomeCardContent {
 export interface JourneyContent extends HomeCardContent {
   button: string;
   to: string;
+  image: string;
 }
 
 export interface StepContent {
@@ -36,6 +37,7 @@ export const journeys: JourneyContent[] = [
     button: "Start a Study",
     to: "/auth/sign-up/researcher",
     icon: SearchCheck,
+    image: "/images/start-a-study.png",
   },
   {
     title: "For Participants",
@@ -43,6 +45,7 @@ export const journeys: JourneyContent[] = [
     button: "Join Paid Studies",
     to: "/auth/sign-up/participant",
     icon: WalletCards,
+    image: "/images/find-participants.png",
   },
 ];
 

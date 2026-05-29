@@ -1,10 +1,4 @@
-import {
-  Check,
-  ChevronDown,
-  Copy,
-  Info,
-  X,
-} from "lucide-react";
+import { Check, ChevronDown, Copy, Info, X } from "lucide-react";
 import { useState } from "react";
 
 type FundingMethod = "instant" | "bank";
@@ -130,7 +124,9 @@ const AddFundsModal = ({
                   : "border-gray-300 bg-white"
               }`}
             >
-              {method === option.key && <Check size={10} className="text-white" />}
+              {method === option.key && (
+                <Check size={10} className="text-white" />
+              )}
             </span>
             <h3 className="mt-4 pl-8 text-sm font-semibold text-gray-950">
               {option.title}
@@ -162,7 +158,10 @@ const InstantPayModal = ({ onClose }: { onClose: () => void }) => (
       <div className="mt-3 border-t border-gray-100 pt-3">
         <TextInput label="Card Number" placeholder="Enter card number" />
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <TextInput label="Expiration Date" placeholder="Enter expiration date" />
+          <TextInput
+            label="Expiration Date"
+            placeholder="Enter expiration date"
+          />
           <TextInput label="CVV" />
         </div>
       </div>
@@ -176,7 +175,7 @@ const InstantPayModal = ({ onClose }: { onClose: () => void }) => (
       </div>
       <TextInput
         label="Organisation (optional)"
-        value="AskField Corporation"
+        value="joinStudy Corporation"
         className="mt-4"
       />
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -204,7 +203,10 @@ const InstantPayModal = ({ onClose }: { onClose: () => void }) => (
         <TextInput label="Postal Code" placeholder="Enter postal code" />
       </div>
       <label className="mt-4 flex gap-3 text-[11px] leading-4 text-gray-950">
-        <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300" />
+        <input
+          type="checkbox"
+          className="mt-0.5 h-4 w-4 rounded border-gray-300"
+        />
         Your card and billing details are securely stored with our payment
         provider. We cannot access or view card information.
       </label>
@@ -213,8 +215,9 @@ const InstantPayModal = ({ onClose }: { onClose: () => void }) => (
     <section className="mt-3 rounded-xl border border-gray-100 p-4">
       <h3 className="text-sm font-medium text-gray-950">Amount</h3>
       <p className="mt-3 max-w-xl text-xs leading-5 text-gray-950">
-        Check that you have the required amount for your study. You can request a
-        refund for any amount you don&apos;t use. Learn about our refund policy.
+        Check that you have the required amount for your study. You can request
+        a refund for any amount you don&apos;t use. Learn about our refund
+        policy.
       </p>
       <div className="mt-4 border-t border-gray-100 pt-4">
         <AmountInput />
@@ -243,8 +246,9 @@ const BankTransferFormModal = ({
     <section className="mt-4 rounded-xl border border-gray-100 p-4">
       <h3 className="text-sm font-medium text-gray-950">Amount</h3>
       <p className="mt-3 max-w-xl text-xs leading-5 text-gray-950">
-        Check that you have the required amount for your study. You can request a
-        refund for any amount you don&apos;t use. Learn about our refund policy.
+        Check that you have the required amount for your study. You can request
+        a refund for any amount you don&apos;t use. Learn about our refund
+        policy.
       </p>
       <div className="mt-4 border-t border-gray-100 pt-4">
         <AmountInput />
