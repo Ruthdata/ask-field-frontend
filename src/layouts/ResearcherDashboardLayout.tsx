@@ -3,10 +3,7 @@ import {
   Menu,
   X,
   Home,
-  DollarSign,
-  HelpCircle,
   Folder,
-  MessageSquare,
   WalletMinimal,
   Users,
   CircleQuestionMark,
@@ -61,8 +58,7 @@ export default function ResearcherDashboardLayout() {
 
   const isCompleteProfilePage = pathname.includes("/complete-profile");
 
-  const { loading, getResearcherInitials, getResearcherFullName, researcher } =
-    useCurrentUser();
+  const { loading, getResearcherInitials, researcher } = useCurrentUser();
 
   useEffect(() => {
     if (!loading && researcher) {
@@ -87,7 +83,7 @@ export default function ResearcherDashboardLayout() {
         return;
       }
     }
-  }, [researcher, loading, pathname, navigate]);
+  }, [researcher, loading, pathname, navigate, searchParams]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -106,7 +102,7 @@ export default function ResearcherDashboardLayout() {
             <span className="text-sm font-bold text-gray-900">a</span>
           </div>
           <span className="text-lg font-semibold">
-            ask<span className="text-yellow-500">Field</span>
+            join<span className="text-yellow-500">Study</span>
           </span>
         </div>
 
@@ -155,7 +151,7 @@ export default function ResearcherDashboardLayout() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
-              <span className="text-lg font-semibold">askField</span>
+              <span className="text-lg font-semibold">joinStudy</span>
               <button onClick={() => setSidebarOpen(false)}>
                 <X className="w-5 h-5 text-gray-600" />
               </button>
@@ -198,14 +194,6 @@ export default function ResearcherDashboardLayout() {
             >
               <Menu className="w-5 h-5 text-gray-600" />
             </button>
-
-            {/* Workspace */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="w-5 h-5 bg-gray-300 rounded" />
-              <span className="text-sm font-medium text-gray-900">
-                {loading ? "Loading..." : getResearcherFullName()}
-              </span>
-            </div>
 
             {/* Avatar */}
             <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">

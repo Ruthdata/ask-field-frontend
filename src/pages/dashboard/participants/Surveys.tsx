@@ -82,7 +82,8 @@ const Surveys = () => {
     isLoading: isLoadingSurveys,
     isError: isSurveyFetchError,
   } = useGetAllSurveysQuery({ status: "published" });
-  const [checkEligibility, { isFetching }] = useLazyCheckSurveyEligibilityQuery();
+  const [checkEligibility, { isFetching }] =
+    useLazyCheckSurveyEligibilityQuery();
 
   const surveys = getSurveys(surveysResponse?.data);
 
@@ -138,9 +139,7 @@ const Surveys = () => {
     }
 
     const participantToken =
-      participant?._id ||
-      selectedSurveyAction?.participantId ||
-      "";
+      participant?._id || selectedSurveyAction?.participantId || "";
     const surveyUrl = withParticipantSurveyParams(
       selectedSurvey.surveyURL,
       participantToken,
@@ -158,7 +157,7 @@ const Surveys = () => {
         </div>
         <p className="text-[11px] font-semibold uppercase mb-2">Pro tip</p>
         <p className="max-w-4xl text-base md:text-lg font-medium leading-relaxed">
-          To earn more from AskField paid surveys, stay honest, avoid giving
+          To earn more from joinStudy paid surveys, stay honest, avoid giving
           fake information. If you don't qualify for one survey, keep trying;
           your genuine participation pays off!
         </p>
@@ -171,8 +170,7 @@ const Surveys = () => {
               Available Surveys
             </h1>
             <p className="mt-1 text-sm text-gray-600">
-              Check out surveys tailored just for you and start earning
-              rewards.
+              Check out surveys tailored just for you and start earning rewards.
             </p>
           </div>
 
@@ -333,7 +331,10 @@ const Surveys = () => {
                   </p>
                   <div>
                     <p className="font-semibold text-gray-800">Requirements:</p>
-                    <p>Age: {selectedSurvey.minimumAge} - {selectedSurvey.maximumAge}</p>
+                    <p>
+                      Age: {selectedSurvey.minimumAge} -{" "}
+                      {selectedSurvey.maximumAge}
+                    </p>
                     <p>Location: Nigeria</p>
                   </div>
                 </div>
