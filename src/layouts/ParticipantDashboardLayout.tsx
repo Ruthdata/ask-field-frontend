@@ -6,7 +6,6 @@ import {
   FileText,
   DollarSign,
   HelpCircle,
-  MessageSquare,
   MessageCircleMore,
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -43,12 +42,7 @@ export default function ParticipantDashboardLayout() {
 
   const isCompleteProfilePage = pathname.includes("/complete-profile");
 
-  const {
-    loading,
-    getParticipantInitials,
-    participant,
-    getParticipantFullName,
-  } = useCurrentUser();
+  const { loading, getParticipantInitials, participant } = useCurrentUser();
 
   useEffect(() => {
     if (loading) return;
@@ -70,10 +64,7 @@ export default function ParticipantDashboardLayout() {
       searchParams.get("skipCompleteProfileRedirect") === "true";
 
     // If profile is complete and user is trying to access complete-profile page, redirect to dashboard
-    if (
-      isComplete &&
-      pathname === "/dashboard/participant/complete-profile"
-    ) {
+    if (isComplete && pathname === "/dashboard/participant/complete-profile") {
       navigate("/dashboard/participant");
       return;
     }
@@ -106,7 +97,7 @@ export default function ParticipantDashboardLayout() {
             <span className="text-sm font-bold text-gray-900">a</span>
           </div>
           <span className="text-lg font-semibold">
-            ask<span className="text-yellow-500">Field</span>
+            join<span className="text-yellow-500">Study</span>
           </span>
         </div>
 
@@ -155,7 +146,7 @@ export default function ParticipantDashboardLayout() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
-              <span className="text-lg font-semibold">askField</span>
+              <span className="text-lg font-semibold">joinStudy</span>
               <button onClick={() => setSidebarOpen(false)}>
                 <X className="w-5 h-5 text-gray-600" />
               </button>
@@ -198,14 +189,6 @@ export default function ParticipantDashboardLayout() {
             >
               <Menu className="w-5 h-5 text-gray-600" />
             </button>
-
-            {/* Workspace */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="w-5 h-5 bg-gray-300 rounded" />
-              <span className="text-sm font-medium text-gray-900">
-                {loading ? "Loading..." : getParticipantFullName()}
-              </span>
-            </div>
 
             {/* Avatar */}
             <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">

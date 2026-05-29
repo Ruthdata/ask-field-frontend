@@ -26,7 +26,8 @@ const HelpSupport = () => {
                 Help & Support
               </h1>
               <p className="mt-3 text-sm text-gray-500">
-                Find answers, read guides, or contact the AskField support team.
+                Find answers, read guides, or contact the joinStudy support
+                team.
               </p>
             </div>
 

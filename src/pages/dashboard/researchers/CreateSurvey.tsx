@@ -98,6 +98,7 @@ const initialFormData: SurveyFormData = {
     howToFindParticipant: "",
     numberOfParticipants: "",
     howToScreenParticipants: "",
+    screenerIds: [],
     surveyDistribution: "",
     surveyCrendentials: "",
     totalSubmission: "",
@@ -155,6 +156,12 @@ const extractSurveyId = (response: CreateDraftSurveyResponse) => {
 
 const getSurveyIdentifier = (survey: Partial<Survey>) =>
   survey.surveyId || survey._id || "";
+
+const formatUsdAmount = (amount: number) =>
+  amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 const createCompletionPathFromSurvey = (survey: Survey): CompletionPath => ({
   ...createEmptyCompletionPath(1),
@@ -225,6 +232,7 @@ const mapSurveyToFormData = (
           ? String(survey.numberOfParticipants)
           : "",
       howToScreenParticipants: survey.howToScreenParticipants || "",
+      screenerIds: survey.screenerIds || [],
       surveyDistribution: survey.surveyDistribution || "",
       surveyCrendentials: survey.surveyCrendentials || "",
       totalSubmission:
@@ -295,6 +303,7 @@ const buildSurveyPayload = (
     body.howToFindParticipant = formData.stepFourData.howToFindParticipant;
     body.howToScreenParticipants =
       formData.stepFourData.howToScreenParticipants;
+    body.screenerIds = formData.stepFourData.screenerIds;
     body.surveyDistribution = formData.stepFourData.surveyDistribution;
     body.surveyCrendentials = formData.stepFourData.surveyCrendentials;
 
@@ -411,8 +420,10 @@ const CreateSurvey = () => {
       return;
     }
 
-    setFormData(mapSurveyToFormData(surveyToEdit, projectId));
-    setHydratedSurveyId(editSurveyId);
+    queueMicrotask(() => {
+      setFormData(mapSurveyToFormData(surveyToEdit, projectId));
+      setHydratedSurveyId(editSurveyId);
+    });
   }, [
     editSurveyId,
     hydratedSurveyId,
@@ -480,7 +491,7 @@ const CreateSurvey = () => {
       }
 
       if (!formData.stepThreeData.toRecordId) {
-        return "Please choose how AskField IDs should be recorded.";
+        return "Please choose how joinStudy IDs should be recorded.";
       }
 
       if (!primaryPath?.handleSubmission) {
@@ -694,9 +705,8 @@ const CreateSurvey = () => {
   const duration = Number(formData.stepFiveData.surveyDuration) || 1;
   const amount = Number(formData.stepFiveData.surveyAmount) || 0;
   const subtotal = participantCount * amount;
-  const platformFee = subtotal > 0 ? 5 : 0;
-  const vat = subtotal > 0 ? 5 : 0;
-  const total = subtotal + platformFee + vat;
+  const platformFee = subtotal * 0.3;
+  const total = subtotal + platformFee;
 
   if (
     isEditingDraft &&
@@ -871,13 +881,13 @@ const CreateSurvey = () => {
                 <span className="font-semibold">{duration} min</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-500">Cost/Participants</span>
+                <span className="text-gray-500">Reward/Participant</span>
                 <span className="font-semibold">${amount} USD</span>
               </div>
               <div className="flex justify-between items-center border-t border-gray-100 pt-3">
-                <span className="font-medium">Total</span>
+                <span className="font-medium">Participant Reward</span>
                 <span className="font-semibold">
-                  ${subtotal.toLocaleString()} USD
+                  ${formatUsdAmount(subtotal)} USD
                 </span>
               </div>
             </div>
@@ -885,16 +895,18 @@ const CreateSurvey = () => {
             <div className="mt-6 pt-5 border-t border-gray-100 space-y-3 text-sm">
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">Platform Fee</span>
-                <span className="font-semibold">${platformFee} USD</span>
+                <span className="font-semibold">
+                  ${formatUsdAmount(platformFee)} USD
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">VAT</span>
-                <span className="font-semibold">${vat} USD</span>
+                <span className="font-semibold">May apply</span>
               </div>
               <div className="flex justify-between items-center border-t border-gray-100 pt-3">
-                <span className="font-medium">Total</span>
+                <span className="font-medium">Estimated Total</span>
                 <span className="font-semibold">
-                  ${total.toLocaleString()} USD
+                  ${formatUsdAmount(total)} USD
                 </span>
               </div>
             </div>

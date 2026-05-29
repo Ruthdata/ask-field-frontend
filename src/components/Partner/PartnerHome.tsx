@@ -17,7 +17,7 @@ export default function PartnerHome() {
         />
       </div>
 
-      <h2>Partner with askField today</h2>
+      <h2>Partner with joinStudy today</h2>
     </div>
   );
 }

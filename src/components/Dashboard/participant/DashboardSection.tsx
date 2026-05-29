@@ -37,7 +37,7 @@ const DashboardSection = () => {
 
             <div className="flex items-center gap-2">
               <p className="text-gray-600">
-                Here’s a summary of all activities happening on your AskField
+                Here’s a summary of all activities happening on your joinStudy
                 account.
               </p>
               <button className="text-gray-400 hover:text-gray-600">

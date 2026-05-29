@@ -5,7 +5,7 @@ const conversations = [
   {
     id: "launch",
     title: "Study launch review",
-    sender: "AskField Support",
+    sender: "joinStudy Support",
     time: "10:24 AM",
     preview: "Your Mobile Banking UX Study is ready for a final launch check.",
     unread: true,
@@ -30,7 +30,9 @@ const conversations = [
 
 const Messages = () => {
   const [activeId, setActiveId] = useState(conversations[0].id);
-  const active = conversations.find((conversation) => conversation.id === activeId);
+  const active = conversations.find(
+    (conversation) => conversation.id === activeId,
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 px-2 sm:px-3 lg:px-4 py-6">

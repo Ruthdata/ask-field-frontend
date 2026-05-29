@@ -26,7 +26,7 @@ const NavbarHome = () => {
       navigate(
         getUserType() === "researcher"
           ? "/dashboard/researcher"
-          : "/dashboard/participant"
+          : "/dashboard/participant",
       );
       return;
     }
@@ -63,7 +63,7 @@ const NavbarHome = () => {
           <Link to="/" className="flex items-center">
             <img
               src="/images/shared/askfield-logo-icon.png"
-              alt="AskField Logo"
+              alt="joinStudy Logo"
               width={36}
               height={36}
               className="mr-2"
@@ -86,7 +86,7 @@ const NavbarHome = () => {
               onClick={handleContribute}
               className="px-5 cursor-pointer py-2 text-yellow-500 border border-yellow-400 rounded-full hover:bg-yellow-50 transition"
             >
-                Join Paid Studies
+              Join Paid Studies
             </button>
             {/* Login / Logout */}
             {isAuthenticated() ? (

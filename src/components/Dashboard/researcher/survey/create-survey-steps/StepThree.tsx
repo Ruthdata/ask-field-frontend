@@ -1,9 +1,4 @@
-import {
-  CircleAlert,
-  Copy,
-  Plus,
-  SquarePen,
-} from "lucide-react";
+import { CircleAlert, Copy, Plus, SquarePen } from "lucide-react";
 import toast from "react-hot-toast";
 import StepIndicator from "../StepIndicator";
 import { CompletionPath, SurveyStepThreeData } from "@/types/survey";
@@ -33,7 +28,8 @@ const submissionOptions = [
   {
     value: "approve_and_pay",
     title: "Approve & Pay",
-    description: "Automatically approve the submission and pay the participant.",
+    description:
+      "Automatically approve the submission and pay the participant.",
   },
 ];
 
@@ -45,7 +41,7 @@ const participantGroups = [
 
 const recordIdOptions = [
   { value: "", label: "-- Select or search --" },
-  { value: "askfield_id", label: "AskField ID" },
+  { value: "askfield_id", label: "joinStudy ID" },
   { value: "respondent_id", label: "Respondent ID" },
   { value: "custom_id", label: "Custom ID" },
 ];
@@ -63,7 +59,7 @@ const StepThree = ({
     setStepData({
       ...stepData,
       completionPaths: stepData.completionPaths.map((path) =>
-        path.id === pathId ? { ...path, ...changes } : path
+        path.id === pathId ? { ...path, ...changes } : path,
       ),
     });
   };
@@ -97,13 +93,18 @@ const StepThree = ({
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-8 max-w-4xl mx-auto w-full">
-      <h1 className="text-2xl sm:text-3xl font-semibold">Create a Fresh Study</h1>
+      <h1 className="text-2xl sm:text-3xl font-semibold">
+        Create a Fresh Study
+      </h1>
 
       <div className="mt-8 space-y-6">
         <section className="border border-gray-100 rounded-2xl p-5 sm:p-6">
-          <h2 className="text-base sm:text-lg font-semibold">Data Collection</h2>
+          <h2 className="text-base sm:text-lg font-semibold">
+            Data Collection
+          </h2>
           <label className="block mt-5 text-sm text-gray-700">
-            What&apos;s the URL of your Study?<span className="text-red-500">*</span>
+            What&apos;s the URL of your Study?
+            <span className="text-red-500">*</span>
           </label>
           <input
             type="url"
@@ -117,9 +118,12 @@ const StepThree = ({
         </section>
 
         <section className="border border-gray-100 rounded-2xl p-5 sm:p-6">
-          <h2 className="text-base sm:text-lg font-semibold">Recording AskField IDs</h2>
+          <h2 className="text-base sm:text-lg font-semibold">
+            Recording joinStudy IDs
+          </h2>
           <label className="block mt-5 text-sm text-gray-700">
-            How do you want to record IDs?<span className="text-red-500">*</span>
+            How do you want to record IDs?
+            <span className="text-red-500">*</span>
           </label>
           <select
             value={stepData.toRecordId}
@@ -138,18 +142,23 @@ const StepThree = ({
           <div className="mt-4 flex gap-2 text-[11px] sm:text-xs text-gray-500 leading-relaxed">
             <CircleAlert size={14} className="mt-0.5 shrink-0" />
             <p>
-              To match participant demographic data in AskField with submissions,
-              your tool needs to record a unique participant ID.
+              To match participant demographic data in joinStudy with
+              submissions, your tool needs to record a unique participant ID.
             </p>
           </div>
         </section>
 
         <section className="border border-gray-100 rounded-2xl p-5 sm:p-6">
-          <h2 className="text-base sm:text-lg font-semibold">Completion Path</h2>
+          <h2 className="text-base sm:text-lg font-semibold">
+            Completion Path
+          </h2>
 
           <div className="space-y-5 mt-5">
             {stepData.completionPaths.map((path) => (
-              <div key={path.id} className="border border-gray-100 rounded-2xl p-4">
+              <div
+                key={path.id}
+                className="border border-gray-100 rounded-2xl p-4"
+              >
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="font-medium text-sm">{path.name}</p>
