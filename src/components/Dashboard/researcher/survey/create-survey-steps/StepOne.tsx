@@ -37,14 +37,14 @@ const StepOne = ({
             selected={selected}
             setSelected={setSelected}
             title="External Study Link"
-            description="Recruit on AskField and send participants to your own survey URL."
+            description="Recruit on joinStudy and send participants to your own survey URL."
           />
           <OptionCard
             type="aiTaskBuilder"
             selected={selected}
             setSelected={setSelected}
             title="AI Task Builder"
-            description="Create a guided AI collection flow directly on AskField."
+            description="Create a guided AI collection flow directly on joinStudy."
           />
         </div>
       </div>
