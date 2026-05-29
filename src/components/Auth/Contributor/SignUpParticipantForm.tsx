@@ -24,15 +24,17 @@ export default function SignUpParticipantForm() {
   const [registerUser, { isLoading, error: registerError, data }] =
     useRegisterParticipantMutation();
 
-    const [form, setForm] = useState<Partial<Participant> & { confirmPassword: string }>({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      signupPlatform: "email",
-      receivesUpdates: false,
-    });
+  const [form, setForm] = useState<
+    Partial<Participant> & { confirmPassword: string }
+  >({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    signupPlatform: "email",
+    receivesUpdates: false,
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -66,9 +68,8 @@ export default function SignUpParticipantForm() {
       } else {
         setError("");
       }
-      
     } catch (err) {
-      const message = formatApiError(err)
+      const message = formatApiError(err);
       setError(message);
     } finally {
       setLoading(false);
@@ -195,7 +196,7 @@ export default function SignUpParticipantForm() {
           htmlFor="terms"
           className="text-xs text-gray-500 leading-relaxed cursor-pointer"
         >
-          I agree to AskField&apos;s{" "}
+          I agree to joinStudy&apos;s{" "}
           <a href="#" className="text-red-400 font-medium hover:underline">
             Participant Terms
           </a>{" "}
@@ -225,7 +226,7 @@ export default function SignUpParticipantForm() {
           className="text-xs text-gray-500 leading-relaxed cursor-pointer"
         >
           I want to receive updates about services, promotions & news from
-          AskField, its affiliates and business partners (e.g., through
+          joinStudy, its affiliates and business partners (e.g., through
           newsletters and/or SMS messages).
         </label>
       </div>
@@ -245,8 +246,11 @@ export default function SignUpParticipantForm() {
       </button>
 
       <p className="text-center mt-4 text-xs text-gray-400">
-        Already registered as a participant on AskField?{" "}
-        <a href="/auth/login/participant" className="text-red-400 font-medium hover:underline">
+        Already registered as a participant on joinStudy?{" "}
+        <a
+          href="/auth/login/participant"
+          className="text-red-400 font-medium hover:underline"
+        >
           Login
         </a>
       </p>

@@ -11,7 +11,7 @@ export default function Company() {
 
   const handleSubmit = () => {
     if (email && agreed) {
-      setFormStep(2)
+      setFormStep(2);
       updateFormData({ email });
       navigate("/auth/sign-up/researcher/country"); // Next step
     }
@@ -26,9 +26,7 @@ export default function Company() {
   return (
     <FormLayout>
       <div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          What's your
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">What's your</h1>
         <h1 className="text-4xl font-bold text-gray-900 mb-8">
           organization email
         </h1>
@@ -51,7 +49,7 @@ export default function Company() {
 
           <p className="text-sm text-gray-600 mb-4">
             We'll occasionally send you emails and messages about how to use
-            AskField, as well as new features and offers.
+            joinStudy, as well as new features and offers.
           </p>
 
           <div className="flex items-start mb-6">
@@ -64,7 +62,7 @@ export default function Company() {
             />
 
             <label htmlFor="terms" className="text-sm text-gray-600">
-              I agree to AskField{" "}
+              I agree to joinStudy{" "}
               <span className="text-amber-500 hover:text-amber-600 font-medium cursor-pointer">
                 Research Terms
               </span>{" "}

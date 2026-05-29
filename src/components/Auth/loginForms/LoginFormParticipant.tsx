@@ -69,7 +69,7 @@ export default function LoginFormParticipant() {
         Login
       </h1>
       <p className="text-sm text-gray-500 leading-relaxed mb-7">
-        Now, login to your AskField account & start getting paid.
+        Now, login to your joinStudy account & start getting paid.
       </p>
       <GoogleAuth />
 
