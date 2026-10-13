@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { useVerifyEmailMutation, useVerifyResearcherEmailMutation } from "@/redux/api/slices/userSlice";
+import {  useVerifyResearcherEmailMutation } from "@/redux/api/slices/userSlice";
 import { useRef } from "react";
-import VerifyAccountSuccess from "@components/Modal/Success/VerifyAccountSuccess";
+// import VerifyAccountSuccess from "@components/Modal/Success/VerifyAccountSuccess";
 
 
 const VerifyResearcherEmail = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
   const token = searchParams.get("token") || "";
-  const [isComplete, setIsComplete] = useState(false)
+  // const [isComplete, setIsComplete] = useState(false)
 
   const navigate = useNavigate();
   const [verifyEmail] = useVerifyResearcherEmailMutation();

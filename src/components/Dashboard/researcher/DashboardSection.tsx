@@ -96,7 +96,7 @@ const DashboardSection = () => {
         </div>
         <div className="flex flex-col px-4 py-5 shadow-lg bg-white rounded-2xl mt-3">
           <div className="flex mt-4 justify-between">
-            <h3 className="">Explore what you can do with Ask Field</h3>
+            <h3 className="">Explore what you can do with joinStudy</h3>
           </div>
           <div className="bg-white mt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 p-4">
@@ -116,8 +116,7 @@ const DashboardSection = () => {
                 <div>
                   <h5 className="my-2">AI Task Builder</h5>
                   <p className="text-[11px] text-gray-500">
-                    Launch text annotation tasks on Prolific in one integrated
-                    workflow.
+                    Have native speakers rate, rank and correct AI outputs.
                   </p>
                 </div>
               </button>

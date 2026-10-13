@@ -26,8 +26,8 @@ const formatCurrency = (amount: number) =>
     .replace("NGN", "NGN ");
 
 const getSurveyId = (survey: Survey) => survey.surveyId || survey._id || "";
-const SURVEY_ACTION_STORAGE_KEY = "askfield_latest_survey_action_id";
-const SURVEY_ACTION_BY_SURVEY_KEY = "askfield_survey_action";
+const SURVEY_ACTION_STORAGE_KEY = "joinstudy_latest_survey_action_id";
+const SURVEY_ACTION_BY_SURVEY_KEY = "joinstudy_survey_action";
 
 const getSurveys = (payload?: SurveyListPayload): Survey[] => {
   if (!payload) return [];
@@ -218,18 +218,17 @@ const Surveys = () => {
                   alt=""
                   className="h-full w-full object-cover"
                 />
-                <span className="absolute bottom-0 left-0 rounded-tr-2xl bg-linear-to-r from-[#FF5BC8] to-[#A403CC] px-4 py-1.5 text-[11px] text-white">
-                  Ends in 2 days
-                </span>
               </div>
 
               <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#FBC02D33] px-3 py-1">
                 <span className="text-sm font-semibold">
                   {formatCurrency(survey.surveyAmount)}
                 </span>
-                <span className="rounded-full bg-[#3E3E3E] px-2 py-0.5 text-[10px] text-white">
-                  {survey.surveyDuration}min
-                </span>
+                {!!survey.surveyDuration && (
+                  <span className="rounded-full bg-[#3E3E3E] px-2 py-0.5 text-[10px] text-white">
+                    {survey.surveyDuration}min
+                  </span>
+                )}
               </div>
 
               <h2 className="mt-3 text-sm font-semibold text-gray-950">
@@ -249,21 +248,22 @@ const Surveys = () => {
                 </span>
               </div>
 
-              <div className="mt-4 flex items-center gap-2">
-                <img
-                  src="/images/dashboard/byUser.png"
-                  alt=""
-                  className="h-9 w-9 rounded-full"
-                />
-                <div>
-                  <h3 className="text-xs font-medium text-gray-950">
-                    By Orji Maxwell
-                  </h3>
-                  <p className="text-[11px] text-gray-500">
-                    Avvicv Group of Companies
-                  </p>
+              {survey.researcher && (
+                <div className="mt-4 flex items-center gap-2">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-[11px] font-semibold text-white">
+                    {survey.researcher.name
+                      .split(" ")
+                      .map((w) => w[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </span>
+                  <div>
+                    <h3 className="text-xs font-medium text-gray-950">By {survey.researcher.name}</h3>
+                    {survey.researcher.organization && <p className="text-[11px] text-gray-500">{survey.researcher.organization}</p>}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="mt-4 rounded-full bg-[#3E3E3E] px-4 py-2 text-center text-xs font-semibold text-white">
                 {isFetching ? "Checking..." : "Start"}
@@ -298,9 +298,12 @@ const Surveys = () => {
                 <p className="mt-4 text-sm leading-relaxed text-gray-600">
                   {selectedSurvey.surveyDescription}
                 </p>
-                <p className="mt-5 text-sm font-semibold text-gray-950">
-                  By Orji Maxwell
-                </p>
+                {selectedSurvey.researcher && (
+                  <p className="mt-5 text-sm font-semibold text-gray-950">
+                    By {selectedSurvey.researcher.name}
+                    {selectedSurvey.researcher.organization ? `, ${selectedSurvey.researcher.organization}` : ""}
+                  </p>
+                )}
 
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className="rounded-full bg-[#FBC02D33] px-3 py-1 text-xs">
@@ -319,23 +322,21 @@ const Surveys = () => {
                 </div>
 
                 <div className="mt-5 space-y-4 text-sm leading-relaxed text-gray-600">
-                  <p>
-                    This study requires sharing personal data about your
-                    responses and general usage. Personal data requested:
-                    responses.
-                  </p>
-                  <p>
-                    Researcher's privacy notice: we kindly ask you to send
-                    photos of your face. All photos will be used only for
-                    training AI models.
-                  </p>
+                  {selectedSurvey.contentWarning && !/^none$/i.test(selectedSurvey.contentWarning.trim()) && (
+                    <p>
+                      <span className="font-semibold text-gray-800">Content note: </span>
+                      {selectedSurvey.contentWarning}
+                    </p>
+                  )}
                   <div>
                     <p className="font-semibold text-gray-800">Requirements:</p>
-                    <p>
-                      Age: {selectedSurvey.minimumAge} -{" "}
-                      {selectedSurvey.maximumAge}
-                    </p>
-                    <p>Location: Nigeria</p>
+                    {(selectedSurvey.minimumAge || selectedSurvey.maximumAge) && (
+                      <p>
+                        Age: {selectedSurvey.minimumAge ?? 18} – {selectedSurvey.maximumAge ?? "any"}
+                      </p>
+                    )}
+                    {!!selectedSurvey.usableDevices?.length && <p>Devices: {selectedSurvey.usableDevices.join(", ")}</p>}
+                    {selectedSurvey.surveyEquipment && <p>You&apos;ll need: {selectedSurvey.surveyEquipment}</p>}
                   </div>
                 </div>
 

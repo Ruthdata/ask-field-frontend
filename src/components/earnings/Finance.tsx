@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import {
-  ChevronDown,
   Eye,
   EyeOff,
   Wallet,
   Zap,
   TrendingUp,
-  HelpCircle,
 } from "lucide-react";
 
 interface StatCardProps {
@@ -15,6 +13,7 @@ interface StatCardProps {
     title: string;
     value: string | number;
     change: string;
+    currency?: string;
     showVisibility?: boolean;
     isVisible?: boolean;
     onToggleVisibility?: () => void;
@@ -26,6 +25,7 @@ const StatCard: React.FC<StatCardProps> = ({
     title,
     value,
     change,
+    currency,
     showVisibility = false,
     isVisible = true,
     onToggleVisibility,
@@ -58,8 +58,8 @@ const StatCard: React.FC<StatCardProps> = ({
           <p className="text-gray-500 text-sm mb-2">{title}</p>
   
           <div className="flex items-baseline gap-2">
-            {title.includes("Balance") && (
-              <span className="text-gray-900 font-semibold text-lg">NGN</span>
+            {currency && (
+              <span className="text-gray-900 font-semibold text-lg">{currency}</span>
             )}
             <h3 className="text-gray-900 font-bold text-3xl">
               {isVisible ? value : "••••"}
@@ -75,102 +75,44 @@ const StatCard: React.FC<StatCardProps> = ({
     );
   };
 
-const Finance = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState("Last 3 days");
-  const [isBalanceVisible, setIsBalanceVisible] = useState(true);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+interface FinanceProps {
+  currency?: string;
+  available?: number;
+  completedStudies?: number;
+  loading?: boolean;
+}
 
-  const periods = [
-    "Last 24 hours",
-    "Last 3 days",
-    "Last 7 days",
-    "Last 30 days",
-    "All time",
-  ];
+const money = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const Finance = ({ currency = "NGN", available = 0, completedStudies = 0, loading = false }: FinanceProps) => {
+  const [isBalanceVisible, setIsBalanceVisible] = useState(true);
 
   return (
     <div className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div className="mb-4 sm:mb-0">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              My Earnings
-            </h1>
-
-            <div className="flex items-center gap-2">
-              <p className="text-gray-600">
-                Track your survey rewards and withdrawals
-              </p>
-              <button className="text-gray-400 hover:text-gray-600">
-                <HelpCircle className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50"
-            >
-              <span className="text-gray-900 font-medium">
-                {selectedPeriod}
-              </span>
-              <ChevronDown
-                className={`w-4 h-4 text-gray-600 ${
-                  isDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
-                {periods.map((period) => (
-                  <button
-                    key={period}
-                    onClick={() => {
-                      setSelectedPeriod(period);
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 ${
-                      selectedPeriod === period
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Earnings</h1>
+          <p className="text-gray-600">Track your study rewards and withdrawals</p>
         </div>
 
-        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatCard
             icon={<Wallet className="w-6 h-6 text-yellow-600" />}
             iconBg="bg-yellow-50"
             title="Available Balance"
-            value="0.00"
-            change="Since last 3 days"
+            currency={currency}
+            value={loading ? "…" : money(available)}
+            change="Ready to withdraw"
             showVisibility={true}
             isVisible={isBalanceVisible}
-            onToggleVisibility={() =>
-              setIsBalanceVisible(!isBalanceVisible)
-            }
+            onToggleVisibility={() => setIsBalanceVisible(!isBalanceVisible)}
           />
-
           <StatCard
             icon={<Zap className="w-6 h-6 text-yellow-600" />}
             iconBg="bg-yellow-50"
-            title="Completed Surveys"
-            value={0}
-            change="Since last 3 days"
-            isVisible={true}
-            onToggleVisibility={()=>{}}
-            showVisibility={true}
+            title="Completed Studies"
+            value={loading ? "…" : completedStudies}
+            change="Submitted or approved"
           />
         </div>
       </div>

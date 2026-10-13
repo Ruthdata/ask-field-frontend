@@ -63,8 +63,7 @@ const AiTaskBuilder = () => {
                 AI Task Builder
               </h1>
               <p className="mt-3 text-xs text-gray-900">
-                Get text data annotated by participants on Prolific, in one
-                integration workflow
+                Have native speakers rate, rank and correct your model's outputs, with reviewer checks on every batch.
               </p>
             </div>
             <button

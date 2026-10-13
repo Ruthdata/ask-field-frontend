@@ -1,11 +1,11 @@
 import { useResetPasswordMutation } from "@/redux/api/slices/userSlice";
 import { EyeIcon } from "@components/icons";
-import CompleteProfileSuccess from "@components/Modal/Success/CompleteProfileSuccess";
+// import CompleteProfileSuccess from "@components/Modal/Success/CompleteProfileSuccess";
 import PasswordChangeSuccess from "@components/Modal/Success/PasswordChangeSuccess";
 import { formatApiError } from "@utils/helper";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const inputClass =
   "w-full box-border px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 outline-none transition-all focus:border-gray-900 focus:bg-white placeholder:text-gray-300";
@@ -13,7 +13,7 @@ const labelClass = "block text-xs font-semibold text-gray-600 mb-1.5";
 
 const ChangePassword = () => {
   const [resetPassword] = useResetPasswordMutation()
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const [isComplete, setIsCommplete] = useState(false)
 
   const [searchParams] = useSearchParams();

@@ -8,6 +8,8 @@ import { store } from './redux/store';
 import { FormProvider } from '@context/FormContext';
 import { Toaster } from 'react-hot-toast';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import './styles/marketing.css';
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 <React.StrictMode>

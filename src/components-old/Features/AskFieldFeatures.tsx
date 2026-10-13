@@ -146,7 +146,7 @@ function ProcessToggle() {
   );
 }
 
-export default function AskFieldFeatures() {
+export default function JoinStudyFeatures() {
   return (
     <>
       <JourneyShowcase />

@@ -10,14 +10,14 @@ import {
 const teamMembers = [
   {
     name: "Maxwell Ninja",
-    email: "maxwell@askfield.co",
+    email: "owner@example.com",
     role: "Owner",
     status: "Active",
     initials: "MN",
   },
   {
     name: "Research Ops",
-    email: "ops@askfield.co",
+    email: "ops@example.com",
     role: "Admin",
     status: "Pending",
     initials: "RO",

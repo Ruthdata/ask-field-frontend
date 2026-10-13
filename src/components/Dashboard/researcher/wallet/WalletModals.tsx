@@ -331,10 +331,9 @@ const BankDetailsModal = ({ onClose }: { onClose: () => void }) => (
     <section className="mt-3 rounded-xl border border-gray-100 p-4">
       <h3 className="text-sm font-medium text-gray-950">Next Steps</h3>
       <p className="mt-3 text-xs leading-5 text-gray-950">
-        We have emailed you an invoice to{" "}
-        <strong>umorenemmanuel4@gmail.com</strong>. You can now begin the
-        transfer from your bank. Please allow up to seven days for your transfer
-        to be received by Prolific. We will email you as soon as we receive your
+        We have emailed an invoice to the email address on your account. You
+        can now begin the transfer from your bank. Please allow up to seven days
+        for your transfer to reach joinStudy. We will email you as soon as we receive your
         money.
       </p>
     </section>

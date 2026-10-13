@@ -138,7 +138,7 @@ export default function Password() {
         </div>
       </div>
 
-      <WelcomeResearcher open={isComplete} />
+      <WelcomeResearcher onClose={()=> setIsComplete(false)} open={isComplete} />
     </FormLayout>
   );
 }

@@ -2,6 +2,9 @@ import { useState, ChangeEvent, JSX, useEffect, useRef } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCurrentUser } from "@hooks/useCurrentUser";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useCompleteResearcherProfileMutation } from "@/redux/api/researcherApi";
+import { formatApiError } from "@/utils/helper";
 
 type Step = {
   id: number;
@@ -56,6 +59,7 @@ export default function CompleteProfile(): JSX.Element {
   );
   const { researcher } = useCurrentUser();
   const navigate = useNavigate();
+  const [saveProfile, { isLoading: isSaving }] = useCompleteResearcherProfileMutation();
 
   const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({});
   const [formData, setFormData] = useState<FormData>({
@@ -117,7 +121,7 @@ export default function CompleteProfile(): JSX.Element {
     });
   };
 
-  const handleSaveAddress = (): void => {
+  const handleSaveAddress = async (): Promise<void> => {
     const optionSteps = [1, 2, 3];
     const addressStepIndex = 4;
     const requiredAddressFields: (keyof FormData)[] = [
@@ -153,8 +157,13 @@ export default function CompleteProfile(): JSX.Element {
       ...formData,
     };
 
-    console.log("Complete Profile Data:", allData);
-    
+    try {
+      await saveProfile(allData).unwrap();
+    } catch (error) {
+      toast.error(formatApiError(error));
+      return;
+    }
+
     setCompletedSteps(new Set([0, 1, 2, 3, 4]));
     localStorage.setItem("researcher_profile_complete", "true");
     setShowModal(false);
@@ -217,17 +226,19 @@ export default function CompleteProfile(): JSX.Element {
               {options.map((item) => {
                 const isSelected = selectedOptions[index]?.includes(item);
                 return (
-                  <span
+                  <button
+                    type="button"
                     key={item}
+                    aria-pressed={!!isSelected}
                     onClick={() => toggleOption(index, item)}
                     className={`px-4 py-2 rounded-full text-sm cursor-pointer border transition ${
                       isSelected
-                        ? "bg-yellow-400 text-white border-yellow-400"
+                        ? "bg-yellow-400 text-gray-900 border-yellow-400"
                         : "bg-gray-100 hover:bg-gray-200"
                     }`}
                   >
                     {item}
-                  </span>
+                  </button>
                 );
               })}
             </div>
@@ -268,9 +279,10 @@ export default function CompleteProfile(): JSX.Element {
             <div className="col-span-2">
               <button
                 onClick={handleSaveAddress}
-                className="bg-black text-white px-4 py-2 rounded-lg text-sm cursor-pointer"
+                disabled={isSaving}
+                className="bg-black text-white px-4 py-2 rounded-lg text-sm cursor-pointer disabled:opacity-60"
               >
-                Save Address
+                {isSaving ? "Saving…" : "Save Address"}
               </button>
             </div>
           </div>

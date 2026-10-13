@@ -160,7 +160,7 @@ export const authApi = apiSlice.injectEndpoints({
         url: `/surveys/verify-survey-action/${surveyId}`,
         method: "GET",
       }),
-      invalidatesTags: ["Surveys"],
+      invalidatesTags: ["Surveys", "Wallet"],
     }),
     getResearcher: builder.query<ApiSuccess<Researcher>, void>({
       query: () => "/researchers/me",

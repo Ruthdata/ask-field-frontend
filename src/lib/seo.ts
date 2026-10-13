@@ -16,7 +16,7 @@ export type SeoConfig = {
 
 const siteUrlFromEnv = import.meta.env.VITE_FRONTEND_URL;
 
-export const SITE_URL = (siteUrlFromEnv || "https://joinstudy.co").replace(
+export const SITE_URL = (siteUrlFromEnv || "https://joinstudy.io").replace(
   /\/+$/,
   "",
 );
@@ -47,7 +47,7 @@ function organizationJsonLd() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: absoluteUrl("/askfield-logo-icon.png"),
+    logo: absoluteUrl("/joinstudy-logo-icon.png"),
     sameAs: [],
   };
 }
@@ -148,6 +148,34 @@ export const routeSeo: Record<string, SeoConfig> = {
       "product research recruitment",
       "AI data study participants",
     ],
+    robots: "index, follow",
+  },
+  "/sign-in": {
+    title: "Sign in | joinStudy",
+    description: "Sign in to your joinStudy researcher or participant account.",
+    path: "/sign-in",
+    robots: "noindex, follow",
+  },
+  "/founding-labs": {
+    title: "Founding Labs | joinStudy",
+    description:
+      "Apply to be a joinStudy founding lab: priority recruiting, founding pricing and a direct line to the team.",
+    path: "/founding-labs",
+    robots: "index, follow",
+  },
+  "/request-a-country": {
+    title: "Request a Country | joinStudy",
+    description:
+      "Tell joinStudy where you need research participants. Requests decide which countries open local recruiting next.",
+    path: "/request-a-country",
+    robots: "index, follow",
+  },
+  "/ai-pilot": {
+    title: "AI Evaluation Pilot | joinStudy",
+    description:
+      "Skill-tested native speakers rate, rank and correct your model's outputs in the languages your evals skip.",
+    path: "/ai-pilot",
+    keywords: ["AI evaluation", "human evaluation", "RLHF", "African languages", "native speaker evaluation"],
     robots: "index, follow",
   },
 };

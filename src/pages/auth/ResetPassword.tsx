@@ -10,7 +10,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
-  const [verifyResetPasswordOtp, { isLoading: isLoadingResetOtp }] =
+  const [verifyResetPasswordOtp, ] =
     useVerifyResetPasswordOtpMutation();
   const [resendOtp, { isLoading: isLoadingSendOtp }] = useSendOtpMutation();
   const [otp, setOtp] = useState<string>("");

@@ -29,6 +29,8 @@ export interface Survey {
   inputRejection: number;
   surveyDuration: number;
   surveyAmount: number;
+  /** Who runs the study. Included on participant-facing lists. */
+  researcher?: { name: string; organization: string } | null;
 }
 
 export interface CreateDraftSurveyPayload {
