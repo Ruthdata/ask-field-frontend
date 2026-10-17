@@ -87,7 +87,8 @@ const baseQueryWithInterceptor: BaseQueryFn<
         const accessToken = normalizeAuthToken(responseData?.data?.accessToken);
 
         if (accessToken && isJwtLikeToken(accessToken)) {
-          storage.set(STORAGE_KEYS.TOKEN, accessToken);
+          // Keep the new token wherever the session lives ("keep me signed in" or this tab only).
+          storage.set(STORAGE_KEYS.TOKEN, accessToken, localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN) !== null);
           result = await baseQuery(args, api, extraOptions);
         } else {
           clearAuthStorage();
@@ -106,6 +107,6 @@ const baseQueryWithInterceptor: BaseQueryFn<
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithInterceptor,
-  tagTypes: ["Items", "Users", "Researchers", "Projects", "Surveys", "Wallet"],
+  tagTypes: ["Items", "Users", "Researchers", "Projects", "Surveys", "Wallet", "Live", "Bookings", "Messages", "Inbox", "Review"],
   endpoints: () => ({}),
 });

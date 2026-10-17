@@ -1,6 +1,7 @@
 import DashboardSection from "@components/Dashboard/participant/DashboardSection";
 import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import MyBookings from "@/pages/participant/MyBookings";
 
 // skipCompleteProfileRedirect
 
@@ -22,6 +23,7 @@ const ParticipantDashboardHome = () => {
 
   return (
     <div>
+      <MyBookings />
       <DashboardSection />
     </div>
   );

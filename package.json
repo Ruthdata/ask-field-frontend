@@ -13,6 +13,8 @@
     "@radix-ui/themes": "^3.3.0",
     "@react-oauth/google": "^0.13.4",
     "@reduxjs/toolkit": "^2.11.2",
+    "@stripe/react-stripe-js": "^3.10.0",
+    "@stripe/stripe-js": "^7.9.0",
     "axios": "^1.13.2",
     "firebase": "^12.10.0",
     "jwt-decode": "^4.0.0",
@@ -42,5 +44,10 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
+  },
+  "allowScripts": {
+    "@firebase/util@1.15.3": true,
+    "esbuild@0.28.2": true,
+    "protobufjs@7.6.6": true
   }
 }

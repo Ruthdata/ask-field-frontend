@@ -127,9 +127,6 @@ function PayoutDetailsModal({ onClose, onSaved }: { onClose: () => void; onSaved
 interface EarningsDashboardProps {
   earnings?: ParticipantEarnings;
   loading?: boolean;
-  pendingAmount?: number;
-  onWithdraw?: () => void;
-  onDownloadStatement?: () => void;
 }
 
 export default function EarningsDashboard({ earnings, loading }: EarningsDashboardProps) {

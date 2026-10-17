@@ -229,6 +229,7 @@ export const {
   useLoginResearcherMutation,
   useLazyGetParticipantQuery,
   useLazyGetResearcherQuery,
+  useGetResearcherQuery,
   useVerifyEmailMutation,
   useGoogleAuthVerifyMutation,
   useLazyGetRefreshTokenQuery,

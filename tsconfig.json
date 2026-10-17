@@ -16,7 +16,7 @@
   "paths": {
     "@components/*": ["src/components/*"],
     "@utils/*": ["src/utils/*"],
-    "@styles/*": ["src/styles-copy/*"],
+    "@styles/*": ["src/styles/*"],
     "@assets/*": ["src/assets/*"],
     "@hooks/*": ["src/hooks/*"],
     "@context/*": ["src/context/*"],

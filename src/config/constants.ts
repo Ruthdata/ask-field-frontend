@@ -139,7 +139,7 @@ export const PARTICIPANT_QUESTIONS = [
       {
         type: "select",
         name: "workHour",
-        label: "How many hours would you be willing to work on JoinStudy on average per week?",
+        label: "How many hours would you be willing to spend on joinStudy on average per week?",
         placeholder: "john.doe@example.com",
         options: ["4h", "8h", "12h"],
         span: 1,

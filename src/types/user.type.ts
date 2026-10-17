@@ -47,6 +47,21 @@ export interface Researcher {
   organizationName: string;
   companyName: string;
   country: string;
+  // Stage 2 setup
+  role?: string;
+  researchAreas?: string[];
+  firstMethod?: string;
+  heardFrom?: string;
+  signupIntent?: { method?: string; source?: string };
+  institutionVerification?: InstitutionVerification;
+}
+
+export interface InstitutionVerification {
+  status: "none" | "pending" | "verified" | "rejected";
+  method?: "sign-in-email" | "work-email" | "link";
+  email?: string;
+  url?: string;
+  note?: string;
 }
 
 export interface CompleteProfile {

@@ -11,6 +11,13 @@ export const ROUTES = {
   aiPilot: "/ai-pilot",
 };
 
+/**
+ * Researcher sign-up link that remembers which button was clicked and, for the method cards,
+ * which method, so the sign-up page can say "Starting with: Interviews".
+ */
+export const researcherSignup = (source: string, method?: string) =>
+  `${ROUTES.researcherSignup}?${new URLSearchParams({ ...(method ? { method } : {}), source }).toString()}`;
+
 /** Where a signed-in user's dashboard is, or null when nobody is signed in. */
 export const dashboardPath = () => {
   if (!isAuthenticated()) return null;

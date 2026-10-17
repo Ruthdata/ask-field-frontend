@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import WorldMap from "@components/marketing/WorldMap";
 import { LanguageWord, SampleTask } from "@components/marketing/HomeBits";
-import { ROUTES, SUPPORT_EMAIL } from "@/lib/site";
+import { researcherSignup, ROUTES, SUPPORT_EMAIL } from "@/lib/site";
 
 const Arrow = () => <span className="go arrow" aria-hidden="true">→</span>;
 
@@ -18,7 +18,7 @@ export default function Homepage() {
                 <WorldMap />
               </div>
               <div className="routes">
-                <Link className="route" to={ROUTES.researcherSignup}><span className="label">Researchers</span><h3>Run a study</h3><p>Surveys, interviews, focus groups, product tests.</p><Arrow /></Link>
+                <Link className="route" to={researcherSignup("hero")}><span className="label">Researchers</span><h3>Run a study</h3><p>Surveys, interviews, focus groups, product tests.</p><Arrow /></Link>
                 <Link className="route" to={ROUTES.aiPilot}><span className="label">AI teams</span><h3>Evaluate a model</h3><p>Native speakers, in the languages your evals skip.</p><Arrow /></Link>
                 <Link className="route earn" to={ROUTES.participantSignup}><span className="label">Participants</span><h3>Get paid for your view</h3><p>Real money, wherever you live.</p><Arrow /></Link>
               </div>
@@ -51,12 +51,12 @@ export default function Homepage() {
               </div>
               <div className="mlist">
                 {[
-                  ['Surveys', 'Bring a link from Qualtrics, Google Forms or any survey tool.', false],
-                  ['Interviews', 'Screen and shortlist, then book across time zones with WhatsApp reminders.', true],
-                  ['Focus groups', 'Groups recruited with a no-show buffer. Local-language moderators on request.', true],
-                  ['Product tests', 'Watch real people use your app on the phones and networks they have.', false]
-                ].map(([t, d, n]) => (
-                  <Link key={t as string} to={ROUTES.researcherSignup} className="m"><h3>{t}{n && <small>new</small>}</h3><p>{d}</p><span className="dot" aria-hidden="true" /></Link>
+                  ['Surveys', 'Bring a link from Qualtrics, Google Forms or any survey tool.', false, 'survey'],
+                  ['Interviews', 'Screen and shortlist, then book across time zones with WhatsApp reminders.', true, 'interview'],
+                  ['Focus groups', 'Groups recruited with a no-show buffer. Local-language moderators on request.', true, 'focus-group'],
+                  ['Product tests', 'Watch real people use your app on the phones and networks they have.', false, 'product-test']
+                ].map(([t, d, n, m]) => (
+                  <Link key={t as string} to={researcherSignup("method-card", m as string)} className="m"><h3>{t}{n && <small>new</small>}</h3><p>{d}</p><span className="dot" aria-hidden="true" /></Link>
                 ))}
               </div>
               <ol className="flow">
@@ -125,7 +125,7 @@ export default function Homepage() {
               <span className="label">One last question</span>
               <h2>Ready<span aria-hidden="true" /></h2>
               <div className="ends">
-                <Link className="end" to={ROUTES.researcherSignup}><span><b>I&apos;m asking</b><small>Launch a study or an AI pilot</small></span><span className="o" aria-hidden="true" /></Link>
+                <Link className="end" to={researcherSignup("closing")}><span><b>I&apos;m asking</b><small>Launch a study or an AI pilot</small></span><span className="o" aria-hidden="true" /></Link>
                 <Link className="end" to={ROUTES.participantSignup}><span><b>I&apos;m answering</b><small>Get paid for your view</small></span><span className="o" aria-hidden="true" /></Link>
               </div>
             </div>
@@ -133,30 +133,3 @@ export default function Homepage() {
         </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import Header from "@components/Modal/Home/Header";
-// import AskFieldFeatures from "@components/Features/AskFieldFeatures";
-// import FaqSection from "@components/Faq/FaqSection";
-
-// export default function Home() {
-//   return (
-//     <div className="">
-//       <Header />
-//       <AskFieldFeatures />
-//       <FaqSection/>
-//     </div>
-//   );
-// }

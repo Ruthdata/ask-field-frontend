@@ -1,4 +1,6 @@
 export interface Survey {
+  /** Planner studies (Stage 4): what participants need before they start. */
+  participantView?: { method: string; consent: { required: boolean; text: string }; ethics: string; warning: string; hasQuestions: boolean; devices: string[]; tasks: string[]; books?: boolean };
   _id?: string;
   surveyId?: string;
   userId: string;

@@ -47,7 +47,7 @@ function organizationJsonLd() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: absoluteUrl("/joinstudy-logo-icon.png"),
+    logo: absoluteUrl("/askfield-logo-icon.png"),
     sameAs: [],
   };
 }
@@ -152,7 +152,7 @@ export const routeSeo: Record<string, SeoConfig> = {
   },
   "/sign-in": {
     title: "Sign in | joinStudy",
-    description: "Sign in to your joinStudy researcher or participant account.",
+    description: "One sign-in for joinStudy researchers and participants.",
     path: "/sign-in",
     robots: "noindex, follow",
   },
@@ -182,6 +182,8 @@ export const routeSeo: Record<string, SeoConfig> = {
 
 const privateRoutePrefixes = ["/dashboard"];
 const authNoIndexPrefixes = [
+  "/auth/researcher/",
+  "/reset-password",
   "/auth/email-sent",
   "/auth/verify-email",
   "/auth/researcher/verify-email",

@@ -265,3 +265,117 @@ body.menu-open .mk .nav{background:transparent;box-shadow:none;color:#fff;backdr
 .mk .choose small{color:var(--mute);font-size:15px}
 .mk .pub .after{margin-top:24px;color:var(--mute);font-size:15px}
 .mk .pub .after a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+
+/* Stage 1 auth: sign up, sign in, check email, confirmed, reset (see the Researcher Flow canvas) */
+.mk.mk-auth{min-height:100vh;display:flex;flex-wrap:wrap;background:var(--paper)}
+.mk .auth-side{flex:1 1 420px;box-sizing:border-box;background:var(--night);color:#fff;padding:clamp(24px,4vw,56px);display:flex;flex-direction:column;gap:40px}
+.mk .auth-side .logo{color:#fff}
+.mk .auth-side h2{font-size:clamp(32px,3.4vw,46px);letter-spacing:-.05em;line-height:.98}
+.mk .auth-side .lead{color:var(--on-night-2);font-size:17px;max-width:34ch}
+.mk .auth-side .story{margin-top:auto;display:grid;gap:16px}
+.mk .auth-side .foot{padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font-size:15px;color:var(--on-night-2)}
+.mk .auth-steps{list-style:none;margin:0;padding:0;display:grid;gap:18px;font-size:16px;color:var(--on-night)}
+.mk .auth-steps li{display:flex;gap:14px}
+.mk .auth-steps .n{flex:none;width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--on-night-2);display:grid;place-items:center;font-size:14px}
+.mk .auth-steps .n.on{background:var(--sun);color:var(--sun-ink);box-shadow:none;font-weight:600}
+.mk .auth-steps .q{color:var(--on-night-2)}
+.mk .auth-main{flex:999 1 560px;box-sizing:border-box;padding:clamp(24px,5vw,72px) clamp(16px,5vw,72px);display:flex;align-items:center;justify-content:center}
+.mk .auth-form{width:100%;max-width:440px;display:grid;gap:20px}
+.mk .auth-form h1,.mk .auth-card h1{font-size:clamp(32px,3vw,40px);letter-spacing:-.05em;line-height:1}
+.mk .auth-form .sub,.mk .auth-card .sub{color:var(--ink-2);font-size:15.5px;max-width:none}
+.mk .auth-form a,.mk .auth-card a.text{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.mk .chip{justify-self:start;display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--mist);font-size:14px;color:var(--ink-2)}
+.mk .chip b{color:var(--ink)}
+.mk .btn-block{width:100%;justify-content:center;box-sizing:border-box}
+.mk .btn-line{box-shadow:inset 0 0 0 1.5px var(--line);background:#fff;color:var(--ink)}
+.mk .btn-line:hover{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.mk .btn-outline{box-shadow:inset 0 0 0 1.5px var(--ink);background:#fff;color:var(--ink)}
+.mk .btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.mk .or{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--mute)}
+.mk .or::before,.mk .or::after{content:"";flex:1;height:1px;background:var(--line)}
+.mk .pass{position:relative}
+.mk .pass input{padding-right:76px}
+.mk .pass button{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:38px;padding:0 12px;border-radius:10px;background:var(--mist);font-size:14px}
+.mk .check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--ink-2);cursor:pointer}
+.mk .check input{margin-top:3px;width:18px;height:18px;accent-color:var(--ink)}
+.mk .fine{font-size:13.5px;color:var(--mute);line-height:1.5}
+.mk .fine a{font-weight:500}
+.mk .switch{padding-top:16px;border-top:1px solid var(--line);font-size:14.5px;color:var(--ink-2)}
+.mk .alert{padding:14px 16px;border-radius:14px;font-size:15px;line-height:1.45;display:grid;gap:10px}
+.mk .alert.warn{background:#fff4ed;color:#7c2d12}
+.mk .alert.warn a,.mk .alert.warn button{color:#7c2d12}
+.mk .alert.info{background:#fff8dc;color:#4a3b00}
+.mk .alert.info a,.mk .alert.info button{color:#4a3b00}
+.mk .alert.plain{background:var(--mist);color:var(--ink)}
+.mk .alert .row{display:flex;flex-wrap:wrap;gap:8px}
+.mk .alert .btn{height:44px;padding:0 16px;font-size:15px}
+.mk .linkbtn{font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.mk.mk-card-page{min-height:100vh;display:flex;flex-direction:column;background:var(--mist)}
+.mk .card-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px clamp(16px,4vw,56px)}
+.mk .card-head a{font-size:14.5px;color:var(--ink-2)}
+.mk .card-head .logo{color:var(--ink);font-size:22px}
+.mk .card-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px 64px}
+.mk .auth-card{width:100%;max-width:520px;box-sizing:border-box;background:#fff;border:1px solid var(--line);border-radius:28px;padding:clamp(24px,5vw,48px);display:grid;gap:22px}
+.mk .auth-card .icon{width:64px;height:64px;border-radius:20px;background:var(--sun);display:grid;place-items:center}
+.mk .auth-card .icon.done{border-radius:50%;background:var(--night)}
+.mk .auth-card .icon.late{background:#fff4ed}
+.mk .auth-card .lede{margin:0;font-size:17px;color:var(--ink-2)}
+.mk .auth-card .lede b{color:var(--ink)}
+.mk .auth-card .two{display:flex;flex-wrap:wrap;gap:10px}
+.mk .auth-card .two .btn{flex:1 1 180px;justify-content:center}
+.mk .auth-card .more{display:grid;gap:12px;padding-top:20px;border-top:1px solid var(--line);font-size:15px;color:var(--ink-2)}
+.mk .auth-card .more .row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.mk .bars{display:flex;gap:6px}
+.mk .bars span{flex:1;height:6px;border-radius:999px;background:var(--line)}
+.mk .bars span.on{background:var(--sun)}
+.mk .meter{height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.mk .meter i{display:block;height:100%;background:var(--sun)}
+.mk .code{display:flex;gap:8px;border:0;margin:0;padding:0}
+.mk .code input{width:100%;min-width:0;height:60px;box-sizing:border-box;text-align:center;border:1.5px solid var(--line);border-radius:14px;font-family:var(--mono);font-size:24px;color:var(--ink);padding:0}
+.mk .code input:focus,.mk .field input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px rgba(240,201,58,.35)}
+.mk .field [aria-invalid="true"]{border-color:#c2410c}
+.mk .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.mk .spin{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--ink);animation:mkspin .8s linear infinite}
+@keyframes mkspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.mk .spin{animation:none}}
+/* On phones the story panel becomes a short header so the form is on the first screen */
+@media (max-width:720px){
+  .mk.mk-auth{align-content:flex-start}
+  .mk .auth-side{gap:16px;padding:20px 16px 24px}
+  .mk .auth-side .story{margin-top:8px;gap:8px}
+  .mk .auth-side h2{font-size:26px}
+  .mk .auth-side .auth-steps,.mk .auth-side .foot,.mk .auth-side .lead{display:none}
+  .mk .auth-main{padding-top:28px}
+}
+
+/* Stage 2: account setup */
+.mk .setup-card{max-width:720px}
+.mk .auth-card fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
+.mk .auth-card legend{font-weight:600;font-size:15px;padding:0;margin-bottom:4px}
+.mk .auth-card legend .opt,.mk .auth-card label .opt{font-weight:400;color:var(--mute)}
+.mk .opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:10px}
+.mk .opt-card{display:grid;align-content:start;gap:4px;padding:14px 16px;min-height:76px;text-align:left;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line);cursor:pointer;transition:box-shadow .15s,background .15s}
+.mk .opt-card b{font-weight:600;font-size:15.5px}
+.mk .opt-card span{font-size:13.5px;color:var(--ink-2)}
+.mk .opt-card:hover{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.mk .opt-card[aria-pressed="true"],.mk .opt-card[aria-checked="true"]{background:#fff8dc;box-shadow:inset 0 0 0 2px var(--ink)}
+.mk .chips{display:flex;flex-wrap:wrap;gap:8px}
+.mk .chips button{height:44px;padding:0 16px;border-radius:999px;font-size:15px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line);cursor:pointer}
+.mk .chips button:hover{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.mk .chips button[aria-pressed="true"],.mk .chips button[aria-checked="true"]{background:var(--ink);color:#fff;box-shadow:none}
+.mk .two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px}
+.mk .field select{font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px 12px;width:100%}
+.mk .field select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px rgba(240,201,58,.35)}
+.mk .actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-top:24px;border-top:1px solid var(--line)}
+.mk .actions .later{flex-basis:100%;font-size:13.5px;color:var(--mute)}
+.mk .perks{margin:0;padding:20px;list-style:none;display:grid;gap:12px;border-radius:18px;background:var(--mist);font-size:15.5px}
+.mk .perks li{display:flex;gap:12px}
+.mk .perks i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--night);display:grid;place-items:center}
+.mk .done-box{display:flex;gap:14px;align-items:flex-start;padding:18px 20px;border-radius:18px;box-shadow:inset 0 0 0 2px var(--ink);background:#fff8dc}
+.mk .done-box .tick{flex:none;width:36px;height:36px;border-radius:50%;background:var(--night);display:grid;place-items:center}
+.mk .done-box b{display:block;font-size:16.5px}
+.mk .done-box span{font-size:15px;color:var(--ink-2)}
+.mk .inline-form{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:0 4px 6px}
+.mk .inline-form .field{flex:1 1 260px}
+.mk .inline-form .btn{height:52px}
+.mk .who{font-size:14.5px;color:var(--ink-2)}

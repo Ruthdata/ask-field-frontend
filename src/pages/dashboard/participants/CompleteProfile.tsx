@@ -3,7 +3,7 @@ import CompleteProfileSuccess from "@components/Modal/Success/CompleteProfileSuc
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-// import { getFormattedAnswers } from "@/utils/formatDate";
+import { getFormattedAnswers } from "@/utils/formatDate";
 import { useCompleteProfileMutation } from "@/redux/api/slices/userSlice";
 import { formatApiError } from "@utils/helper";
 

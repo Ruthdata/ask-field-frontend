@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
   ChevronDown,
@@ -13,8 +14,11 @@ import { useLazyCheckSurveyEligibilityQuery } from "@/redux/api/slices/userSlice
 import { useGetAllSurveysQuery } from "@/redux/api/surveyApi";
 import { Survey, SurveyAction, SurveyListPayload } from "@/types/survey";
 import { formatApiError } from "@/utils/helper";
+import { readProblem } from "@/lib/session";
+import { useScreenForStudyMutation, useStudyStartLinkMutation } from "@/redux/api/planApi";
 
-type ModalState = "details" | "unqualified" | "error" | null;
+type ModalState = "details" | "questions" | "unqualified" | "error" | null;
+type ScreenQuestion = { text: string; answers: string[] };
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("en-NG", {
@@ -26,8 +30,8 @@ const formatCurrency = (amount: number) =>
     .replace("NGN", "NGN ");
 
 const getSurveyId = (survey: Survey) => survey.surveyId || survey._id || "";
-const SURVEY_ACTION_STORAGE_KEY = "joinstudy_latest_survey_action_id";
-const SURVEY_ACTION_BY_SURVEY_KEY = "joinstudy_survey_action";
+const SURVEY_ACTION_STORAGE_KEY = "askfield_latest_survey_action_id";
+const SURVEY_ACTION_BY_SURVEY_KEY = "askfield_survey_action";
 
 const getSurveys = (payload?: SurveyListPayload): Survey[] => {
   if (!payload) return [];
@@ -86,8 +90,15 @@ const Surveys = () => {
     useLazyCheckSurveyEligibilityQuery();
 
   const surveys = getSurveys(surveysResponse?.data);
+  const [questions, setQuestions] = useState<ScreenQuestion[]>([]);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [consent, setConsent] = useState(false);
+  const [screen, screenState] = useScreenForStudyMutation();
+  const [startLink, startState] = useStudyStartLinkMutation();
+  const navigate = useNavigate();
 
   const closeModal = () => {
+    setConsent(false);
     setModalState(null);
     setSelectedSurveyAction(null);
     setEligibilityError("");
@@ -119,6 +130,14 @@ const Surveys = () => {
       setSelectedSurvey(survey);
       setModalState("details");
     } catch (error) {
+      const problem = readProblem(error);
+      if (problem.code === "screener_required") {
+        const qs = (problem.data?.questions as ScreenQuestion[]) || [];
+        setQuestions(qs);
+        setAnswers(qs.map(() => -1));
+        setModalState("questions");
+        return;
+      }
       const message = formatApiError(error);
       setEligibilityError(message);
       setModalState(
@@ -129,8 +148,34 @@ const Surveys = () => {
     }
   };
 
-  const handleStartSurvey = () => {
-    if (!selectedSurvey?.surveyURL) return;
+  const submitAnswers = async () => {
+    if (!selectedSurvey) return;
+    const surveyId = getSurveyId(selectedSurvey);
+    try {
+      const res = await screen({ id: surveyId, answers }).unwrap();
+      storeSurveyAction(surveyId, res.data as unknown as SurveyAction);
+      setSelectedSurveyAction(res.data as unknown as SurveyAction);
+      setModalState("details");
+    } catch (error) {
+      setEligibilityError(readProblem(error).message);
+      setModalState("unqualified");
+    }
+  };
+
+  const handleStartSurvey = async () => {
+    if (!selectedSurvey) return;
+    if (selectedSurvey.participantView) {
+      try {
+        const res = await startLink({ id: getSurveyId(selectedSurvey), consent }).unwrap();
+        // Interviews and focus groups: choose a time on joinStudy (Stage 6).
+        if (res.data.book) navigate(`/dashboard/participant/studies/${getSurveyId(selectedSurvey)}/book`);
+        else window.location.assign(res.data.url);
+      } catch (error) {
+        setEligibilityError(readProblem(error).message);
+      }
+      return;
+    }
+    if (!selectedSurvey.surveyURL) return;
 
     const surveyId = getSurveyId(selectedSurvey);
     if (!surveyId) {
@@ -322,7 +367,7 @@ const Surveys = () => {
                 </div>
 
                 <div className="mt-5 space-y-4 text-sm leading-relaxed text-gray-600">
-                  {selectedSurvey.contentWarning && !/^none$/i.test(selectedSurvey.contentWarning.trim()) && (
+                  {!selectedSurvey.participantView && selectedSurvey.contentWarning && !/^none$/i.test(selectedSurvey.contentWarning.trim()) && (
                     <p>
                       <span className="font-semibold text-gray-800">Content note: </span>
                       {selectedSurvey.contentWarning}
@@ -340,6 +385,25 @@ const Surveys = () => {
                   </div>
                 </div>
 
+                {selectedSurvey.participantView && (
+                  <div className="mt-5 space-y-3 text-sm leading-relaxed text-gray-700">
+                    {selectedSurvey.participantView.warning && (
+                      <p><span className="font-semibold text-gray-900">Before you start: </span>{selectedSurvey.participantView.warning}</p>
+                    )}
+                    {selectedSurvey.participantView.ethics && <p>Ethics approval: {selectedSurvey.participantView.ethics}</p>}
+                    {selectedSurvey.participantView.consent.required && (
+                      <div className="rounded-xl border border-gray-200 p-4">
+                        <p className="font-semibold text-gray-900">Consent</p>
+                        <div className="mt-2 max-h-48 overflow-y-auto whitespace-pre-line text-gray-700">{selectedSurvey.participantView.consent.text}</div>
+                        <label className="mt-3 flex items-start gap-3 font-medium text-gray-900">
+                          <input type="checkbox" className="mt-1 h-4 w-4" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+                          I've read this and agree to take part.
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {eligibilityError && (
                   <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
                     {eligibilityError}
@@ -347,12 +411,43 @@ const Surveys = () => {
                 )}
 
                 <button
+                  disabled={startState.isLoading || (!!selectedSurvey.participantView?.consent.required && !consent)}
                   onClick={handleStartSurvey}
                   className="mt-6 w-full rounded-full bg-[#3E3E3E] px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Start survey
+                  {selectedSurvey.participantView?.books ? "Choose a time" : "Start survey"}
                 </button>
               </div>
+            </div>
+          )}
+
+          {modalState === "questions" && (
+            <div role="dialog" aria-modal="true" aria-labelledby="sq-title" className="relative max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl md:p-8">
+              <button onClick={closeModal} className="absolute right-4 top-4 rounded-full bg-white/90 p-2 text-gray-700" aria-label="Close">
+                <X className="h-4 w-4" />
+              </button>
+              <h2 id="sq-title" className="text-2xl font-bold text-gray-950">A few quick questions</h2>
+              <p className="mt-2 text-sm text-gray-600">The researcher is looking for particular people. Answer honestly; there's no wrong answer.</p>
+              <div className="mt-5 space-y-5">
+                {questions.map((q, i) => (
+                  <fieldset key={i} className="space-y-2">
+                    <legend className="font-semibold text-gray-900">{q.text}</legend>
+                    {q.answers.map((a, j) => (
+                      <label key={j} className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm">
+                        <input type="radio" name={`sq-${i}`} checked={answers[i] === j} onChange={() => setAnswers(answers.map((x, k) => (k === i ? j : x)))} />
+                        {a}
+                      </label>
+                    ))}
+                  </fieldset>
+                ))}
+              </div>
+              <button
+                onClick={submitAnswers}
+                disabled={screenState.isLoading || answers.some((a) => a < 0)}
+                className="mt-6 w-full rounded-full bg-[#3E3E3E] px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                {screenState.isLoading ? "Checking..." : "Continue"}
+              </button>
             </div>
           )}
 

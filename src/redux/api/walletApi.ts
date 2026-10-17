@@ -1,8 +1,8 @@
 import { apiSlice } from "./slices/appSlice";
 import { ApiSuccess } from "@/types/api.type";
 
-export type LedgerKind = "earning" | "payout" | "charge";
-export type LedgerStatus = "pending" | "available" | "processing" | "paid" | "cancelled" | "failed";
+export type LedgerKind = "earning" | "payout" | "charge" | "funding" | "credit" | "credit-used";
+export type LedgerStatus = "pending" | "available" | "processing" | "paid" | "cancelled" | "failed" | "refunded";
 
 export interface LedgerLine {
   _id: string;
@@ -35,6 +35,10 @@ export interface ResearcherWallet {
   currency: string;
   spent: number;
   feeRate: number;
+  /** Stage 5: money back from closed studies, to use on the next one. */
+  credit: number;
+  /** Stage 5: payments made for studies (card, invoice or credit). */
+  fundings: import("./launchApi").Funding[];
   transactions: LedgerLine[];
 }
 

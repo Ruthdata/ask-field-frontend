@@ -1,4 +1,4 @@
-import EmailSentScreen from '@components/Auth/Contributor/EmailSentScreen'
+import EmailSentScreen from '@components/auth/Contributor/EmailSentScreen'
 import React from 'react'
 
 const EmailSent = () => {

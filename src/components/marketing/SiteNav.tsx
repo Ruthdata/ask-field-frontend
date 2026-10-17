@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LogoMark } from "./Logo";
-import { dashboardPath, ROUTES } from "@/lib/site";
+import { dashboardPath, researcherSignup, ROUTES } from "@/lib/site";
 
 /** Public-site navigation. Dark over the homepage hero, light everywhere else. */
 export default function SiteNav() {
@@ -107,7 +107,7 @@ export default function SiteNav() {
                 Sign in
               </Link>
             )}
-            <Link className="btn btn-sun start" to={ROUTES.researcherSignup}>
+            <Link className="btn btn-sun start" to={researcherSignup("nav")}>
               <span className="long">Start a study</span>
               <span className="short">Start</span>
             </Link>
@@ -134,7 +134,7 @@ export default function SiteNav() {
           {dash ? <Link to={dash}>Dashboard</Link> : <Link to={ROUTES.signIn}>Sign in</Link>}
         </nav>
         <div className="ctas">
-          <Link className="btn btn-sun" to={ROUTES.researcherSignup}>Start a study</Link>
+          <Link className="btn btn-sun" to={researcherSignup("menu")}>Start a study</Link>
           <Link className="btn ghost" to={ROUTES.participantSignup}>Start earning</Link>
         </div>
       </div>

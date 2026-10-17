@@ -1,9 +1,8 @@
-import { Download, Eye, WalletCards } from "lucide-react";
-import { useState } from "react";
+import { Download } from "lucide-react";
+import { Link } from "react-router-dom";
 import { type LedgerLine, useGetResearcherWalletQuery } from "@/redux/api/walletApi";
-import WalletModals, {
-  WalletModalStep,
-} from "@components/Dashboard/researcher/wallet/WalletModals";
+import { openFundingDocument } from "@/redux/api/launchApi";
+import { formatMoney } from "@/lib/study";
 
 const downloadStatement = (lines: LedgerLine[]) => {
   const rows = [["Date", "Study", "Amount", "Platform fee", "Currency"], ...lines.map((t) => [t.createdAt.slice(0, 10), t.title, String(t.amount), String(t.fee ?? 0), t.currency])];
@@ -13,90 +12,77 @@ const downloadStatement = (lines: LedgerLine[]) => {
   URL.revokeObjectURL(url);
 };
 
-const Wallet = () => {
-  const [modalStep, setModalStep] = useState<WalletModalStep | null>(null);
-  const [visible, setVisible] = useState(true);
-  const { data, isLoading } = useGetResearcherWalletQuery();
-  const wallet = data?.data;
-  const charges = (wallet?.transactions ?? []).filter((t) => t.kind === "charge");
+const STATUS: Record<string, string> = { pending: "Waiting for payment", paid: "Paid", refunded: "Refunded" };
 
+/** Payments: what was paid for each study (with receipts), and what's been paid out for approved work. */
+export default function Wallet() {
+  const { data, isLoading, isError } = useGetResearcherWalletQuery();
+  const w = data?.data;
+  const cur = w?.currency ?? "USD";
+  const charges = (w?.transactions ?? []).filter((t) => t.kind === "charge");
+  const fundings = w?.fundings ?? [];
   return (
-    <div className="min-h-screen bg-gray-50 px-2 sm:px-3 lg:px-4 py-6">
-      <section className="max-w-5xl rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-base font-semibold text-gray-950">Wallet</h1>
-            <p className="mt-3 text-xs text-gray-950">
-              Track your survey spends
-            </p>
-          </div>
+    <div className="ja-page">
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <h1 className="ja-h1">Payments</h1>
+        <p className="ja-lede">You pay for each study when you launch it. Participants are paid, and the fee charged, as you approve their work.</p>
+      </div>
+      {isError && <div className="ja-error" role="alert">We couldn't load your payments.</div>}
 
-
+      <section className="ja-grid" aria-label="Totals">
+        <div className="ja-card ja-stat" style={{ gap: 6 }}>
+          <span className="ja-muted">Paid for approved work</span>
+          <span className="big">{isLoading ? "…" : formatMoney(w?.spent ?? 0, cur)}</span>
+          <span className="ja-small">Participant pay plus the fee</span>
         </div>
-
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_1fr_1fr] lg:items-end">
-          <div className="border-r border-gray-100 pr-7">
-            <button type="button" onClick={() => setVisible(!visible)} className="flex items-center gap-2 text-xs text-gray-400" aria-pressed={!visible}>
-              Research Spend <Eye size={14} className="fill-gray-950 text-gray-950" />
-            </button>
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <span className="text-sm text-gray-500">{wallet?.currency ?? "NGN"}</span>
-              <strong className="text-2xl font-medium text-gray-950">
-                {isLoading ? "…" : visible ? (wallet?.spent ?? 0).toLocaleString() : "••••"}
-              </strong>
-            </div>
-            <p className="mt-2 text-[11px] text-gray-400">Approved rewards plus platform fee</p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setModalStep("select")}
-            className="flex items-center justify-center gap-3 rounded-3xl bg-[#3E3E3E] px-6 py-3 text-xs text-white"
-          >
-            <WalletCards size={15} />
-            Add funds
-          </button>
-
-          <button
-            type="button"
-            onClick={() => downloadStatement(charges)}
-            disabled={!charges.length}
-            className="flex items-center justify-center gap-3 rounded-3xl bg-gray-100 px-6 py-3 text-xs text-gray-700 disabled:opacity-50"
-          >
-            <Download size={15} />
-            Download statement
-          </button>
+        <div className="ja-card ja-stat" style={{ gap: 6 }}>
+          <span className="ja-muted">Credit</span>
+          <span className="big">{isLoading ? "…" : formatMoney(w?.credit ?? 0, cur)}</span>
+          <span className="ja-small">Money back from closed studies; used when you pay for the next one</span>
         </div>
       </section>
 
-      <section className="mt-4 max-w-5xl rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-950">Recent charges</h2>
-        {charges.length === 0 ? (
-          <p className="py-8 text-center text-xs text-gray-400">
-            {isLoading ? "Loading…" : "You're charged when you approve a submission. Approved work will show here."}
-          </p>
+      <section className="ja-card" aria-labelledby="pay-h">
+        <h2 id="pay-h" className="ja-h3">Payments for studies</h2>
+        {fundings.length === 0 ? (
+          <p className="ja-muted">{isLoading ? "Loading…" : <>Nothing yet. You pay when you launch a study. <Link to="/dashboard/researcher/new" style={{ color: "var(--ink)" }}>Start one</Link></>}</p>
         ) : (
-          <ul className="mt-3 divide-y divide-gray-100">
-            {charges.map((t) => (
-              <li key={t._id} className="flex items-center justify-between gap-4 py-3 text-sm">
-                <div>
-                  <p className="font-medium text-gray-950">{t.title}</p>
-                  <p className="text-xs text-gray-400">
-                    {new Date(t.createdAt).toLocaleDateString()} · includes {t.currency} {(t.fee ?? 0).toLocaleString()} fee
-                  </p>
-                </div>
-                <span className="font-semibold text-gray-950">
-                  {t.currency} {t.amount.toLocaleString()}
+          <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            {fundings.map((f) => (
+              <li key={f.fundingId} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px 16px", padding: "12px 0", borderBottom: "1px solid var(--line-2)" }}>
+                <span style={{ flex: "1 1 240px", display: "flex", flexDirection: "column", gap: 2 }}>
+                  <b style={{ fontWeight: 600 }}>{f.title}</b>
+                  <span className="ja-small">{f.number ? `${f.number} · ` : ""}{f.method === "card" ? "Card" : f.method === "invoice" ? "Invoice" : "Credit"} · {STATUS[f.status] ?? f.status} · {new Date(f.paidAt || f.createdAt).toLocaleDateString()}</span>
                 </span>
+                <span style={{ fontFamily: "var(--mono)" }}>{formatMoney(f.amount + (f.creditUsed || 0), f.currency)}</span>
+                <button type="button" className="ja-link" onClick={() => openFundingDocument(f.fundingId)}>{f.status === "pending" ? "Invoice" : "Receipt"}</button>
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      <WalletModals step={modalStep} setStep={setModalStep} />
+      <section className="ja-card" aria-labelledby="ch-h">
+        <div className="ja-row">
+          <h2 id="ch-h" className="ja-h3">Approved work</h2>
+          <button type="button" className="ja-link" onClick={() => downloadStatement(charges)} disabled={!charges.length} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Download size={15} aria-hidden="true" />Download statement</button>
+        </div>
+        {charges.length === 0 ? (
+          <p className="ja-muted">{isLoading ? "Loading…" : "When you approve a participant's work, it shows here."}</p>
+        ) : (
+          <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            {charges.map((t) => (
+              <li key={t._id} style={{ display: "flex", justifyContent: "space-between", gap: 16, padding: "12px 0", borderBottom: "1px solid var(--line-2)" }}>
+                <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <b style={{ fontWeight: 600 }}>{t.title}</b>
+                  <span className="ja-small">{new Date(t.createdAt).toLocaleDateString()} · includes {formatMoney(t.fee ?? 0, t.currency)} fee</span>
+                </span>
+                <span style={{ fontFamily: "var(--mono)" }}>{formatMoney(t.amount, t.currency)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
-};
-
-export default Wallet;
+}

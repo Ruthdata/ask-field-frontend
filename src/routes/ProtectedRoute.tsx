@@ -1,19 +1,18 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { isAuthenticated, getUserType } from "../utils/auth";
 
 interface ProtectedRouteProps {
   requiredRole?: "researcher" | "participant";
 }
 
+/** Not signed in (or signed in as the other account type) → the one sign-in page, then back here. */
 const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
-  if (!isAuthenticated()) {
-    return <Navigate to="/auth/login/participant" replace />;
-  }
+  const { pathname, search } = useLocation();
+  const back = `next=${encodeURIComponent(pathname + search)}${requiredRole ? `&intent=${requiredRole}` : ""}`;
 
-  if (requiredRole && getUserType() !== requiredRole) {
-    return <Navigate to={`/auth/login/${requiredRole}`} replace />;
+  if (!isAuthenticated() || (requiredRole && getUserType() !== requiredRole)) {
+    return <Navigate to={`/sign-in?${back}`} replace />;
   }
-
   return <Outlet />;
 };
 
