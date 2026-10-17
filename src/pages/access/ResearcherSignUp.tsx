@@ -100,7 +100,7 @@ export default function ResearcherSignUp() {
           </p>
         </div>
 
-        {problem && (
+        {/* {problem && (
           <div className="alert warn" role="alert">
             {problem.code === "email_taken" ? (
               <span>
@@ -111,7 +111,7 @@ export default function ResearcherSignUp() {
               <span>{problem.message}</span>
             )}
           </div>
-        )}
+        )} */}
         {choice && <AccountChoice choices={choice.c.choices} onPick={pick} busy={picking} />}
 
         <GoogleButton
@@ -136,6 +136,18 @@ export default function ResearcherSignUp() {
           error={errors.email}
         />
         <PasswordField id="su-password" label="Password" value={password} onChange={setPassword} autoComplete="new-password" placeholder="At least 8 characters" error={errors.password} />
+        {problem && (
+          <div className="alert warn" role="alert">
+            {problem.code === "email_taken" ? (
+              <span>
+                There's already an account with this email. <Link to={`/sign-in?intent=researcher&email=${encodeURIComponent(email)}`}>Sign in</Link> or{" "}
+                <Link to={`/reset-password?intent=researcher&email=${encodeURIComponent(email)}`}>reset your password</Link>.
+              </span>
+            ) : (
+              <span>{problem.message}</span>
+            )}
+          </div>
+        )}
 
         <label className="check">
           <input type="checkbox" checked={updates} onChange={(e) => setUpdates(e.target.checked)} />
