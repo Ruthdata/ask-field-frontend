@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { readProblem } from "@/lib/session";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useVerifySurveyActionMutation } from "@/redux/api/slices/userSlice";
 import { formatApiError } from "@/utils/helper";
@@ -11,6 +12,7 @@ export default function SurveyThankYouPage() {
   const { getParticipantFirstName } = useCurrentUser();
   const [searchParams] = useSearchParams();
   const [verifySurveyAction] = useVerifySurveyActionMutation();
+  const navigate = useNavigate();
   const [submissionMessage, setSubmissionMessage] = useState(
     "Your response has been recorded successfully.",
   );
@@ -53,9 +55,14 @@ export default function SurveyThankYouPage() {
         );
       })
       .catch((error) => {
+        // Participant Stage 4: studies with a finish link need the link or its code, not just this page.
+        if (readProblem(error).code === "use_code" && surveyId) {
+          navigate(`/dashboard/participant/studies/${surveyId}/finish`, { replace: true });
+          return;
+        }
         setSubmissionMessage(formatApiError(error));
       });
-  }, [searchParams, verifySurveyAction]);
+  }, [searchParams, verifySurveyAction, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6 py-10">

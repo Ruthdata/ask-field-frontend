@@ -4,7 +4,7 @@ export const SUPPORT_EMAIL = "hello@joinstudy.io";
 
 export const ROUTES = {
   researcherSignup: "/auth/sign-up/researcher",
-  participantSignup: "/auth/sign-up/participant",
+  participantSignup: "/participate",
   signIn: "/sign-in",
   foundingLabs: "/founding-labs",
   requestCountry: "/request-a-country",

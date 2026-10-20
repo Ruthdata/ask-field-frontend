@@ -122,11 +122,11 @@ export const routeSeo: Record<string, SeoConfig> = {
     path: "/auth/login/researcher",
     robots: "noindex, follow",
   },
-  "/auth/sign-up/participant": {
+  "/participate": {
     title: "Join Paid Research Studies | joinStudy",
     description:
       "Create a participant profile on joinStudy to apply for legitimate paid surveys, interviews, usability tests, and research studies.",
-    path: "/auth/sign-up/participant",
+    path: "/participate",
     keywords: [
       "join paid research studies",
       "paid surveys",

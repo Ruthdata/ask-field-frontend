@@ -12,7 +12,9 @@ export interface Plan {
     ethics?: { body: string; reference: string };
   };
   audience?: {
-    countries?: string[]; includeDiaspora?: boolean; minAge?: number; maxAge?: number; genders?: string[]; languages?: string[];
+    countries?: string[]; includeDiaspora?: boolean;
+    regions?: string[];
+    linkedinOnly?: boolean; minAge?: number; maxAge?: number; genders?: string[]; languages?: string[];
     education?: string; employment?: string; students?: string; questions?: Question[];
     quota?: { by: "gender" | "language"; groups: { value: string; places: number }[] } | null;
   };
@@ -46,6 +48,10 @@ export const planApi = apiSlice.injectEndpoints({
       query: (id) => `/surveys/${id}/plan`,
       providesTags: (_r, _e, id) => [{ type: "Surveys", id }],
     }),
+    // Participant Stage 2: the countries, places and languages participants can answer.
+    getParticipantOptions: b.query<ApiSuccess<{ countries: string[]; regions: Record<string, { label: string; list: string[] }>; languages: Record<string, string[]>; genders: { value: string; label: string }[] }>, void>({
+      query: () => "/participant-options",
+    }),
     getMatchCount: b.query<ApiSuccess<{ count: number; total: number }>, { id: string; v: number }>({
       query: ({ id }) => `/surveys/${id}/plan/match`,
     }),
@@ -70,14 +76,15 @@ export const planApi = apiSlice.injectEndpoints({
     studyStartLink: b.mutation<ApiSuccess<{ url: string; surveyActionId: string; book?: boolean }>, { id: string; consent: boolean }>({
       query: ({ id, consent }) => ({ url: `/surveys/${id}/start-link`, method: "POST", body: { consent } }),
     }),
-    finishByCode: b.mutation<ApiSuccess<{ status: string }>, string>({
+    finishByCode: b.mutation<ApiSuccess<{ status: string; outcome: "paid" | "review" | "late" | "late-over"; amount: number; currency: string; surveyId: string }>, string>({
       query: (code) => ({ url: `/surveys/done/${encodeURIComponent(code)}`, method: "POST" }),
-      invalidatesTags: ["Surveys", "Wallet"],
+      invalidatesTags: ["Surveys", "Wallet", "Studies"],
     }),
   }),
 });
 
 export const {
+  useGetParticipantOptionsQuery,
   useGetPlanQuery,
   useGetMatchCountQuery,
   useSavePlanStepMutation,

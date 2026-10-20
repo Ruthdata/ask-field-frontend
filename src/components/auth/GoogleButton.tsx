@@ -4,6 +4,10 @@ import { useGoogleSignInMutation } from "@/redux/api/authApi";
 import { readProblem, type AccountType, type NeedsChoice, type Session } from "@/lib/session";
 
 interface Props {
+  /** Participant sign-up: a new participant account also needs the country and the 18+/terms agreement. */
+  extra?: { country?: string; agree?: boolean };
+  /** Return false to stop before opening Google (e.g. the agreement box isn't ticked). */
+  beforeOpen?: () => boolean;
   intent?: AccountType;
   method?: string;
   accountType?: AccountType;
@@ -16,18 +20,19 @@ interface Props {
  * "Continue with Google". Uses the Firebase popup, then /api/auth/google, which knows whether the
  * email belongs to a researcher, a participant or both (so researchers no longer land in a participant account).
  */
-export default function GoogleButton({ intent, method, accountType, onSession, onChoice, onError }: Props) {
+export default function GoogleButton({ extra, beforeOpen, intent, method, accountType, onSession, onChoice, onError }: Props) {
   const [busy, setBusy] = useState(false);
   const [googleSignIn] = useGoogleSignInMutation();
 
   const go = async () => {
     if (busy) return;
+    if (beforeOpen && !beforeOpen()) return;
     setBusy(true);
     try {
       const [{ signInWithPopup }, { auth, googleProvider }] = await Promise.all([import("firebase/auth"), import("../../firebase")]);
       const result = await signInWithPopup(auth, googleProvider);
       const token = await result.user.getIdToken();
-      const res = await googleSignIn({ token, intent, method, accountType }).unwrap();
+      const res = await googleSignIn({ token, intent, method, accountType, ...extra }).unwrap();
       const data = res.data;
       if ("needsChoice" in data) onChoice(data, token);
       else onSession(data);

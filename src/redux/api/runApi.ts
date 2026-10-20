@@ -2,6 +2,7 @@ import { apiSlice } from "./slices/appSlice";
 import type { ApiSuccess } from "@/types/api.type";
 import type { StudyMethod } from "./homeApi";
 import type { PayResult, Receipt } from "./launchApi";
+import { apiHeaders } from "@/utils/token";
 
 /** Stage 6: running a live study (backend: /api/surveys/:id/live…, /api/bookings…, messages). */
 
@@ -12,6 +13,8 @@ export interface LiveView {
   method: StudyMethod;
   status: "live" | "closed" | "draft";
   paused: boolean;
+  /** Participant Stage 7: paused by joinStudy after reports; only joinStudy can lift it. */
+  reportHold?: boolean;
   publishedAt: string | null;
   closedAt: string | null;
   closes: string | null;
@@ -25,6 +28,10 @@ export interface LiveView {
   bookings: null | { booked: number; happened: number; noshow: number; next: { start: string; code: string }[] };
   money: { paidIn: number; paidOut: number; held: number; currency: string };
   perPerson: number;
+  /** Participant Stage 3: people who said "Not interested", and why (totals only). */
+  declines?: { total: number; reasons: Record<"too-long" | "pay-low" | "topic" | "timing" | "other", number> };
+  /** Participant Stage 4: people who left (and why) or ran out of time. Totals only. */
+  leaves?: { left: number; timedOut: number; reasons: Record<"longer" | "link-broken" | "came-up" | "uncomfortable" | "other", number> };
   returnLink: string | null;
 }
 export interface LiveParticipant { surveyActionId: string; participantId: string; code: string; status: string; startedAt: string; submittedAt: string | null; minutes: number | null }
@@ -47,7 +54,7 @@ export interface SlotsView { title: string; method: StudyMethod; perPerson: numb
 export interface MyBooking extends Booking { title: string; canChange: boolean }
 export type AddPlacesResult = PayResult & { extra?: number };
 // Stage 7: review the work
-export type Flag = "fast" | "no-link" | "rejected-before";
+export type Flag = "fast" | "no-link" | "rejected-before" | "late" | "over";
 export type RejectReason = "tasks" | "attention" | "low-effort" | "not-eligible" | "other";
 export interface ReviewItem {
   surveyActionId: string;
@@ -61,6 +68,8 @@ export interface ReviewItem {
   flags: Flag[];
   finishedBy: "link" | "self" | "booking" | null;
   review: { by: "researcher" | "auto" | "attendance"; reason: RejectReason | null; note: string } | null;
+  /** Participant Stage 5: their question about a "not approved" decision. */
+  question: { status: "open" | "approved" | "kept" | "escalated" | "upheld" | "overturned"; why: "did-tasks" | "did-checks" | "eligible" | "other"; message: string; askedAt: string; answerBy: string; answer: string } | null;
 }
 export interface ReviewView {
   surveyId: string;
@@ -72,12 +81,34 @@ export interface ReviewView {
   currency: string;
   autoApproveDays: number;
   reviewMode: "manual" | "auto";
-  counts: { toReview: number; flagged: number; approved: number; rejected: number };
+  counts: { toReview: number; flagged: number; approved: number; rejected: number; questions?: number };
   soonest: string | null;
   reasons: { key: RejectReason; label: string }[];
   items: ReviewItem[];
 }
-export interface ToReviewRow { surveyId: string; name: string; method: StudyMethod; count: number; flagged: number; toMark: number; autoApproveAt: string | null }
+// Stage 8: finish
+export interface Settlement { at: string; paidIn: number; participants: number; fees: number; approved: number; unused: number; credit: number; refunded: number; refunds: { number: string; last4: string; amount: number }[] }
+export interface FinishView {
+  surveyId: string;
+  name: string;
+  method: StudyMethod;
+  status: "live" | "closed" | "draft";
+  closedAt: string | null;
+  closedReason: "early" | "full" | "date" | null;
+  toReview: number;
+  stillFinishing: number;
+  unmarked: number;
+  settlesBy: string | null;
+  counts: { approved: number; rejected: number; didntFinish: number; places: number; unusedPlaces: number };
+  plannedMinutes: number;
+  medianMinutes: number | null;
+  money: { currency: string; paidIn: number; participants: number; fees: number; waitingIfApproved: number; unused: number };
+  returnTo: "credit" | "card";
+  card: { last4: string } | null;
+  settlement: Settlement | null;
+}
+export interface ClosedStudies { studies: { surveyId: string; name: string; closedAt: string; settlement: Settlement | null; toReview: number; returnTo: "credit" | "card" }[]; refundsOnTheWay: number }
+export interface ToReviewRow { surveyId: string; name: string; method: StudyMethod; count: number; flagged: number; toMark: number; questions?: number; autoApproveAt: string | null }
 
 /** Opening a conversation marks it read on the server, so unread counts (tag "Inbox") refresh after it loads. */
 async function readMarksRead(dispatch: (a: unknown) => unknown, done: Promise<unknown>) {
@@ -144,11 +175,24 @@ export const runApi = apiSlice.injectEndpoints({
       query: ({ id, ...body }) => ({ url: `/surveys/${id}/review`, method: "POST", body }),
       invalidatesTags: (_r, _e, { id }) => [...live(id), "Review", "Wallet"],
     }),
+    answerQuestion: b.mutation<ApiSuccess<{ status: string }>, { id: string; actionId: string; decision: "approve" | "keep"; reply?: string }>({
+      query: ({ id, actionId, ...body }) => ({ url: `/surveys/${id}/review/${actionId}/answer`, method: "POST", body }),
+      invalidatesTags: (_r, _e, { id }) => [...live(id), "Review", "Wallet"],
+    }),
     saveAttendance: b.mutation<ApiSuccess<{ joined: number; missed: number }>, { id: string; joined: string[]; missed: string[] }>({
       query: ({ id, ...body }) => ({ url: `/surveys/${id}/attendance`, method: "POST", body }),
       invalidatesTags: (_r, _e, { id }) => [...live(id), { type: "Bookings", id }, "Review", "Wallet"],
     }),
     getToReview: b.query<ApiSuccess<ToReviewRow[]>, void>({ query: () => `/researchers/me/to-review`, providesTags: ["Review"] }),
+
+    // finish (Stage 8)
+    getFinish: b.query<ApiSuccess<FinishView>, string>({ query: (id) => `/surveys/${id}/finish`, providesTags: (_r, _e, id) => [{ type: "Live", id }, "Review"] }),
+    setReturnTo: b.mutation<ApiSuccess<FinishView>, { id: string; to: "credit" | "card" }>({
+      query: ({ id, to }) => ({ url: `/surveys/${id}/finish/return-to`, method: "POST", body: { to } }),
+      invalidatesTags: (_r, _e, { id }) => [{ type: "Live", id }],
+    }),
+    runAgain: b.mutation<ApiSuccess<{ surveyId: string }>, string>({ query: (id) => ({ url: `/surveys/${id}/run-again`, method: "POST" }), invalidatesTags: ["Researchers", "Surveys"] }),
+    getClosedStudies: b.query<ApiSuccess<ClosedStudies>, void>({ query: () => `/researchers/me/closed-studies`, providesTags: ["Wallet", "Live"] }),
 
     // participant side
     getSlots: b.query<ApiSuccess<SlotsView>, string>({ query: (id) => `/surveys/${id}/slots`, providesTags: ["Bookings"] }),
@@ -195,6 +239,38 @@ export const {
   useReplyAsParticipantMutation,
   useGetReviewQuery,
   useDecideMutation,
+  useAnswerQuestionMutation,
   useSaveAttendanceMutation,
   useGetToReviewQuery,
+  useGetFinishQuery,
+  useSetReturnToMutation,
+  useRunAgainMutation,
+  useGetClosedStudiesQuery,
 } = runApi;
+
+const authHeader = apiHeaders;
+
+/** Downloads the results CSV (it needs the sign-in token, so it's fetched, not linked). */
+export async function downloadResults(id: string, show: "all" | "approved" | "other" = "all") {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/surveys/${id}/results.csv?show=${show}`, { headers: authHeader() });
+  if (!res.ok) throw new Error("We couldn't make the file. Try again.");
+  const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") || "")?.[1] || "results.csv";
+  const url = URL.createObjectURL(await res.blob());
+  Object.assign(document.createElement("a"), { href: url, download: name }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** Opens the study statement in a new tab. */
+export async function openStatement(id: string) {
+  const w = window.open("", "_blank");
+  try {
+    const html = await (await fetch(`${import.meta.env.VITE_API_URL}/surveys/${id}/statement`, { headers: authHeader() })).text();
+    if (w) {
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    }
+  } catch {
+    w?.close();
+  }
+}

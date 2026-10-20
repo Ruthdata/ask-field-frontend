@@ -24,9 +24,9 @@ export default function BookPage() {
     return (
       <div className="jp" style={{ minHeight: 0, background: "transparent" }}>
         <div className="jr-book">
-          <Link to="/dashboard/participant/surveys" className="jr-back">← Studies</Link>
+          <Link to="/dashboard/participant" className="jr-back">← Studies</Link>
           <div className="jp-note bad" role="alert">{p.message || "We couldn't open this study."}</div>
-          <div className="jp-actions"><Link to="/dashboard/participant/surveys" className="jp-btn2">Back to studies</Link><button type="button" className="jp-btn2" onClick={() => refetch()}>Try again</button></div>
+          <div className="jp-actions"><Link to="/dashboard/participant" className="jp-btn2">Back to studies</Link><button type="button" className="jp-btn2" onClick={() => refetch()}>Try again</button></div>
         </div>
       </div>
     );
@@ -47,7 +47,7 @@ export default function BookPage() {
   return (
     <div className="jp" style={{ minHeight: 0, background: "transparent" }}>
       <div className="jr-book">
-        <Link to="/dashboard/participant/surveys" className="jr-back">← Studies</Link>
+        <Link to="/dashboard/participant" className="jr-back">← Studies</Link>
         <h1 className="jp-h1" style={{ margin: 0 }}>{v.booking ? `Your ${word} is booked` : `Book your ${word}`}</h1>
         <div className="jr-pay">
           <span style={{ display: "flex", flexDirection: "column", gap: 4 }}>

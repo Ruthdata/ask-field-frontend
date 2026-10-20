@@ -36,6 +36,9 @@ const baseQuery = fetchBaseQuery({
 
     if (token && isJwtLikeToken(token)) {
       headers.set("authorization", `Bearer ${token}`);
+      // Stage 9: work in a team workspace the researcher belongs to.
+      const ws = storage.get(STORAGE_KEYS.WORKSPACE);
+      if (ws && /^[a-f\d]{24}$/i.test(String(ws)) && storage.get(STORAGE_KEYS.USER_TYPE) === "researcher") headers.set("x-workspace", String(ws));
     } else if (storedToken) {
       storage.remove(STORAGE_KEYS.TOKEN);
     }
@@ -107,6 +110,6 @@ const baseQueryWithInterceptor: BaseQueryFn<
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithInterceptor,
-  tagTypes: ["Items", "Users", "Researchers", "Projects", "Surveys", "Wallet", "Live", "Bookings", "Messages", "Inbox", "Review"],
+  tagTypes: ["Items", "Users", "Researchers", "Projects", "Surveys", "Wallet", "Live", "Bookings", "Messages", "Inbox", "Review", "Team", "Account", "Verification", "Profile", "Studies", "ParticipantAccount"],
   endpoints: () => ({}),
 });

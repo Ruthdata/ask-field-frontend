@@ -42,26 +42,12 @@ export interface ResearcherWallet {
   transactions: LedgerLine[];
 }
 
-export interface PayoutDetails {
-  method: "bank_transfer" | "mobile_money" | "paypal";
-  bankName?: string;
-  accountName: string;
-  accountNumber: string;
-}
 
 export const walletApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getParticipantEarnings: builder.query<ApiSuccess<ParticipantEarnings>, void>({
       query: () => "/participants/earnings",
       providesTags: ["Wallet"],
-    }),
-    savePayoutDetails: builder.mutation<ApiSuccess<unknown>, PayoutDetails>({
-      query: (body) => ({ url: "/participants/payout-details", method: "PUT", body }),
-      invalidatesTags: ["Wallet", "Users"],
-    }),
-    requestPayout: builder.mutation<ApiSuccess<LedgerLine>, { amount?: number }>({
-      query: (body) => ({ url: "/participants/payouts", method: "POST", body }),
-      invalidatesTags: ["Wallet"],
     }),
     getResearcherWallet: builder.query<ApiSuccess<ResearcherWallet>, void>({
       query: () => "/researchers/wallet",
@@ -72,7 +58,5 @@ export const walletApi = apiSlice.injectEndpoints({
 
 export const {
   useGetParticipantEarningsQuery,
-  useSavePayoutDetailsMutation,
-  useRequestPayoutMutation,
   useGetResearcherWalletQuery,
 } = walletApi;

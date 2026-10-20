@@ -379,3 +379,39 @@ body.menu-open .mk .nav{background:transparent;box-shadow:none;color:#fff;backdr
 .mk .inline-form .field{flex:1 1 260px}
 .mk .inline-form .btn{height:52px}
 .mk .who{font-size:14.5px;color:var(--ink-2)}
+
+/* Participant Stage 1 (participant canvas 1.1–1.9) */
+.mk .jp-country{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:12px 16px;border-radius:16px;background:#fff;border:1.5px solid var(--line);font:inherit;color:var(--ink);cursor:pointer;text-align:left}
+.mk .jp-country:hover{border-color:var(--ink)}
+.mk .jp-country[data-on="true"]{background:#fff8dc;border:2px solid var(--ink)}
+.mk .jp-country .dot{flex:none;width:20px;height:20px;box-sizing:border-box;border-radius:50%;border:1.5px solid #9a95b3}
+.mk .jp-country[data-on="true"] .dot{border:6px solid var(--ink)}
+.mk .jp-code{font-family:var(--mono);font-size:26px;letter-spacing:.4em;text-align:left}
+.mk .jp-phone{display:flex;gap:8px}
+.mk .jp-phone .cc{flex:none;display:flex;align-items:center;padding:0 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--mist);font-size:16px}
+.mk .jp-phone input{flex:1;min-width:0}
+.mk .jp-steps{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.mk .jp-steps li{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line)}
+.mk .jp-steps .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--night);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:600}
+.mk .jp-steps .n.done{background:var(--sun);color:var(--sun-ink)}
+.mk .jp-keep{padding:14px 16px;border-radius:16px;background:var(--mist);font-size:14.5px;line-height:1.5}
+.mk .jp-keep summary{font-weight:600;cursor:pointer;min-height:28px}
+.mk .jp-keep ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px;color:var(--ink-2)}
+.mk .jp-keep b{color:var(--ink)}
+.mk .jp-qualify{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:#fff8dc;border:1.5px solid var(--sun);font-size:15px;line-height:1.4}
+.mk .jp-qualify .n{flex:none;width:36px;height:36px;border-radius:50%;background:var(--night);color:var(--sun);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:17px}
+.mk .jp-camera{height:300px;border-radius:24px;background:var(--night);display:grid;place-items:center}
+.mk .jp-camera span{width:170px;height:224px;border-radius:50%;border:3px dashed var(--sun)}
+.mk .jp-test{display:grid;gap:8px;padding:14px 16px;border-radius:16px;border:1.5px dashed #9a95b3;font-size:14px;color:var(--ink-2)}
+.mk .jp-test .row{display:flex;flex-wrap:wrap;gap:8px}
+.mk .jp-test button{height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:14px;cursor:pointer}
+.mk .jp-test button[aria-pressed="true"]{border-color:var(--ink);background:#fff8dc}
+.mk .jp-tips{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14.5px;color:var(--ink-2)}
+.mk .auth-card .lede b{overflow-wrap:anywhere}
+/* Participant Stage 2 (canvas 2.1–2.3) */
+.mk .jp-pills{display:flex;flex-wrap:wrap;gap:8px}
+.mk .jp-pills button{min-height:46px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
+.mk .jp-pills button:hover{border-color:var(--ink)}
+.mk .jp-pills button[data-on="true"]{border:2px solid var(--ink);background:#fff8dc}
+.mk .jp-pills[role="radiogroup"] button{flex:1 1 120px}
+.mk fieldset[disabled] select{opacity:.6}

@@ -35,6 +35,8 @@ export function safeNext(next: string | null, t: AccountType) {
   if (!next || !next.startsWith("/") || next.startsWith("//")) return dashboardFor(t);
   // A participant who signs in from a survey's finish link goes back to it.
   if (t === "participant" && /^\/done\/[A-Za-z0-9-]{1,20}$/.test(next)) return next;
+  // A researcher who signs in from a team invite goes back to it (Stage 9).
+  if (t === "researcher" && /^\/join\/[a-f0-9]{16,64}$/.test(next)) return next;
   return next.startsWith(dashboardFor(t)) ? next : dashboardFor(t);
 }
 

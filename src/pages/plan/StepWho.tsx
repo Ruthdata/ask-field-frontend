@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useGetMatchCountQuery, type PlanView, type Question } from "@/redux/api/planApi";
+import { useGetMatchCountQuery, useGetParticipantOptionsQuery, type PlanView, type Question } from "@/redux/api/planApi";
 import { ROUTES } from "@/lib/site";
 import { PlanShell } from "./PlanPage";
 import { planPath, type Slug } from "./steps";
@@ -8,13 +8,12 @@ import { useStepDraft, statusText } from "./useStepDraft";
 import { Chips, ErrorLine, Field, NumberInput, Toggle } from "./parts";
 import { StepActions } from "./StepActions";
 
-const LANGS = ["English", "Nigerian Pidgin", "Yoruba", "Igbo", "Hausa", "French", "Twi", "Swahili"];
+/** Participant Stage 2: participants answer Female or Male. Older plans may still say woman/man. */
 const GENDERS = [
-  { value: "woman", label: "Women" },
-  { value: "man", label: "Men" },
-  { value: "non-binary", label: "Non-binary people" },
-  { value: "self-described", label: "People who describe it another way" },
+  { value: "female", label: "Female" },
+  { value: "male", label: "Male" },
 ];
+const toSex = (g: string) => (g === "woman" ? "female" : g === "man" ? "male" : g);
 type Quota = { by: "gender" | "language"; groups: { value: string; places: number }[] } | null;
 
 export default function StepWho({ view, slug }: { view: PlanView; slug: Slug }) {
@@ -22,10 +21,12 @@ export default function StepWho({ view, slug }: { view: PlanView; slug: Slug }) 
   const a = view.plan.audience || {};
   const d = useStepDraft(view.surveyId, "audience", {
     countries: a.countries ?? ["Nigeria"],
+    regions: (a.regions ?? []) as string[],
+    linkedinOnly: (a.linkedinOnly ?? false) as boolean,
     includeDiaspora: a.includeDiaspora ?? false,
     minAge: a.minAge as number | undefined,
     maxAge: a.maxAge as number | undefined,
-    genders: a.genders ?? [],
+    genders: ((a.genders ?? []) as string[]).map(toSex).filter((g) => g === "female" || g === "male") as string[],
     languages: a.languages ?? [],
     education: a.education ?? "any",
     employment: a.employment ?? "any",
@@ -36,6 +37,11 @@ export default function StepWho({ view, slug }: { view: PlanView; slug: Slug }) 
   const v = d.value;
   const e = d.errors;
   const [pickGender, setPickGender] = useState(v.genders.length > 0);
+  const [pickRegions, setPickRegions] = useState(v.regions.length > 0);
+  const { data: optsData } = useGetParticipantOptionsQuery();
+  const opts = optsData?.data;
+  const countryOptions = (opts?.countries ?? ["Nigeria", "Ghana", "Kenya"]).map((c) => ({ value: c, label: c }));
+  const LANGS = [...new Set(v.countries.flatMap((c) => opts?.languages[c] ?? []))];
   const [saves, setSaves] = useState(0);
   const [lastStatus, setLastStatus] = useState(d.status);
   if (lastStatus !== d.status) {
@@ -51,7 +57,7 @@ export default function StepWho({ view, slug }: { view: PlanView; slug: Slug }) 
     const total = need || values.length * 10;
     return values.map((value, i) => ({ value, places: Math.floor(total / values.length) + (i < total % values.length ? 1 : 0) }));
   };
-  const quotaValues = (by: "gender" | "language") => (by === "gender" ? (v.genders.length >= 2 ? v.genders : ["woman", "man"]) : v.languages.length >= 2 ? v.languages : ["Yoruba", "Igbo"]);
+  const quotaValues = (by: "gender" | "language") => (by === "gender" ? ["female", "male"] : v.languages.length >= 2 ? v.languages : LANGS.slice(1, 3));
   const quotaLabel = (by: string, value: string) => (by === "gender" ? GENDERS.find((g) => g.value === value)?.label ?? value : value);
   const quotaTotal = v.quota ? v.quota.groups.reduce((t, g) => t + (g.places || 0), 0) : 0;
 
@@ -66,7 +72,7 @@ export default function StepWho({ view, slug }: { view: PlanView; slug: Slug }) 
       <div role="status" aria-live="polite" className="jp-note sun" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "8px 20px" }}>
         <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <b style={{ fontSize: 17 }}>{count === undefined || isFetching ? "Counting people who match…" : `${count.toLocaleString("en-US")} ${count === 1 ? "person matches" : "people match"} right now`}</b>
-          <span className="jp-hint">Counted from participant profiles. Your own questions narrow it further.</span>
+          <span className="jp-hint">Counted from verified participant profiles. Your own questions narrow it further.</span>
         </span>
         {need > 0 && count !== undefined && <span className="jp-mono">You need {need} · {count >= need * 5 ? "plenty" : count >= need * 2 ? "should fill" : count >= need ? "may be slow" : "not enough yet"}</span>}
       </div>
@@ -75,13 +81,25 @@ export default function StepWho({ view, slug }: { view: PlanView; slug: Slug }) 
         <h2 id="w-where">Where they live</h2>
         <Chips
           label="Countries"
-          options={[{ value: "Nigeria", label: "Nigeria" }, { value: "Ghana", label: "Ghana", disabled: true }, { value: "Kenya", label: "Kenya", disabled: true }]}
-          disabledNote="opening next"
+          options={countryOptions}
           selected={v.countries}
-          onChange={(countries) => d.update({ countries })}
+          onChange={(countries) => d.update({ countries, regions: v.regions.filter((r) => countries.some((c) => opts?.regions[c]?.list.includes(r))), languages: v.languages.filter((l) => countries.some((c) => opts?.languages[c]?.includes(l))) })}
           error={e.countries}
         />
-        <Toggle on={v.includeDiaspora} onChange={(includeDiaspora) => d.update({ includeDiaspora })} title="Also people from these countries living elsewhere" text="For example Nigerians in the UK, the US or Canada." />
+        <div className="jp-fld" role="group" aria-labelledby="w-r">
+          <span id="w-r" className="jp-lbl">Where in {v.countries.length === 1 ? v.countries[0] : "those countries"}</span>
+          <div className="jp-chips">
+            <button type="button" className="jp-chip" aria-pressed={!pickRegions} onClick={() => { setPickRegions(false); d.update({ regions: [] }); }}>Anywhere</button>
+            <button type="button" className="jp-chip" aria-pressed={pickRegions} onClick={() => setPickRegions(true)}>Only certain places…</button>
+          </div>
+          {pickRegions &&
+            v.countries.map((c) =>
+              opts?.regions[c] ? (
+                <Chips key={c} label={`${opts.regions[c].label === "State" ? "States" : opts.regions[c].label === "County" ? "Counties" : "Regions"} in ${c}`} options={opts.regions[c].list.map((r) => ({ value: r, label: r }))} selected={v.regions} onChange={(regions) => d.update({ regions })} />
+              ) : null
+            )}
+          {e.regions && <ErrorLine error={e.regions} />}
+        </div>
         <Link to={ROUTES.requestCountry} style={{ fontWeight: 600, fontSize: 14.5, color: "var(--ink)" }}>Need another country? Tell us →</Link>
       </section>
 
@@ -106,6 +124,12 @@ export default function StepWho({ view, slug }: { view: PlanView; slug: Slug }) 
           )}
         </div>
         <Chips label="Languages they speak well (optional)" hint="Pick several to include anyone who speaks any of them." options={LANGS.map((l) => ({ value: l, label: l }))} selected={v.languages} onChange={(languages) => d.update({ languages })} error={e.languages} />
+        <Toggle
+          on={v.linkedinOnly}
+          onChange={(linkedinOnly) => d.update({ linkedinOnly })}
+          title="Only people who've connected LinkedIn"
+          text="Useful for studies of professionals. It narrows your sample towards city-based, more educated people, so leave it off unless you need it."
+        />
         <details style={{ borderTop: "1px solid var(--line-2)", paddingTop: 14 }} open={v.education !== "any" || v.employment !== "any" || v.students !== "include"}>
           <summary style={{ cursor: "pointer", fontWeight: 600, fontSize: 15.5 }}>More filters: education, work, students</summary>
           <div className="jp-row2" style={{ marginTop: 14 }}>

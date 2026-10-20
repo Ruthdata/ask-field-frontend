@@ -71,6 +71,10 @@ function ReturnLink({ link }: { link: string | null }) {
         {Object.keys(HOW).map((t) => <button key={t} type="button" className="jp-chip" style={{ height: 38, fontSize: 14 }} aria-pressed={t === tool} onClick={() => setTool(t)}>{t}</button>)}
       </div>
       <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5 }}>{HOW[tool]}</p>
+      {/* Participant Stage 4: people who aren't sent back can type this code on joinStudy. */}
+      <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5 }}>
+        Also show the finish code <b style={{ fontFamily: "var(--mono, monospace)", letterSpacing: ".06em" }}>{link.split("/done/")[1] ?? ""}</b> on your last page. If the link doesn't send someone back, they type the code on joinStudy instead.
+      </p>
     </section>
   );
 }

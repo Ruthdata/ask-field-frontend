@@ -61,7 +61,7 @@ export default function Homepage() {
               </div>
               <ol className="flow">
                 <li><h3>Launch</h3><p>Pick countries, languages, quotas and pay.</p></li>
-                <li><h3>We verify</h3><p>Phone, device and ID checks. Single-use links. Attention flags.</p></li>
+                <li><h3>We verify</h3><p>Every participant once, before their first study: a phone code and a selfie check for one person, one account. Attention flags on every study.</p></li>
                 <li><h3>Approve</h3><p>Pay only for approved work. Export with quality flags.</p></li>
               </ol>
             </div>
@@ -97,7 +97,7 @@ export default function Homepage() {
   
           <section>
             <div className="wrap trust">
-              <div><span className="ic" style={{ background: 'var(--sun)' }}><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3.2 3.2L14 5.8" fill="none" stroke="#120e22" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span><h3>Real, verified people</h3><p>One person, one account. Checked at sign-up, during the study and before payment.</p></div>
+              <div><span className="ic" style={{ background: 'var(--sun)' }}><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3.2 3.2L14 5.8" fill="none" stroke="#120e22" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span><h3>Real, verified people</h3><p>One person, one account. Every participant is verified with a phone code and a selfie before their first study. A duplicate found later is removed and refunded.</p></div>
               <div><span className="ic" style={{ background: 'var(--lilac)' }}><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="5" width="12" height="9" rx="2" fill="none" stroke="#120e22" strokeWidth="1.8" /><path d="M3 8.5h12" stroke="#120e22" strokeWidth="1.8" /></svg></span><h3>Open to everyone</h3><p>Run a study from any country. Take part from any country. Fair pay floors published for each.</p></div>
               <div><span className="ic" style={{ background: 'var(--night)' }}><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="3" fill="#f0c93a" /></svg></span><h3>Built by researchers</h3><p>Designed around ethics review, fair pay and data quality from day one.</p></div>
             </div>

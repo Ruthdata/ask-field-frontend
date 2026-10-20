@@ -272,3 +272,7 @@ a.ja-tr:hover{background:#fbfaf6}
 .jp .jp-link{background:none;border:0;padding:0;font:inherit;font-weight:600;font-size:14.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .jp-cost .r{display:flex;justify-content:space-between;gap:10px;font-size:14.5px}
 @media (max-width: 560px){.jp .jl-kv{grid-template-columns:1fr;gap:2px}.jp .jl-kv dd{margin-bottom:10px}}
+
+/* Stage 9: workspace switcher */
+.ja-ws{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:14px;background:var(--mist)}
+.ja-ws select{height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);font:inherit;font-size:14.5px;font-weight:600;color:var(--ink);padding:0 8px}

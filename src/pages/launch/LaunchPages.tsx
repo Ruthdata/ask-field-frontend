@@ -12,7 +12,9 @@ import {
   type Receipt,
 } from "@/redux/api/launchApi";
 import { useGetResearcherQuery } from "@/redux/api/slices/userSlice";
-import { formatMoney, methodById } from "@/lib/study";
+import { formatMoney, methodById, RECEIPT_COUNTRIES } from "@/lib/study";
+import { useGetBillingQuery } from "@/redux/api/accountApi";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import { readProblem } from "@/lib/session";
 import { SUPPORT_EMAIL } from "@/lib/site";
 import { launchPath, planPath } from "@/pages/plan/steps";
@@ -169,7 +171,7 @@ export function LaunchReview() {
 }
 
 // ---------------------------------------------------------------- 5.2 pay
-const COUNTRIES = ["United States", "Canada", "United Kingdom", "Ireland", "Germany", "France", "Netherlands", "Nigeria", "Ghana", "Kenya", "South Africa", "Other"];
+const COUNTRIES = RECEIPT_COUNTRIES;
 
 export function LaunchPay() {
   const { id, view, isLoading, isError, refetch } = useLaunch();
@@ -178,6 +180,10 @@ export function LaunchPay() {
   const agreed = !!(location.state as { agreed?: boolean } | null)?.agreed;
   const { data: me } = useGetResearcherQuery();
   const r = me?.data;
+  // Stage 9: the workspace's saved receipt details come first.
+  const { data: billingData } = useGetBillingQuery();
+  const saved = billingData?.data;
+  const ws = useWorkspace();
   const [method, setMethod] = useState<"card" | "invoice">("card");
   const [useCredit, setUseCredit] = useState(false);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
@@ -192,14 +198,16 @@ export function LaunchPay() {
   if (go) return <Navigate to={go} replace />;
   if (!agreed) return <Navigate to={launchPath(id)} replace />;
 
-  const rc: Receipt = receipt ?? {
-    name: r ? `${r.firstName} ${r.lastName || ""}`.trim() : "",
-    organization: r?.organizationName || "",
-    email: r?.email || "",
-    cc: "",
-    reference: "",
-    country: r?.country && COUNTRIES.includes(r.country) ? r.country : "United States",
-  };
+  const rc: Receipt = receipt ?? (saved?.saved
+    ? { name: saved.name, organization: saved.organization, email: saved.email, cc: saved.cc, reference: saved.reference, country: COUNTRIES.includes(saved.country) ? saved.country : "Other" }
+    : {
+        name: r ? `${r.firstName} ${r.lastName || ""}`.trim() : "",
+        organization: r?.organizationName || "",
+        email: r?.email || "",
+        cc: "",
+        reference: "",
+        country: r?.country && COUNTRIES.includes(r.country) ? r.country : "United States",
+      });
   const set = (patch: Partial<Receipt>) => setReceipt({ ...rc, ...patch });
   const cur = view.figures.currency;
   const credit = useCredit ? Math.min(view.credit, view.due) : 0;
@@ -229,7 +237,8 @@ export function LaunchPay() {
   return (
     <Shell view={view} step={1} aside={<Order view={view} useCredit={useCredit} />}>
       <h1 className="jp-h1">Pay for your study</h1>
-      {!started && (
+      {!ws.canPay && <div className="jp-note sun" role="status">Only owners and admins of this workspace can pay. Ask one of them to pay for this study; everything else is ready.</div>}
+      {!started && ws.canPay && (
         <>
           <section className="jp-sec" aria-labelledby="pm">
             <h2 id="pm">How you'll pay</h2>

@@ -108,7 +108,7 @@ export default function ResetAccess() {
   };
 
   return (
-    <CardPage right={<Link to="/sign-in">Back to sign in</Link>}>
+    <CardPage right={<Link to={intent ? `/sign-in?intent=${intent}` : "/sign-in"}>Back to sign in</Link>}>
       <div className="bars" aria-hidden="true">
         <span className="on" />
         <span className={step >= 2 ? "on" : ""} />

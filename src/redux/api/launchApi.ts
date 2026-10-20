@@ -1,9 +1,7 @@
 import { apiSlice } from "./slices/appSlice";
 import type { ApiSuccess } from "@/types/api.type";
 import type { PlanView } from "./planApi";
-import { storage } from "@/utils/storage";
-import { normalizeAuthToken } from "@/utils/token";
-import { STORAGE_KEYS } from "@/config/constants";
+import { apiHeaders } from "@/utils/token";
 
 export type LaunchStage = "none" | "awaiting-payment" | "checking" | "changes-needed" | "rejected";
 export interface Funding {
@@ -19,6 +17,7 @@ export interface Funding {
   paidAt?: string;
   createdAt: string;
   title?: string;
+  paidByName?: string; // Stage 9: who in the workspace paid
 }
 export interface LaunchView extends PlanView {
   launchStage: LaunchStage;
@@ -68,7 +67,7 @@ export async function openFundingDocument(fundingId: string) {
   const w = window.open("", "_blank");
   try {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/billing/fundings/${fundingId}/document`, {
-      headers: { authorization: `Bearer ${normalizeAuthToken(storage.get(STORAGE_KEYS.TOKEN)) ?? ""}` },
+      headers: apiHeaders(),
     });
     const html = await res.text();
     if (w) {

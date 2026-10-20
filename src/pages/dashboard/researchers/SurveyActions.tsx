@@ -21,13 +21,14 @@ export default function ToReview() {
           {rows.map((r) => {
             const booking = r.method === "interview" || r.method === "focus-group";
             return (
-              <Link key={r.surveyId} className="jr-thread" to={`/dashboard/researcher/studies/${r.surveyId}?tab=${booking ? "people" : "review"}`}>
+              <Link key={r.surveyId} className="jr-thread" to={`/dashboard/researcher/studies/${r.surveyId}?tab=${booking && !r.questions ? "people" : "review"}`}>
                 <span className="top" style={{ flexWrap: "wrap" }}>
                   <b style={{ fontSize: 16 }}>{r.name}</b>
                   <span style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
                     {r.count > 0 && <span className="unread">{r.count} to review</span>}
                     {r.toMark > 0 && <span className="unread">{r.toMark} {r.toMark === 1 ? "session" : "sessions"} to mark</span>}
                     {r.flagged > 0 && <span className="jr-flag">{r.flagged} flagged</span>}
+                    {!!r.questions && <span className="unread">{r.questions} {r.questions === 1 ? "question" : "questions"} about a decision</span>}
                   </span>
                 </span>
                 <span className="pv">{methodById(r.method)?.label}{r.autoApproveAt ? ` · approved automatically ${untilLabel(r.autoApproveAt, fulfilledTimeStamp)} if you don't decide` : ""}</span>

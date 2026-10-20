@@ -21,4 +21,13 @@ export const clearAuthStorage = () => {
   storage.remove(STORAGE_KEYS.TOKEN);
   storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
   storage.remove(STORAGE_KEYS.USER_TYPE);
+  storage.remove(STORAGE_KEYS.WORKSPACE);
+};
+
+/** Headers for API calls made with fetch (file downloads): the sign-in token and, in a team, the workspace (Stage 9). */
+export const apiHeaders = (): Record<string, string> => {
+  const h: Record<string, string> = { authorization: `Bearer ${normalizeAuthToken(storage.get(STORAGE_KEYS.TOKEN)) ?? ""}` };
+  const ws = storage.get(STORAGE_KEYS.WORKSPACE);
+  if (ws && storage.get(STORAGE_KEYS.USER_TYPE) === "researcher") h["x-workspace"] = String(ws);
+  return h;
 };

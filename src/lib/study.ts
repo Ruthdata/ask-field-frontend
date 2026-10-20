@@ -79,3 +79,6 @@ export function rateDefaults(currency = "USD") {
   };
   return table[currency] ?? { rate: 12, step: 1 };
 }
+
+/** Countries offered for receipts and invoices. */
+export const RECEIPT_COUNTRIES = ["United States", "Canada", "United Kingdom", "Ireland", "Germany", "France", "Netherlands", "Nigeria", "Ghana", "Kenya", "South Africa", "Other"];

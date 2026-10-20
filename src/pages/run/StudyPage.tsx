@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
-import { useGetLiveParticipantsQuery, useGetLiveQuery, useGetStudyThreadsQuery, type LiveView } from "@/redux/api/runApi";
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { downloadResults, useGetLiveParticipantsQuery, useGetLiveQuery, useGetStudyThreadsQuery, useRunAgainMutation, type LiveView } from "@/redux/api/runApi";
 import { formatMoney, methodById } from "@/lib/study";
 import { readProblem } from "@/lib/session";
 import ChangeDialog, { type Change } from "./ChangeDialog";
 import StudyBookings from "./StudyBookings";
 import StudyMessages from "./StudyMessages";
 import StudyReview from "./StudyReview";
+import StudyFinish from "./StudyFinish";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import { ago, shortDate, STATUS_WORDS } from "./format";
 import "@/styles/run.css";
 
@@ -20,6 +22,10 @@ export default function StudyPage() {
   const { data, isLoading, isError, error, refetch } = useGetLiveQuery(id, { pollingInterval: 30000, refetchOnMountOrArgChange: true });
   const { data: threads } = useGetStudyThreadsQuery(id, { pollingInterval: 30000 });
   const [change, setChange] = useState<Change | null>(null);
+  const [runAgain, againState] = useRunAgainMutation();
+  const [problem, setProblem] = useState("");
+  const navigate = useNavigate();
+  const ws = useWorkspace(); // Stage 9: viewers only look; researchers can't pay
   const live = data?.data;
 
   if (isLoading) return <div className="ja-page"><div className="ja-skeleton" style={{ height: 420 }} aria-busy="true" /></div>;
@@ -52,10 +58,23 @@ export default function StudyPage() {
               {isLive && <button type="button" className="ja-link" style={{ fontSize: 14.5 }} onClick={() => setChange("date")}>Change<span className="sr-only"> close date</span></button>}
             </div>
           </div>
-          {isLive && (
+          {!isLive && (
             <div className="jr-btns">
-              <button type="button" className="jr-btn" onClick={() => setChange("pause")}>{live.paused ? "Resume" : "Pause"}</button>
-              <button type="button" className="jr-btn" onClick={() => setChange("places")}>{live.method === "focus-group" ? "Add a session" : "Add places"}</button>
+              <button type="button" className="jr-btn" onClick={() => downloadResults(id).catch((e) => setProblem(e.message))}>Download results</button>
+              {ws.canEdit && <button type="button" className="jr-btn" disabled={againState.isLoading} onClick={async () => {
+                try {
+                  const r = (await runAgain(id).unwrap()).data;
+                  navigate(`/dashboard/researcher/studies/${r.surveyId}/plan/basics`);
+                } catch (err) {
+                  setProblem(readProblem(err).message);
+                }
+              }}>{againState.isLoading ? "Copying…" : "Run it again"}</button>}
+            </div>
+          )}
+          {isLive && ws.canEdit && (
+            <div className="jr-btns">
+              {!live.reportHold && <button type="button" className="jr-btn" onClick={() => setChange("pause")}>{live.paused ? "Resume" : "Pause"}</button>}
+              {ws.canPay && <button type="button" className="jr-btn" onClick={() => setChange("places")}>{live.method === "focus-group" ? "Add a session" : "Add places"}</button>}
               <button type="button" className="jr-btn danger" onClick={() => setChange("close")}>Close early</button>
             </div>
           )}
@@ -75,14 +94,21 @@ export default function StudyPage() {
       </header>
 
       {params.get("paid") && <div className="jr-alert" role="status"><span className="txt"><b>Payment received.</b><span className="jr-muted">The new places open as soon as your bank confirms the card payment, usually within a minute.</span></span></div>}
-      {live.paused && isLive && (
+      {live.paused && isLive && live.reportHold && (
+        <div className="jr-alert" role="status">
+          <span className="txt"><b>Paused by joinStudy while we check it.</b><span className="jr-muted">Several participants reported this study. New people can't start; anyone already taking part can finish. We'll email you within 1 working day. Studies must never ask for bank, card or ID details, ask people to pay, or move them off joinStudy.</span></span>
+        </div>
+      )}
+      {live.paused && isLive && !live.reportHold && (
         <div className="jr-alert dark" role="status">
           <span className="txt"><b>Paused.</b><span className="jr-muted">New people can't start; anyone already taking part can finish.</span></span>
           <button type="button" className="jr-btn sun" onClick={() => setChange("pause")}>Resume</button>
         </div>
       )}
 
-      {tab === "overview" && <Overview live={live} onMessage={() => go("messages")} onReview={() => go(booking ? "people" : "review")} />}
+      {problem && <div className="ja-error" role="alert">{problem}</div>}
+      {tab === "overview" && !isLive && <StudyFinish id={id} onReview={() => go(booking ? "people" : "review")} />}
+      {tab === "overview" && isLive && <Overview live={live} onMessage={() => go("messages")} onReview={() => go(booking ? "people" : "review")} />}
       {tab === "people" && (booking ? <StudyBookings live={live} onAddTimes={() => setChange(live.method === "interview" ? "times" : "places")} onMessage={(p) => go("messages", { p })} /> : <Participants live={live} onMessage={(p) => go("messages", { p })} />)}
       {tab === "review" && !booking && <StudyReview live={live} onMessage={(p) => go("messages", { p })} />}
       {tab === "messages" && <StudyMessages live={live} participantId={params.get("p") || ""} onPick={(p) => go("messages", p ? { p } : {})} />}
@@ -143,6 +169,8 @@ function Overview({ live, onMessage, onReview }: { live: LiveView; onMessage: ()
             <span className="ja-small">
               {[c.screenedOut && `${c.screenedOut} screened out by your questions`, c.noShow && `${c.noShow} didn't join`, c.rejected && `${c.rejected} rejected`].filter(Boolean).join(" · ") || "Nobody screened out or rejected yet."}
             </span>
+            {!!live.declines?.total && <Declines d={live.declines} />}
+            {!!live.leaves && live.leaves.left + live.leaves.timedOut > 0 && <Leaves l={live.leaves} />}
           </section>
           <section className="ja-card" aria-labelledby="ov-d">
             <h2 id="ov-d" className="ja-h3">Finished per day, last 7 days</h2>
@@ -225,5 +253,30 @@ function Participants({ live, onMessage }: { live: LiveView; onMessage: (partici
         </div>
       )}
     </section>
+  );
+}
+
+const DECLINE_LABELS: Record<string, string> = { "too-long": "too long", "pay-low": "pay too low", topic: "not their topic", timing: "bad timing", other: "something else" };
+/** Participant Stage 3: "Not interested" totals. Never who. */
+function Declines({ d }: { d: NonNullable<LiveView["declines"]> }) {
+  const why = Object.entries(d.reasons).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${n} ${DECLINE_LABELS[k] ?? k}`);
+  return (
+    <span className="ja-small">
+      {d.total === 1 ? "1 person" : `${d.total} people`} who fit said “Not interested”{why.length ? `: ${why.join(", ")}` : ""}.
+      {d.reasons["pay-low"] >= Math.max(3, d.total / 3) && " Better pay usually fills faster."}
+    </span>
+  );
+}
+
+const LEAVE_LABELS: Record<string, string> = { longer: "longer than it said", "link-broken": "the link didn't work", "came-up": "something came up", uncomfortable: "not comfortable", other: "something else" };
+/** Participant Stage 4: people who left or ran out of time. Totals only. */
+function Leaves({ l }: { l: NonNullable<LiveView["leaves"]> }) {
+  const why = Object.entries(l.reasons).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${n} ${LEAVE_LABELS[k] ?? k}`);
+  const parts = [l.left ? `${l.left} left${why.length ? ` (${why.join(", ")})` : ""}` : "", l.timedOut ? `${l.timedOut} ran out of time` : ""].filter(Boolean);
+  return (
+    <span className="ja-small">
+      {parts.join(" · ")}. Their places went back to the study.
+      {l.reasons["link-broken"] > 0 && " Check your study link opens on a phone."}
+    </span>
   );
 }

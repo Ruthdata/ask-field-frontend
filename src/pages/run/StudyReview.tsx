@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useDecideMutation, useGetReviewQuery, type Flag, type LiveView, type RejectReason, type ReviewItem, type ReviewView } from "@/redux/api/runApi";
+import { useAnswerQuestionMutation, useDecideMutation, useGetReviewQuery, type Flag, type LiveView, type RejectReason, type ReviewItem, type ReviewView } from "@/redux/api/runApi";
 import { formatMoney } from "@/lib/study";
 import { readProblem } from "@/lib/session";
 import { ago, untilLabel } from "./format";
@@ -10,6 +10,8 @@ const FLAG: Record<Flag, [string, string]> = {
   fast: ["Very fast", "Finished in under a third of your planned time."],
   "no-link": ["No finish link", "Said they finished, but never came back through your study's finish link."],
   "rejected-before": ["Rejected before", "Two or more rejections on joinStudy in the last 90 days."],
+  late: ["Finished late", "Finished after their held time ran out. A place was still free, so it counts."],
+  over: ["Over your places", "Finished after their time ran out, when every place you paid for was taken. Approving pays them on top."],
 };
 const REASON_NOTES: Record<RejectReason, [string, string]> = {
   tasks: ["Skipped tasks or questions you required.", "the tasks or questions the study required weren't completed"],
@@ -69,6 +71,7 @@ export default function StudyReview({ live, onMessage }: { live: LiveView; onMes
         </div>
         {said && <div className="jr-alert" role="status" style={{ background: "var(--paper)", borderColor: "var(--line)" }}><span className="txt">{said}</span></div>}
         {problem && <div className="jr-error" role="alert">{problem}</div>}
+        {v.items.filter((i) => i.question?.status === "open").map((i) => <QuestionCard key={i.surveyActionId} i={i} v={v} now={now} onDone={setSaid} />)}
         <section className="ja-card jr-review" aria-label="Submissions">
           {open && shown.length > 0 && (
             <div className="ja-row">
@@ -126,7 +129,7 @@ function Row({ i, v, now, open, on, onToggle, onApprove, onReject, onMessage, bu
       <span role="cell" className="flags">
         {i.flags.length ? i.flags.map((f) => <span key={f} className="jr-flag" title={FLAG[f][1]}>{FLAG[f][0]}</span>) : <span className="jr-status">{open ? "no flags" : i.finishedBy === "booking" ? "booking" : "—"}</span>}
       </span>
-      <span role="cell">{i.submittedAt ? ago(i.submittedAt, now) : "—"}<br /><span className="ja-small">{open && i.autoApproveAt ? `auto-approves ${untilLabel(i.autoApproveAt, now)}` : decided}</span>{!open && i.review?.note ? <><br /><span className="ja-small">“{i.review.note}”</span></> : null}</span>
+      <span role="cell">{i.submittedAt ? ago(i.submittedAt, now) : "—"}<br /><span className="ja-small">{open && i.autoApproveAt ? `auto-approves ${untilLabel(i.autoApproveAt, now)}` : decided}</span>{!open && i.review?.note ? <><br /><span className="ja-small">“{i.review.note}”</span></> : null}{i.question && i.question.status !== "open" ? <><br /><span className="ja-small">{QUESTION_DONE[i.question.status]}</span></> : null}</span>
       <span role="cell" className="acts">
         {open && <button type="button" className="jr-btn sm ink" disabled={busy} onClick={onApprove}>Approve<span className="sr-only"> {i.code}</span></button>}
         {open && <button type="button" className="jr-btn sm" onClick={onReject}>Reject<span className="sr-only"> {i.code}</span></button>}
@@ -190,5 +193,48 @@ function RejectDialog({ items, v, onClose }: { items: ReviewItem[]; v: ReviewVie
         </div>
       </div>
     </div>
+  );
+}
+
+const WHY_LABEL: Record<string, string> = { "did-tasks": "I did everything the study asked", "did-checks": "I did the attention checks", eligible: "I am who the study is for", other: "Something else" };
+const QUESTION_DONE: Record<string, string> = { approved: "Asked about it · you approved it", kept: "Asked about it · you kept your decision", escalated: "Asked joinStudy to look", upheld: "joinStudy kept your decision", overturned: "joinStudy approved it", open: "" };
+
+/** Participant Stage 5: a participant asked about a decision. Approve it after all, or keep it with a reply. */
+function QuestionCard({ i, v, now, onDone }: { i: ReviewItem; v: ReviewView; now: number; onDone: (said: string) => void }) {
+  const [answer, state] = useAnswerQuestionMutation();
+  const [reply, setReply] = useState("");
+  const [problem, setProblem] = useState("");
+  const q = i.question!;
+  const go = async (decision: "approve" | "keep") => {
+    setProblem("");
+    try {
+      await answer({ id: v.surveyId, actionId: i.surveyActionId, decision, reply: reply.trim() || undefined }).unwrap();
+      onDone(decision === "approve" ? `${i.code} approved and paid. We've told them.` : `Reply sent to ${i.code}. Your decision stands.`);
+    } catch (err) {
+      setProblem(readProblem(err).message);
+    }
+  };
+  const reason = v.reasons.find((r) => r.key === i.review?.reason)?.label;
+  return (
+    <section className="ja-card" aria-label={`${i.code} asked about your decision`} style={{ gap: 12, borderColor: "var(--sun)", borderWidth: 1.5 }}>
+      <div className="ja-row" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
+        <b style={{ fontSize: 17 }}>{i.code} asked about your decision</b>
+        <span className="ja-small" style={{ color: "#9a3412", fontWeight: 600 }}>Answer {untilLabel(q.answerBy, now)}</span>
+      </div>
+      <span style={{ fontSize: 15 }}>You didn't approve it: <b>{reason || "no reason recorded"}</b>{i.review?.note ? ` · “${i.review.note}”` : ""}</span>
+      <blockquote style={{ margin: 0, padding: "10px 14px", borderLeft: "3px solid var(--sun)", background: "var(--sun-soft)", borderRadius: "0 12px 12px 0", fontSize: 15, lineHeight: 1.5 }}>
+        <b style={{ display: "block", fontSize: 13 }}>{WHY_LABEL[q.why]}</b>{q.message}
+      </blockquote>
+      <label style={{ display: "flex", flexDirection: "column", gap: 6, fontWeight: 600, fontSize: 14.5 }}>
+        Your answer (they see it)
+        <textarea value={reply} onChange={(e) => setReply(e.target.value)} maxLength={2000} style={{ minHeight: 70, borderRadius: 12, border: "1.5px solid var(--line)", padding: "10px 12px", font: "inherit", fontWeight: 400 }} />
+      </label>
+      {problem && <div className="jr-error" role="alert">{problem}</div>}
+      <span className="jr-btns">
+        <button type="button" className="jr-btn sun" disabled={state.isLoading} onClick={() => go("approve")}>Approve it and pay {formatMoney(v.perPerson, v.currency)}</button>
+        <button type="button" className="jr-btn" disabled={state.isLoading} onClick={() => go("keep")}>Keep my decision and reply</button>
+      </span>
+      <span className="ja-small">No answer by then: they can ask joinStudy to look. If we find the work was done as asked, we approve it and charge the study.</span>
+    </section>
   );
 }

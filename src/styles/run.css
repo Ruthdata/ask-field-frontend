@@ -148,3 +148,10 @@
 .jr-session{display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:20px;border:2px solid var(--ink);background:var(--paper)}
 .jr-who{display:flex;align-items:center;gap:14px;padding:10px 0;border-top:1px solid var(--line-2);font-size:15px}
 .jr-who b{font-family:var(--mono);font-weight:500;width:60px}
+
+/* Stage 9: settings switches */
+.jr-switch{flex:none;width:46px;height:28px;border-radius:999px;background:#d9d6e4;position:relative;border:0;cursor:pointer;padding:0}
+.jr-switch::after{content:"";position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.jr-switch[aria-checked="true"]{background:var(--night)}
+.jr-switch[aria-checked="true"]::after{left:22px;background:var(--sun)}
+.jr-switch:disabled{opacity:.6}

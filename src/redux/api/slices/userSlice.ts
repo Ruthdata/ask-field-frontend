@@ -228,6 +228,7 @@ export const {
   useLoginParticipantMutation,
   useLoginResearcherMutation,
   useLazyGetParticipantQuery,
+  useGetParticipantQuery,
   useLazyGetResearcherQuery,
   useGetResearcherQuery,
   useVerifyEmailMutation,

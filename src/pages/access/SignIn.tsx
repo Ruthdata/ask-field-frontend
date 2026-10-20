@@ -86,7 +86,7 @@ export default function SignIn() {
           <div className="alert info" role="alert">
             <span>
               Confirm your email first. We've sent a new link to {String(problem.data?.email ?? email)}.{" "}
-              <Link to={`/auth/researcher/check-email?email=${enc}`}>Didn't get it?</Link>
+              <Link to={problem.data?.accountType === "participant" ? `/participate/check-email?email=${enc}` : `/auth/researcher/check-email?email=${enc}`}>Didn't get it?</Link>
             </span>
           </div>
         );
@@ -117,7 +117,7 @@ export default function SignIn() {
             <span>{problem.message}</span>
             <div className="row">
               <Link className="btn btn-ink" to="/auth/sign-up/researcher" style={{ textDecoration: "none" }}>Start a study</Link>
-              <Link className="btn btn-outline" to="/auth/sign-up/participant" style={{ textDecoration: "none" }}>Start earning</Link>
+              <Link className="btn btn-outline" to="/participate" style={{ textDecoration: "none" }}>Start earning</Link>
             </div>
           </div>
         );
@@ -146,7 +146,7 @@ export default function SignIn() {
         <div style={{ display: "grid", gap: 10 }}>
           <h1>Sign in</h1>
           <p className="sub">
-            New to joinStudy? <Link to="/auth/sign-up/researcher">Start a study</Link> or <Link to="/auth/sign-up/participant">start earning</Link>
+            New to joinStudy? <Link to="/auth/sign-up/researcher">Start a study</Link> or <Link to="/participate">start earning</Link>
           </p>
         </div>
 
@@ -161,7 +161,7 @@ export default function SignIn() {
         />
         <div className="or">or with your email</div>
 
-        <TextField id="si-email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" placeholder="ada.obi@university.edu" error={errors.email} />
+        <TextField id="si-email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" placeholder={intent === "participant" ? "amaka@example.com" : "ada.obi@university.edu"} error={errors.email} />
         <PasswordField
           id="si-password"
           label="Password"

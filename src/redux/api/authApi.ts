@@ -20,7 +20,7 @@ export const authApi = apiSlice.injectEndpoints({
     signIn: b.mutation<ApiSuccess<Session | NeedsChoice>, { email: string; password: string; intent?: AccountType; accountType?: AccountType }>({
       query: (body) => ({ url: "/auth/login", method: "POST", body }),
     }),
-    googleSignIn: b.mutation<ApiSuccess<Session | NeedsChoice>, { token: string; intent?: AccountType; accountType?: AccountType; method?: string }>({
+    googleSignIn: b.mutation<ApiSuccess<Session | NeedsChoice>, { token: string; intent?: AccountType; accountType?: AccountType; method?: string; country?: string; agree?: boolean }>({
       query: (body) => ({ url: "/auth/google", method: "POST", body }),
     }),
     sendResetCode: b.mutation<ApiSuccess<object>, { email: string }>({

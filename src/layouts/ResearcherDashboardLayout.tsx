@@ -5,6 +5,9 @@ import { Menu, X } from "lucide-react";
 import { useGetResearcherQuery } from "@/redux/api/slices/userSlice";
 import { useGetHomeQuery } from "@/redux/api/homeApi";
 import { useGetInboxQuery, useGetToReviewQuery } from "@/redux/api/runApi";
+import { useWorkspace } from "@/hooks/useWorkspace";
+import { STORAGE_KEYS } from "@/config/constants";
+import { storage } from "@/utils/storage";
 import { apiSlice } from "@/redux/api/slices/appSlice";
 import { clearAuthStorage } from "@/utils/token";
 import "@/styles/app.css";
@@ -69,6 +72,14 @@ export default function ResearcherDashboardLayout() {
   const verified = r?.institutionVerification?.status === "verified";
   const org = !r ? "" : !r.isCompleteProfile ? "Setup not finished" : r.organizationName ? `${r.organizationName}${verified ? " · ✓ verified" : ""}` : "Independent researcher";
 
+  const ws = useWorkspace();
+  // Signed up from a team invite: finish joining (Stage 9).
+  useEffect(() => {
+    const pending = storage.get(STORAGE_KEYS.PENDING_INVITE);
+    if (pending && r?.isCompleteProfile) navigate(`/join/${pending}`, { replace: true });
+  }, [r?.isCompleteProfile, navigate]);
+  const ROLE_WORD: Record<string, string> = { owner: "Owner", admin: "Admin", researcher: "Researcher", viewer: "Viewer" };
+
   const signOut = () => {
     clearAuthStorage();
     dispatch(apiSlice.util.resetApiState());
@@ -80,9 +91,20 @@ export default function ResearcherDashboardLayout() {
       <div className={`ja-scrim${open ? " open" : ""}`} onClick={() => setOpen(false)} aria-hidden="true" />
       <aside id="ja-side" className={`ja-side${open ? " open" : ""}`} aria-label="Researcher menu">
         <Logo />
-        <Link to="/dashboard/researcher/new" className="ja-new">
-          <span aria-hidden="true" style={{ fontSize: 20, lineHeight: 1 }}>+</span> New study
-        </Link>
+        {ws.list.length > 1 && ws.current && (
+          <div className="ja-ws">
+            <label htmlFor="ja-ws" className="ja-mono" style={{ fontSize: 11.5 }}>Workspace</label>
+            <select id="ja-ws" value={ws.current.workspaceId} onChange={(e) => { const w = ws.list.find((x) => x.workspaceId === e.target.value); if (w) { ws.switchTo(w); navigate("/dashboard/researcher"); } }}>
+              {ws.list.map((w) => <option key={w.workspaceId} value={w.workspaceId}>{w.own ? `${w.name} (yours)` : w.name}</option>)}
+            </select>
+            {!ws.current.own && <span className="ja-small">{ROLE_WORD[ws.role]} · {ws.current.ownerName}'s workspace</span>}
+          </div>
+        )}
+        {ws.canEdit && (
+          <Link to="/dashboard/researcher/new" className="ja-new">
+            <span aria-hidden="true" style={{ fontSize: 20, lineHeight: 1 }}>+</span> New study
+          </Link>
+        )}
         <nav aria-label="Main" className="ja-navlist">
           {NAV.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `ja-nv${isActive ? " on" : ""}`}>
@@ -103,7 +125,7 @@ export default function ResearcherDashboardLayout() {
             </div>
           </div>
           <div className="links">
-            <Link to="/setup">{r?.isCompleteProfile ? "Settings" : "Finish setup"}</Link>
+            <Link to={r?.isCompleteProfile ? "/dashboard/researcher/settings" : "/setup"}>{r?.isCompleteProfile ? "Settings" : "Finish setup"}</Link>
             <button type="button" onClick={signOut}>Sign out</button>
           </div>
         </div>
