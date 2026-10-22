@@ -100,18 +100,6 @@ export default function ResearcherSignUp() {
           </p>
         </div>
 
-        {problem && (
-          <div className="alert warn" role="alert">
-            {problem.code === "email_taken" ? (
-              <span>
-                There's already an account with this email. <Link to={`/sign-in?intent=researcher&email=${encodeURIComponent(email)}`}>Sign in</Link> or{" "}
-                <Link to={`/reset-password?intent=researcher&email=${encodeURIComponent(email)}`}>reset your password</Link>.
-              </span>
-            ) : (
-              <span>{problem.message}</span>
-            )}
-          </div>
-        )}
         {choice && <AccountChoice choices={choice.c.choices} onPick={pick} busy={picking} />}
 
         <GoogleButton
@@ -141,6 +129,18 @@ export default function ResearcherSignUp() {
           <input type="checkbox" checked={updates} onChange={(e) => setUpdates(e.target.checked)} />
           <span>Email me occasional product news. You can stop any time.</span>
         </label>
+        {problem && (
+          <div className="alert warn" role="alert">
+            {problem.code === "email_taken" ? (
+              <span>
+                There's already an account with this email. <Link to={`/sign-in?intent=researcher&email=${encodeURIComponent(email)}`}>Sign in</Link> or{" "}
+                <Link to={`/reset-password?intent=researcher&email=${encodeURIComponent(email)}`}>reset your password</Link>.
+              </span>
+            ) : (
+              <span>{problem.message}</span>
+            )}
+          </div>
+        )}
 
         <button type="submit" className="btn btn-sun btn-block" disabled={isLoading} aria-busy={isLoading}>
           {isLoading ? "Creating your account…" : "Create account"}
