@@ -7,7 +7,7 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 import { storage } from "@/utils/storage";
-import { ApiSuccess } from "@/types/api.type";
+import { IDLE_MINUTES, idleLimitMs, idleMs, renewSession, signOutForIdle } from "@/lib/idle";
 import {
   clearAuthStorage,
   isJwtLikeToken,
@@ -65,42 +65,15 @@ const baseQueryWithInterceptor: BaseQueryFn<
       return result;
     }
 
-    // 2. Check for your specific "TokenExpiredError" message
+    // 2. The access token ran out. Alpha feedback: renew only for someone active within the idle limit
+    // (background requests must not keep an idle sign-in alive); otherwise sign out with an explanation.
     if (errorName === "TokenExpiredError") {
-      const refreshToken = normalizeAuthToken(
-        storage.get(STORAGE_KEYS.REFRESH_TOKEN),
-      );
-
-      if (refreshToken && isJwtLikeToken(refreshToken)) {
-        // 1. Trigger the refresh
-        const response = await baseQuery(
-          {
-            url: "/participants/auth/refresh-token",
-            method: "GET",
-            headers: { token: refreshToken },
-          },
-          api,
-          extraOptions,
-        );
-
-        const responseData = response.data as ApiSuccess<{
-          accessToken: string;
-        }> | undefined;
-
-        const accessToken = normalizeAuthToken(responseData?.data?.accessToken);
-
-        if (accessToken && isJwtLikeToken(accessToken)) {
-          // Keep the new token wherever the session lives ("keep me signed in" or this tab only).
-          storage.set(STORAGE_KEYS.TOKEN, accessToken, localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN) !== null);
-          result = await baseQuery(args, api, extraOptions);
-        } else {
-          clearAuthStorage();
-          window.location.href = "/";
-        }
-      } else {
-        clearAuthStorage();
-        window.location.href = "/";
+      if (IDLE_MINUTES && idleMs() >= idleLimitMs()) {
+        signOutForIdle("idle");
+        return result;
       }
+      if (await renewSession()) result = await baseQuery(args, api, extraOptions);
+      else signOutForIdle("expired");
     }
   }
 

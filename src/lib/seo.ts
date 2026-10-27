@@ -16,7 +16,8 @@ export type SeoConfig = {
 
 const siteUrlFromEnv = import.meta.env.VITE_FRONTEND_URL;
 
-export const SITE_URL = (siteUrlFromEnv || "https://joinstudy.io").replace(
+// The main address (joinstudy.io forwards to www). Set VITE_FRONTEND_URL to the same, so search engines see one site.
+export const SITE_URL = (siteUrlFromEnv || "https://www.joinstudy.io").replace(
   /\/+$/,
   "",
 );
@@ -155,6 +156,12 @@ export const routeSeo: Record<string, SeoConfig> = {
     description: "One sign-in for joinStudy researchers and participants.",
     path: "/sign-in",
     robots: "noindex, follow",
+  },
+  "/start": {
+    title: "Get started | joinStudy",
+    description: "Run a study with verified people in Nigeria, Ghana and Kenya, or take part in studies and get paid.",
+    path: "/start",
+    robots: "index, follow",
   },
   "/founding-labs": {
     title: "Founding Labs | joinStudy",

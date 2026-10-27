@@ -70,14 +70,30 @@ export function formatMoney(amount: number, currency = "USD") {
 
 export const percent = (rate: number) => `${Math.round(rate * 100)}%`;
 
-/** Starting pay per hour and step size for the estimate, by the currency the server charges in. */
-export function rateDefaults(currency = "USD") {
+/**
+ * Starting pay per hour and step size for the estimate, by the currency the server charges in.
+ * Starts at the server's suggested hourly pay (RECOMMENDED_HOURLY_PAY, $8) when it gives one.
+ */
+export function rateDefaults(currency = "USD", recommended?: number | null) {
   const table: Record<string, { rate: number; step: number }> = {
     NGN: { rate: 5000, step: 500 },
     GHS: { rate: 60, step: 5 },
     KES: { rate: 600, step: 50 },
   };
-  return table[currency] ?? { rate: 12, step: 1 };
+  const d = table[currency] ?? { rate: 8, step: 1 };
+  return recommended ? { ...d, rate: recommended } : d;
+}
+
+/**
+ * The fair-pay line for an hourly rate. Below the floor: can't launch. Below the suggestion: a warning.
+ * Otherwise the suggestion itself ("We suggest at least $8.00 an hour. Better pay fills faster.").
+ */
+export function fairPay(rate: number, currency: string, min?: number | null, recommended?: number | null) {
+  const suggest = recommended ?? min;
+  if (min != null && rate > 0 && rate < min) return { level: "below-min" as const, text: `This is below the minimum of ${formatMoney(min, currency)} an hour. We won't launch studies that pay less.` };
+  if (suggest != null && rate > 0 && rate < suggest) return { level: "below-suggested" as const, text: `This is below the ${formatMoney(suggest, currency)} an hour we suggest. Better pay fills faster.` };
+  if (suggest != null) return { level: "ok" as const, text: `We suggest at least ${formatMoney(suggest, currency)} an hour. Better pay fills faster.` };
+  return { level: "ok" as const, text: "Better pay fills faster, and participants see the pay before they start." };
 }
 
 /** Countries offered for receipts and invoices. */

@@ -210,7 +210,7 @@ function Emails({ a }: { a: AccountSettings }) {
 function Close() {
   const { data } = useGetCloseCheckQuery(undefined, { refetchOnMountOrArgChange: true });
   const { data: home } = useGetHomeQuery();
-  const cur = home?.data?.money.currency || "NGN";
+  const cur = home?.data?.money.currency || "USD";
   const c = data?.data;
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState("");

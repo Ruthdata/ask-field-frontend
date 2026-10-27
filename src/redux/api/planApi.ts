@@ -37,6 +37,7 @@ export interface PlanView {
   returnLink: string | null;
   figures: { places: number; minutes: number; perPerson: number; hourly: number; feeRate: number; pay: number; fee: number; total: number; currency: string };
   minHourlyPay: number | null;
+  recommendedHourlyPay?: number | null;
   organization: { name: string; verified: boolean };
   fields?: Record<string, string>;
 }
@@ -54,6 +55,11 @@ export const planApi = apiSlice.injectEndpoints({
     }),
     getMatchCount: b.query<ApiSuccess<{ count: number; total: number }>, { id: string; v: number }>({
       query: ({ id }) => `/surveys/${id}/plan/match`,
+    }),
+    // Alpha feedback: delete an unpaid draft. "Surveys" refreshes the home and studies lists.
+    deleteDraftStudy: b.mutation<ApiSuccess<{ deleted: string }>, string>({
+      query: (id) => ({ url: `/surveys/${id}`, method: "DELETE" }),
+      invalidatesTags: ["Surveys"],
     }),
     savePlanStep: b.mutation<ApiSuccess<PlanView>, { id: string; step: PlanStep; data: Record<string, unknown>; final?: boolean }>({
       query: ({ id, step, data, final }) => ({ url: `/surveys/${id}/plan/${step}`, method: "PUT", body: { data, final: !!final } }),
@@ -88,6 +94,7 @@ export const {
   useGetPlanQuery,
   useGetMatchCountQuery,
   useSavePlanStepMutation,
+  useDeleteDraftStudyMutation,
   useScreenForStudyMutation,
   useStudyStartLinkMutation,
   useFinishByCodeMutation,

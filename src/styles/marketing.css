@@ -415,3 +415,19 @@ body.menu-open .mk .nav{background:transparent;box-shadow:none;color:#fff;backdr
 .mk .jp-pills button[data-on="true"]{border:2px solid var(--ink);background:#fff8dc}
 .mk .jp-pills[role="radiogroup"] button{flex:1 1 120px}
 .mk fieldset[disabled] select{opacity:.6}
+
+/* Alpha feedback: the "How do you want to use joinStudy?" page (/start) */
+.mk .start-form{max-width:520px}
+.mk .role-card{display:grid;gap:10px;padding:clamp(20px,3vw,28px);border-radius:22px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line)}
+.mk .role-card.earn{background:var(--sun);color:var(--sun-ink);box-shadow:none}
+.mk .role-card h2{font-size:clamp(22px,2.2vw,26px);letter-spacing:-.04em;line-height:1.1;margin:0}
+.mk .role-card p{margin:0;font-size:15.5px;color:var(--ink-2)}
+.mk .role-card.earn p{color:rgba(37,29,0,.82)}
+.mk .role-label{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--mute)}
+.mk .role-card.earn .role-label{color:rgba(37,29,0,.7)}
+.mk .role-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.mk .role-actions .btn{flex:1 1 180px;justify-content:center;box-sizing:border-box;text-decoration:none}
+.mk .role-card.earn .btn-line{box-shadow:inset 0 0 0 1.5px rgba(37,29,0,.35);background:transparent;color:var(--sun-ink)}
+.mk .role-card.earn .btn-line:hover{box-shadow:inset 0 0 0 1.5px var(--sun-ink)}
+.mk .role-actions .btn{text-decoration:none;font-weight:600}
+.mk .role-actions .btn-ink{color:#fff}

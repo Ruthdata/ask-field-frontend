@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useGetHomeQuery, type StudyStatus } from "@/redux/api/homeApi";
 import StudiesTable from "@/components/researcher/StudiesTable";
 
@@ -15,6 +15,7 @@ export default function Studies() {
   const { data, isLoading, isError, refetch } = useGetHomeQuery();
   const [filter, setFilter] = useState<"all" | StudyStatus>("all");
   const h = data?.data;
+  const deleted = (useLocation().state as { deleted?: string } | null)?.deleted;
   const shown = h ? h.studies.filter((s) => filter === "all" || s.status === filter) : [];
 
   return (
@@ -23,6 +24,7 @@ export default function Studies() {
         <h1 className="ja-h1">Studies</h1>
         <Link to="/dashboard/researcher/new" className="ja-btn ink">+ New study</Link>
       </div>
+      {deleted && <div className="ja-card" role="status" style={{ padding: "14px 18px", borderRadius: 16, background: "#f0faf3", border: "1px solid #cfe9d6" }}>Draft “{deleted}” deleted.</div>}
       {isLoading && <div className="ja-skeleton" style={{ height: 280 }} aria-busy="true" />}
       {isError && <div className="ja-error" role="alert">We couldn't load your studies. <button type="button" className="ja-link" onClick={() => refetch()}>Try again</button></div>}
       {h && (

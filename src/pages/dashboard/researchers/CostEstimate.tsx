@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useGetHomeQuery, useStartStudyMutation, type StudyMethod } from "@/redux/api/homeApi";
 import { useGetPricingQuery, VERIFIABLE } from "@/redux/api/setupApi";
-import { estimateCost, formatMoney, METHODS, methodById, percent, rateDefaults, studyLink } from "@/lib/study";
+import { estimateCost, fairPay, formatMoney, METHODS, methodById, percent, rateDefaults, studyLink } from "@/lib/study";
 import { readProblem } from "@/lib/session";
 import Stepper from "@/components/researcher/Stepper";
 
@@ -14,7 +14,7 @@ export default function CostEstimate() {
   const pricing = pricingRes?.data;
   const account = homeRes?.data.account;
   const currency = pricing?.currency ?? "USD";
-  const d = rateDefaults(currency);
+  const d = rateDefaults(currency, pricing?.recommendedHourlyPay);
 
   const [method, setMethod] = useState<StudyMethod>("survey");
   const [people, setPeople] = useState(100);
@@ -33,7 +33,8 @@ export default function CostEstimate() {
   const isAcademic = !!account && account.verification === "verified" && VERIFIABLE.includes(account.organizationType);
   const c = estimateCost(count, minutes, r, feeRate);
   const saving = pricing ? estimateCost(count, minutes, r, feeRate - pricing.academicFeeRate).fee : 0;
-  const lowPay = pricing?.minHourlyPay != null && r < pricing.minHourlyPay;
+  const fair = fairPay(r, currency, pricing?.minHourlyPay, pricing?.recommendedHourlyPay);
+  const lowPay = fair.level !== "ok";
 
   const pick = (id: StudyMethod) => {
     const next = methodById(id)!;
@@ -99,9 +100,7 @@ export default function CostEstimate() {
         <div className="ja-card" style={{ gap: 4, padding: "16px 18px", borderRadius: 18, ...(lowPay ? { border: "2px solid var(--ink)" } : {}) }}>
           <span style={{ fontWeight: 600, fontSize: 15 }}>Fair pay</span>
           <span className="ja-muted">
-            {pricing?.minHourlyPay != null
-              ? `${lowPay ? "This is below" : "We suggest at least"} ${formatMoney(pricing.minHourlyPay, currency)} an hour. Better pay fills faster.`
-              : "Better pay fills faster, and participants see the pay before they start."}
+            {fair.text}
           </span>
         </div>
         <div className="ja-card" style={{ gap: 4, padding: "16px 18px", borderRadius: 18 }}>

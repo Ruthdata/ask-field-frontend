@@ -2,6 +2,7 @@ import { STORAGE_KEYS } from "@/config/constants";
 import { storage } from "@/utils/storage";
 import { store } from "@/redux/store";
 import { apiSlice } from "@/redux/api/slices/appSlice";
+import { markSignedIn } from "@/lib/idle";
 
 export type AccountType = "researcher" | "participant";
 
@@ -19,8 +20,12 @@ export interface NeedsChoice {
 
 export const isChoice = (d: unknown): d is NeedsChoice => Boolean(d && (d as NeedsChoice).needsChoice);
 
-/** Saves the tokens and account type after any successful sign-in. */
+/**
+ * Saves the tokens and account type after any successful sign-in. Kept in localStorage so every tab shares one
+ * sign-in; it ends after 20 minutes without activity (see lib/idle.ts), which replaced "Keep me signed in".
+ */
 export function saveSession(s: Session, remember = true) {
+  markSignedIn();
   // A different person may have been signed in on this tab: forget everything cached for them.
   store.dispatch(apiSlice.util.resetApiState());
   storage.set(STORAGE_KEYS.TOKEN, s.accessToken, remember);

@@ -126,7 +126,7 @@ function HowItWorks() {
 function QuickEstimate({ feeRate, academic }: { feeRate: number; academic: boolean }) {
   const { data } = useGetPricingQuery();
   const currency = data?.data.currency ?? "USD";
-  const d = rateDefaults(currency);
+  const d = rateDefaults(currency, data?.data.recommendedHourlyPay);
   const [people, setPeople] = useState(50);
   const [minutes, setMinutes] = useState(15);
   const [rate, setRate] = useState<number | null>(null);

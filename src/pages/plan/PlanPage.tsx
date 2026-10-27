@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
-import { useGetPlanQuery, type PlanView } from "@/redux/api/planApi";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { useDeleteDraftStudyMutation, useGetPlanQuery, type PlanView } from "@/redux/api/planApi";
+import { readProblem } from "@/lib/session";
 import { formatMoney, methodById } from "@/lib/study";
 import "@/styles/app.css";
 import StepBasics from "./StepBasics";
@@ -126,6 +127,66 @@ function Summary({ view }: { view: PlanView }) {
           <span style={{ fontSize: 14, color: "var(--ink-2)" }}>✓ Nothing. You can launch.</span>
         )}
       </section>
+      {view.status === "draft" && (view.launchStage === "none" || view.launchStage === "changes-needed") && <DeleteDraft view={view} />}
     </aside>
   );
 }
+
+/** Alpha feedback: a draft can be deleted (never a paid, live or closed study). */
+function DeleteDraft({ view }: { view: PlanView }) {
+  const [open, setOpen] = useState(false);
+  const [problem, setProblem] = useState("");
+  const [del, { isLoading }] = useDeleteDraftStudyMutation();
+  const navigate = useNavigate();
+  const cancel = useRef<HTMLButtonElement>(null);
+  const title = view.plan.basics?.title || view.name || "this draft";
+
+  useEffect(() => {
+    if (!open) return;
+    cancel.current?.focus();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const go = async () => {
+    setProblem("");
+    try {
+      await del(view.surveyId).unwrap();
+      navigate("/dashboard/researcher/studies", { replace: true, state: { deleted: title } });
+    } catch (err) {
+      setProblem(readProblem(err).message);
+    }
+  };
+
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} style={DD.link}>Delete this draft</button>
+      {open && (
+        <div style={DD.scrim} onMouseDown={(e) => e.target === e.currentTarget && setOpen(false)}>
+          <div role="alertdialog" aria-modal="true" aria-labelledby="dd-h" aria-describedby="dd-p" style={DD.box}>
+            <h2 id="dd-h" style={DD.h}>Delete this draft?</h2>
+            <p id="dd-p" style={DD.p}>
+              “{title}” and everything you've planned for it will be deleted. This can't be undone. Nothing has been paid, so there's nothing to refund.
+            </p>
+            {problem && <p role="alert" style={{ ...DD.p, color: "#9a3412", background: "#fff4ed", padding: "10px 12px", borderRadius: 12 }}>{problem}</p>}
+            <div style={DD.row}>
+              <button type="button" onClick={go} disabled={isLoading} style={{ ...DD.btn, background: "#9a3412", color: "#fff" }}>{isLoading ? "Deleting…" : "Delete draft"}</button>
+              <button ref={cancel} type="button" onClick={() => setOpen(false)} style={{ ...DD.btn, background: "#fff", color: "#120e22", boxShadow: "inset 0 0 0 1.5px #ebe9f2" }}>Keep it</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+const DD: Record<string, React.CSSProperties> = {
+  link: { alignSelf: "flex-start", background: "none", border: 0, padding: "4px 2px", font: "inherit", fontSize: 14.5, fontWeight: 600, color: "#9a3412", textDecoration: "underline", textUnderlineOffset: 3, cursor: "pointer" },
+  scrim: { position: "fixed", inset: 0, zIndex: 90, background: "rgba(18,14,34,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 },
+  box: { width: "min(460px, 100%)", boxSizing: "border-box", background: "#fff", color: "#120e22", borderRadius: 24, padding: "clamp(20px, 5vw, 30px)", display: "grid", gap: 14, boxShadow: "0 24px 80px rgba(18,14,34,.3)" },
+  h: { margin: 0, fontFamily: "var(--display)", fontSize: 26, fontWeight: 700, letterSpacing: "-.04em", lineHeight: 1.1 },
+  p: { margin: 0, fontSize: 15.5, lineHeight: 1.55, color: "#4b4664" },
+  row: { display: "flex", flexWrap: "wrap", gap: 10, marginTop: 4 },
+  btn: { flex: "1 1 150px", height: 50, borderRadius: 999, border: 0, font: "inherit", fontSize: 15.5, fontWeight: 600, cursor: "pointer" },
+};

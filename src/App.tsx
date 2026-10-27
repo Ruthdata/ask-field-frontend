@@ -59,6 +59,8 @@ import ResearcherSignUp from "./pages/access/ResearcherSignUp";
 import CheckEmail from "./pages/access/CheckEmail";
 import ConfirmEmail from "./pages/access/ConfirmEmail";
 import SignIn from "./pages/access/SignIn";
+import StartPage from "./pages/access/StartPage";
+import IdleSignOut from "./components/IdleSignOut";
 import ResetAccess from "./pages/access/ResetAccess";
 import LegalPending from "./pages/access/LegalPending";
 import RedirectWithQuery from "./routes/RedirectWithQuery";
@@ -80,6 +82,7 @@ export default function App() {
       <RouteSEO />
       <ScrollToTop />
       <Toaster />
+      <IdleSignOut />
       <Routes>
         <Route path="/" element={<HomeLayout />}>
           <Route index element={<Homepage />} />
@@ -95,6 +98,8 @@ export default function App() {
         <Route element={<PublicRoute />}>
           <Route path="/auth/sign-up/researcher" element={<ResearcherSignUp />} />
           <Route path="/sign-in" element={<SignIn />} />
+          {/* Alpha feedback: choose researcher or participant before any form */}
+          <Route path="/start" element={<StartPage />} />
           <Route path="/reset-password" element={<ResetAccess />} />
         </Route>
         <Route path="/auth/researcher/check-email" element={<CheckEmail />} />

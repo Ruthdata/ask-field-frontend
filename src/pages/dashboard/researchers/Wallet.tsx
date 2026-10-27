@@ -145,15 +145,19 @@ function YearDownload() {
 function ReceiptDetails() {
   const { data } = useGetBillingQuery();
   const b = data?.data;
-  return b ? <ReceiptForm key={JSON.stringify(b)} b={b} /> : null;
+  // The form starts again from the saved details after each save (the key), so "Saved" lives here and survives that.
+  const [ok, setOk] = useState("");
+  return b ? <ReceiptForm key={JSON.stringify(b)} b={b} ok={ok} setOk={setOk} /> : null;
 }
-function ReceiptForm({ b }: { b: BillingDetails }) {
+function ReceiptForm({ b, ok, setOk }: { b: BillingDetails; ok: string; setOk: (m: string) => void }) {
   const ws = useWorkspace();
   const [v, setV] = useState<Receipt>({ name: b.name, organization: b.organization, email: b.email, cc: b.cc, reference: b.reference, country: RECEIPT_COUNTRIES.includes(b.country) ? b.country : "Other" });
   const [save, state] = useSaveBillingMutation();
-  const [ok, setOk] = useState("");
   const [problem, setProblem] = useState("");
-  const set = (patch: Partial<Receipt>) => setV({ ...v, ...patch });
+  const set = (patch: Partial<Receipt>) => {
+    setOk("");
+    setV({ ...v, ...patch });
+  };
   const go = async () => {
     setOk("");
     setProblem("");

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { PlanView } from "@/redux/api/planApi";
-import { formatMoney } from "@/lib/study";
+import { fairPay, formatMoney } from "@/lib/study";
 import { PlanShell } from "./PlanPage";
 import { launchPath, planPath, type Slug } from "./steps";
 import { useStepDraft, statusText } from "./useStepDraft";
@@ -33,7 +33,8 @@ export default function StepPay({ view, slug }: { view: PlanView; slug: Slug }) 
   const cur = f.currency;
   const minutes = f.minutes;
   const hourly = minutes && v.perPerson ? Math.round(((v.perPerson * 60) / minutes) * 100) / 100 : 0;
-  const low = view.minHourlyPay != null && hourly > 0 && hourly < view.minHourlyPay;
+  const fair = fairPay(hourly, cur, view.minHourlyPay, view.recommendedHourlyPay);
+  const low = fair.level === "below-min";
   const navigate = useNavigate();
   const [confirming, setConfirming] = useState(false);
 
@@ -59,9 +60,7 @@ export default function StepPay({ view, slug }: { view: PlanView; slug: Slug }) 
         </div>
         {!minutes && <span className="jp-hint">Set how long it takes in the previous step to see the hourly rate.</span>}
         <div role="status" className={`jp-note${low ? " bad" : ""}`}>
-          {low
-            ? `This is below the minimum of ${formatMoney(view.minHourlyPay!, cur)} an hour. We won't launch studies that pay less.`
-            : "Better pay fills faster, and participants see it before they start."}
+          {fair.level === "below-suggested" ? <b>{fair.text}</b> : fair.text}
         </div>
         {!fixedPlaces && (
           <Field label="How many people you need" error={e.places}>

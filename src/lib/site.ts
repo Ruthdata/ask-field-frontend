@@ -6,6 +6,7 @@ export const ROUTES = {
   researcherSignup: "/auth/sign-up/researcher",
   participantSignup: "/participate",
   signIn: "/sign-in",
+  start: "/start",
   foundingLabs: "/founding-labs",
   requestCountry: "/request-a-country",
   aiPilot: "/ai-pilot",

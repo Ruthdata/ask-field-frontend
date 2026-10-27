@@ -17,8 +17,10 @@ export interface Pricing {
   platformFeeRate: number;
   academicFeeRate: number;
   minPayoutAmount: number;
-  /** Lowest hourly pay we suggest; null until it's decided. */
+  /** Hard floor: a study can't launch below this hourly pay (null = no floor). */
   minHourlyPay: number | null;
+  /** The suggested hourly pay: a warning shows below it, and estimates start here. */
+  recommendedHourlyPay?: number | null;
   currency: string;
 }
 

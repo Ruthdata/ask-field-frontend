@@ -114,7 +114,7 @@ function AddPlaces({ live, onClose }: { live: LiveView; onClose: () => void }) {
   const focus = live.method === "focus-group";
   const [extra, setExtra] = useState(focus ? 0 : Math.max(1, Math.round(live.places / 5)));
   const [session, setSession] = useState("");
-  const [method, setMethod] = useState<"card" | "invoice">("card");
+  const [picked, setMethod] = useState<"card" | "invoice">("card");
   const [useCredit, setUseCredit] = useState(false);
   const [problem, setProblem] = useState("");
   const [result, setResult] = useState<AddPlacesResult | null>(null);
@@ -127,6 +127,8 @@ function AddPlaces({ live, onClose }: { live: LiveView; onClose: () => void }) {
   const cost = Math.round(count * live.perPerson * (1 + feeRate) * 100) / 100;
   const credit = useCredit ? Math.min(lv?.credit ?? 0, cost) : 0;
   const cardsOff = lv?.payments.cards === "unavailable";
+  // Cards off (Stripe not set up): start on invoice, so the Pay button works straight away.
+  const method = cardsOff && picked === "card" ? "invoice" : picked;
 
   const pay = async () => {
     setProblem("");

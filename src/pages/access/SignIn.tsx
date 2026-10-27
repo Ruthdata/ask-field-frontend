@@ -6,6 +6,7 @@ import AccountChoice from "@components/auth/AccountChoice";
 import TextField from "@components/auth/TextField";
 import PasswordField from "@components/auth/PasswordField";
 import { useGoogleSignInMutation, useSignInMutation } from "@/redux/api/authApi";
+import { IDLE_MINUTES } from "@/lib/idle";
 import { EMAIL_RE, readProblem, safeNext, saveSession, type AccountType, type ApiProblem, type NeedsChoice, type Session } from "@/lib/session";
 
 /**
@@ -18,10 +19,10 @@ export default function SignIn() {
   const intentParam = params.get("intent");
   const intent: AccountType | undefined = intentParam === "researcher" || intentParam === "participant" ? intentParam : undefined;
   const next = params.get("next");
+  const reason = params.get("reason") === "idle" ? "idle" : params.get("reason") === "expired" ? "expired" : null;
   const navigate = useNavigate();
   const [email, setEmail] = useState(params.get("email") ?? "");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(true);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [problem, setProblem] = useState<ApiProblem | null>(null);
   const [choice, setChoice] = useState<{ c: NeedsChoice; googleToken?: string } | null>(null);
@@ -29,7 +30,7 @@ export default function SignIn() {
   const [googleSignIn, { isLoading: googleBusy }] = useGoogleSignInMutation();
 
   const finish = (s: Session) => {
-    saveSession(s, remember);
+    saveSession(s);
     navigate(safeNext(next, s.userType), { replace: true });
   };
 
@@ -150,6 +151,15 @@ export default function SignIn() {
           </p>
         </div>
 
+        {!problem && reason && (
+          <div className="alert info" role="status">
+            <span>
+              {reason === "idle"
+                ? `You were signed out after ${IDLE_MINUTES} minutes without activity. Sign in to carry on where you were.`
+                : "Your sign-in ended. Sign in again to carry on."}
+            </span>
+          </div>
+        )}
         {problemView()}
         {choice && <AccountChoice choices={choice.c.choices} onPick={pick} busy={isLoading || googleBusy} />}
 
@@ -172,10 +182,7 @@ export default function SignIn() {
           aside={<Link to={`/reset-password?email=${enc}${intent ? `&intent=${intent}` : ""}`} style={{ fontSize: 14.5, fontWeight: 500 }}>Forgot password?</Link>}
         />
 
-        <label className="check" style={{ alignItems: "center" }}>
-          <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} style={{ marginTop: 0 }} />
-          <span>Keep me signed in on this device</span>
-        </label>
+        <p className="sub" style={{ fontSize: 14 }}>For your security, we sign you out after {IDLE_MINUTES} minutes without activity.</p>
 
         <button type="submit" className="btn btn-sun btn-block" disabled={isLoading} aria-busy={isLoading}>
           {isLoading ? "Signing in…" : "Sign in"}

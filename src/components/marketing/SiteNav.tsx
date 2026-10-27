@@ -107,10 +107,12 @@ export default function SiteNav() {
                 Sign in
               </Link>
             )}
-            <Link className="btn btn-sun start" to={researcherSignup("nav")}>
-              <span className="long">Start a study</span>
-              <span className="short">Start</span>
-            </Link>
+            {!dash && (
+              <Link className="btn btn-sun start" to={ROUTES.start}>
+                <span className="long">Get started</span>
+                <span className="short">Start</span>
+              </Link>
+            )}
           </div>
           <button
             ref={burger}
