@@ -212,7 +212,7 @@ export function LaunchPay() {
   const cur = view.figures.currency;
   const credit = useCredit ? Math.min(view.credit, view.due) : 0;
   const toPay = Math.max(0, view.due - credit);
-  const cardsOff = view.payments.cards === "unavailable";
+  const cardsOff = view.payments.cards === "stripe";
   // Cards off (Stripe not set up): start on invoice, so the Pay button works straight away.
   const method = cardsOff && picked === "card" ? "invoice" : picked;
 
