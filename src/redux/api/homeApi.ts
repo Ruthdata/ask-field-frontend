@@ -21,6 +21,10 @@ export interface HomeStudy {
   stage: "none" | "awaiting-payment" | "checking" | "changes-needed" | "rejected";
   funded: number;
   updatedAt: string;
+  /** For the row's ⋯ menu. */
+  paused?: boolean;
+  heldByJoinStudy?: boolean;
+  settled?: boolean;
 }
 
 export type NeedsYou =

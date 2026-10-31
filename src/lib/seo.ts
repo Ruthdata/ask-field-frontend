@@ -48,7 +48,7 @@ function organizationJsonLd() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: absoluteUrl("/askfield-logo-icon.png"),
+    logo: absoluteUrl("/joinstudy-logo-icon.png"),
     sameAs: [],
   };
 }

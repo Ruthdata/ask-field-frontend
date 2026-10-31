@@ -16,6 +16,7 @@ export default function Studies() {
   const [filter, setFilter] = useState<"all" | StudyStatus>("all");
   const h = data?.data;
   const deleted = (useLocation().state as { deleted?: string } | null)?.deleted;
+  const [notice, setNotice] = useState(deleted ? `Draft “${deleted}” deleted.` : "");
   const shown = h ? h.studies.filter((s) => filter === "all" || s.status === filter) : [];
 
   return (
@@ -24,7 +25,7 @@ export default function Studies() {
         <h1 className="ja-h1">Studies</h1>
         <Link to="/dashboard/researcher/new" className="ja-btn ink">+ New study</Link>
       </div>
-      {deleted && <div className="ja-card" role="status" style={{ padding: "14px 18px", borderRadius: 16, background: "#f0faf3", border: "1px solid #cfe9d6" }}>Draft “{deleted}” deleted.</div>}
+      {notice && <div className="ja-card" role="status" style={{ padding: "14px 18px", borderRadius: 16, background: "#f0faf3", border: "1px solid #cfe9d6" }}>{notice}</div>}
       {isLoading && <div className="ja-skeleton" style={{ height: 280 }} aria-busy="true" />}
       {isError && <div className="ja-error" role="alert">We couldn't load your studies. <button type="button" className="ja-link" onClick={() => refetch()}>Try again</button></div>}
       {h && (
@@ -38,7 +39,7 @@ export default function Studies() {
           </div>
           <section className="ja-card" aria-label="Studies list">
             {shown.length ? (
-              <StudiesTable studies={shown} currency={h.money.currency} label="Studies" />
+              <StudiesTable studies={shown} currency={h.money.currency} label="Studies" onNotice={setNotice} />
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "flex-start", padding: "12px 4px" }}>
                 <span style={{ fontWeight: 600 }}>{h.counts.total ? "Nothing here yet." : "No studies yet."}</span>

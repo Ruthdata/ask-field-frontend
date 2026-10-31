@@ -210,6 +210,7 @@ function FoundingCard({ status }: { status: HomeSummary["founding"] }) {
 }
 
 function Returning({ h }: { h: HomeSummary }) {
+  const [notice, setNotice] = useState("");
   const cur = h.money.currency;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -247,7 +248,8 @@ function Returning({ h }: { h: HomeSummary }) {
           <h2 id="st-h" className="ja-h2">Your studies</h2>
           {h.counts.total > 5 && <Link to="/dashboard/researcher/studies" className="ja-link">See all {h.counts.total} →</Link>}
         </div>
-        <StudiesTable studies={h.studies.slice(0, 5)} currency={cur} />
+        {notice && <div role="status" style={{ padding: "12px 16px", borderRadius: 14, background: "#f0faf3", border: "1px solid #cfe9d6", fontSize: 15 }}>{notice}</div>}
+        <StudiesTable studies={h.studies.slice(0, 5)} currency={cur} onNotice={setNotice} />
       </section>
 
       <section aria-label="Money" className="ja-grid">

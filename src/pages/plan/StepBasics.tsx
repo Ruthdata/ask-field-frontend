@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { PlanView } from "@/redux/api/planApi";
-import { PlanShell } from "./PlanPage";
+import { PlanShell } from "./PlanPage copy";
 import { planPath, type Slug } from "./steps";
 import { useStepDraft, statusText } from "./useStepDraft";
 import { Choice, Field } from "./parts";

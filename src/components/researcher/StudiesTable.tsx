@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import StudyMenu from "./StudyMenu";
 import type { HomeStudy } from "@/redux/api/homeApi";
 import { formatMoney, methodById, studyLink } from "@/lib/study";
 
@@ -16,7 +17,7 @@ function progress(s: HomeStudy) {
   return { text: parts.join(" · "), pct: s.places ? Math.min(100, Math.round((done / s.places) * 100)) : 0 };
 }
 
-export default function StudiesTable({ studies, currency, label = "Your studies" }: { studies: HomeStudy[]; currency: string; label?: string }) {
+export default function StudiesTable({ studies, currency, label = "Your studies", onNotice }: { studies: HomeStudy[]; currency: string; label?: string; onNotice?: (m: string) => void }) {
   return (
     <div role="table" aria-label={label} className="ja-table">
       <div role="row" className="ja-tr head">
@@ -25,12 +26,14 @@ export default function StudiesTable({ studies, currency, label = "Your studies"
         <span role="columnheader">Status</span>
         <span role="columnheader">Progress</span>
         <span role="columnheader">Spent so far</span>
+        <span role="columnheader"><span className="sr-only">Actions</span></span>
       </div>
       {studies.map((s) => {
         const p = progress(s);
         return (
-          <Link role="row" key={s.surveyId} to={studyLink(s)} className="ja-tr">
-            <span role="cell" className="nm">{s.name}</span>
+          // The whole row opens the study (a link stretched over it); the ⋯ button sits above that link.
+          <div role="row" key={s.surveyId} className="ja-tr row">
+            <span role="cell" className="nm"><Link to={studyLink(s)} className="ja-row-link">{s.name}</Link></span>
             <span role="cell" className="meta">{methodById(s.method)?.label ?? "Survey"}</span>
             <span role="cell"><span className={`ja-pill ${s.status}`}>{s.status === "draft" && s.stage && s.stage !== "none" ? STAGE_LABEL[s.stage] : STATUS_LABEL[s.status]}</span></span>
             <span role="cell" className="ja-prog">
@@ -38,7 +41,8 @@ export default function StudiesTable({ studies, currency, label = "Your studies"
               <span className="ja-bar" aria-hidden="true"><span style={{ width: `${p.pct}%`, background: s.status === "closed" ? "#c9c5d8" : undefined }} /></span>
             </span>
             <span role="cell" className="money">{s.spent ? formatMoney(s.spent, currency) : "—"}</span>
-          </Link>
+            <span role="cell" className="act"><StudyMenu s={s} onDone={onNotice} /></span>
+          </div>
         );
       })}
     </div>

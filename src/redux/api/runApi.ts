@@ -191,7 +191,11 @@ export const runApi = apiSlice.injectEndpoints({
       query: ({ id, to }) => ({ url: `/surveys/${id}/finish/return-to`, method: "POST", body: { to } }),
       invalidatesTags: (_r, _e, { id }) => [{ type: "Live", id }],
     }),
-    runAgain: b.mutation<ApiSuccess<{ surveyId: string }>, string>({ query: (id) => ({ url: `/surveys/${id}/run-again`, method: "POST" }), invalidatesTags: ["Researchers", "Surveys"] }),
+    // "Run it again", or "Duplicate" from a study's ⋯ menu ({ id, copy: true } names the new draft "… (copy)").
+    runAgain: b.mutation<ApiSuccess<{ surveyId: string }>, string | { id: string; copy?: boolean }>({
+      query: (a) => (typeof a === "string" ? { url: `/surveys/${a}/run-again`, method: "POST" } : { url: `/surveys/${a.id}/run-again`, method: "POST", body: { copy: !!a.copy } }),
+      invalidatesTags: ["Researchers", "Surveys"],
+    }),
     getClosedStudies: b.query<ApiSuccess<ClosedStudies>, void>({ query: () => `/researchers/me/closed-studies`, providesTags: ["Wallet", "Live"] }),
 
     // participant side

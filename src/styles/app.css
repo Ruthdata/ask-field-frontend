@@ -127,10 +127,26 @@
 .ja-need.hot .d{color:var(--on-night-2)}
 
 /* studies table */
-.ja-table{display:flex;flex-direction:column;overflow-x:auto}
+.ja-table{position:relative;display:flex;flex-direction:column;overflow-x:auto}
 .ja-tr{display:grid;grid-template-columns:minmax(220px,2.2fr) minmax(110px,1fr) minmax(100px,.9fr) minmax(170px,1.4fr) minmax(110px,1fr);gap:12px;align-items:center;padding:14px 12px;border-bottom:1px solid var(--line-2);min-width:760px;text-decoration:none;color:var(--ink);font-size:15px}
 .ja-tr.head{padding:10px 12px;font-family:var(--mono);font-size:12.5px;color:var(--mute);border-bottom:1px solid var(--line)}
-a.ja-tr:hover{background:#fbfaf6}
+a.ja-tr:hover,.ja-tr.row:hover{background:#fbfaf6}
+/* Study rows: a stretched link opens the study; the ⋯ menu (last column) sits above it.
+   Its popup is .ja-pop (.ja-menu is the top bar's menu button on narrow screens). */
+.ja-tr{grid-template-columns:minmax(220px,2.2fr) minmax(110px,1fr) minmax(100px,.9fr) minmax(170px,1.4fr) minmax(110px,1fr) 40px}
+.ja-tr.row{position:relative}
+.ja-row-link{color:inherit;text-decoration:none}
+.ja-row-link::after{content:"";position:absolute;inset:0;border-radius:inherit}
+.ja-row-link:focus-visible{outline:none}
+.ja-row-link:focus-visible::after{outline:2px solid var(--sun);outline-offset:-2px;border-radius:10px}
+.ja-tr .act{position:relative;z-index:1;display:flex;justify-content:flex-end;flex-direction:column;align-items:flex-end}
+.ja-dots{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:12px;background:none;color:var(--ink-2);cursor:pointer}
+.ja-dots:hover,.ja-dots[aria-expanded="true"]{background:var(--line-2);color:var(--ink)}
+.ja-pop{position:fixed;z-index:85;width:220px;box-sizing:border-box;padding:6px;border-radius:16px;background:#fff;box-shadow:0 0 0 1px #ebe9f2,0 16px 48px rgba(18,14,34,.18);display:flex;flex-direction:column;font-family:Geist,system-ui,sans-serif}
+.ja-pop [role=menuitem]{height:42px;padding:0 12px;border:0;border-radius:10px;background:none;text-align:left;font:inherit;font-size:15px;color:#120e22;cursor:pointer}
+.ja-pop [role=menuitem]:hover,.ja-pop [role=menuitem]:focus-visible{background:#f6f5fa;outline:none}
+.ja-pop [role=menuitem].danger{color:#9a3412}
+.ja-pop-problem{font-size:12.5px;color:#9a3412;max-width:220px;text-align:right}
 .ja-tr .nm{font-weight:600}
 .ja-tr .meta{color:var(--ink-2)}
 .ja-pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-family:var(--mono);font-size:12.5px}

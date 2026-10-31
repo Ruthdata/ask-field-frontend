@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useGetMatchCountQuery, useGetParticipantOptionsQuery, type PlanView, type Question } from "@/redux/api/planApi";
 import { ROUTES } from "@/lib/site";
-import { PlanShell } from "./PlanPage";
+import { PlanShell } from "./PlanPage copy";
 import { planPath, type Slug } from "./steps";
 import { useStepDraft, statusText } from "./useStepDraft";
 import { Chips, ErrorLine, Field, NumberInput, Toggle } from "./parts";

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { PlanView } from "@/redux/api/planApi";
 import { fairPay, formatMoney } from "@/lib/study";
-import { PlanShell } from "./PlanPage";
+import { PlanShell } from "./PlanPage copy";
 import { launchPath, planPath, type Slug } from "./steps";
 import { useStepDraft, statusText } from "./useStepDraft";
 import { Choice, Field, NumberInput } from "./parts";

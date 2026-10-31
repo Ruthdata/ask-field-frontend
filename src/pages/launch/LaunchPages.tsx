@@ -178,10 +178,10 @@ export function LaunchPay() {
   const navigate = useNavigate();
   const location = useLocation();
   const agreed = !!(location.state as { agreed?: boolean } | null)?.agreed;
-  const { data: me } = useGetResearcherQuery();
+  const { data: me, isLoading: meLoading } = useGetResearcherQuery();
   const r = me?.data;
   // Stage 9: the workspace's saved receipt details come first.
-  const { data: billingData } = useGetBillingQuery();
+  const { data: billingData, isLoading: billingLoading } = useGetBillingQuery();
   const saved = billingData?.data;
   const ws = useWorkspace();
   const [picked, setMethod] = useState<"card" | "invoice">("card");
@@ -192,7 +192,8 @@ export function LaunchPay() {
   const [pay, payState] = usePayForStudyMutation();
   const [confirmTest, testState] = useConfirmTestPaymentMutation();
 
-  if (isLoading) return <Loading />;
+  // Wait for the receipt details too (saved ones, or the profile): paying before they arrive sent an empty name.
+  if (isLoading || meLoading || billingLoading) return <Loading />;
   if (isError || !view) return <Failed retry={refetch} />;
   const go = routeFor(view, "pay");
   if (go) return <Navigate to={go} replace />;

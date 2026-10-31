@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { downloadResults, useGetLiveParticipantsQuery, useGetLiveQuery, useGetStudyThreadsQuery, useRunAgainMutation, type LiveView } from "@/redux/api/runApi";
 import { formatMoney, methodById } from "@/lib/study";
@@ -22,6 +22,16 @@ export default function StudyPage() {
   const { data, isLoading, isError, error, refetch } = useGetLiveQuery(id, { pollingInterval: 30000, refetchOnMountOrArgChange: true });
   const { data: threads } = useGetStudyThreadsQuery(id, { pollingInterval: 30000 });
   const [change, setChange] = useState<Change | null>(null);
+  // The ⋯ menu on the Studies list opens a change straight away (?change=pause|places|close).
+  const wanted = params.get("change");
+  useEffect(() => {
+    if (wanted === "pause" || wanted === "places" || wanted === "close") {
+      setChange(wanted);
+      const next = new URLSearchParams(params);
+      next.delete("change");
+      setParams(next, { replace: true });
+    }
+  }, [wanted]); // eslint-disable-line react-hooks/exhaustive-deps
   const [runAgain, againState] = useRunAgainMutation();
   const [problem, setProblem] = useState("");
   const navigate = useNavigate();
@@ -113,7 +123,7 @@ export default function StudyPage() {
       {tab === "review" && !booking && <StudyReview live={live} onMessage={(p) => go("messages", { p })} />}
       {tab === "messages" && <StudyMessages live={live} participantId={params.get("p") || ""} onPick={(p) => go("messages", p ? { p } : {})} />}
 
-      {change && <ChangeDialog kind={change} live={live} onClose={() => setChange(null)} />}
+      {change && isLive && <ChangeDialog kind={change} live={live} onClose={() => setChange(null)} />}
     </div>
   );
 }

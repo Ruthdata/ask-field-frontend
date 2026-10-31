@@ -33,7 +33,7 @@ import ResearcherHome from "./pages/dashboard/researchers/ResearcherHome";
 import Studies from "./pages/dashboard/researchers/Studies";
 import NewStudy from "./pages/dashboard/researchers/NewStudy";
 import CostEstimate from "./pages/dashboard/researchers/CostEstimate";
-import PlanPage from "./pages/plan/PlanPage";
+import PlanPage from "./pages/plan/PlanPage copy";
 import { LaunchPay, LaunchReview, LaunchStatus } from "./pages/launch/LaunchPages";
 import OldEditorRedirect from "./pages/plan/OldEditorRedirect";
 import FinishLink from "./pages/landing/FinishLink";
