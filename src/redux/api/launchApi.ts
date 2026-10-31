@@ -26,7 +26,7 @@ export interface LaunchView extends PlanView {
   paidIn: number;
   due: number;
   credit: number;
-  payments: { cards: "stripe" | "test" | "unavailable"; publishableKey: string | null; invoices: boolean };
+  payments: { cards: "stripe" | "test" | "unavailable"; publishableKey: string | null; invoices: boolean; /** Paid studies go live at once, with no review (PUBLISH_ON_PAYMENT). */ publishOnPayment?: boolean };
 }
 export interface Receipt { name: string; organization: string; email: string; cc: string; reference: string; country: string }
 export type PayResult =

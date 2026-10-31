@@ -23,6 +23,8 @@ import "@/styles/app.css";
 
 /** Stage 5: check everything once → pay (card, invoice or credit) → our check → live. */
 const STEPS = ["Review", "Pay", "Our check", "Live"];
+/** With PUBLISH_ON_PAYMENT on, there's no check: a paid study goes straight to Live. */
+const STEPS_NO_CHECK = ["Review", "Pay", "Live"];
 
 function useLaunch(poll = false) {
   const { id = "" } = useParams();
@@ -39,11 +41,11 @@ function Shell({ view, step, children, aside }: { view: LaunchView; step: number
       </header>
       <nav aria-label="Launch steps" style={{ padding: "18px clamp(16px,3vw,32px) 0", maxWidth: 1400, margin: "0 auto" }}>
         <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", maxWidth: 760 }}>
-          {STEPS.map((s, i) => (
+          {(view.payments?.publishOnPayment ? STEPS_NO_CHECK : STEPS).map((s, i, all) => (
             <li key={s} aria-current={i === step ? "step" : undefined} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14.5, fontWeight: i === step ? 600 : 400, color: i <= step ? "var(--ink)" : "#8d89a3" }}>
               <span className={`jp-rn${i < step ? " done" : ""}`} aria-hidden="true" style={i === step ? { border: "2px solid var(--ink)", color: "var(--ink)" } : undefined}>{i < step ? "✓" : i + 1}</span>
               {s}
-              {i < 3 && <span aria-hidden="true" style={{ width: 40, height: 2, background: "#e7e4ef", marginLeft: 6 }} />}
+              {i < all.length - 1 && <span aria-hidden="true" style={{ width: 40, height: 2, background: "#e7e4ef", marginLeft: 6 }} />}
             </li>
           ))}
         </ol>
@@ -249,10 +251,10 @@ export function LaunchPay() {
             <h2 id="pm">How you'll pay</h2>
             <div role="radiogroup" aria-labelledby="pm" className="jp-opts">
               <button type="button" role="radio" aria-checked={method === "card"} className="jp-opt" disabled={cardsOff} onClick={() => setMethod("card")}>
-                <span className="jp-dot" aria-hidden="true" /><span className="jp-ot"><b>Card</b><span>{cardsOff ? `Not available yet. Choose invoice, or email ${SUPPORT_EMAIL}.` : "Paid now. Our check starts straight away."}</span></span>
+                <span className="jp-dot" aria-hidden="true" /><span className="jp-ot"><b>Card</b><span>{cardsOff ? `Not available yet. Choose invoice, or email ${SUPPORT_EMAIL}.` : view.payments.publishOnPayment ? "Paid now. Your study goes live straight away." : "Paid now. Our check starts straight away."}</span></span>
               </button>
               <button type="button" role="radio" aria-checked={method === "invoice"} className="jp-opt" onClick={() => setMethod("invoice")}>
-                <span className="jp-dot" aria-hidden="true" /><span className="jp-ot"><b>Invoice or bank transfer</b><span>For universities and companies paying by purchase order. We start our check when the money arrives.</span></span>
+                <span className="jp-dot" aria-hidden="true" /><span className="jp-ot"><b>Invoice or bank transfer</b><span>For universities and companies paying by purchase order. {view.payments.publishOnPayment ? "Your study goes live when the money arrives." : "We start our check when the money arrives."}</span></span>
               </button>
             </div>
             {view.credit > 0 && (
@@ -282,7 +284,7 @@ export function LaunchPay() {
             </button>
             <Link className="jp-btn2" to={launchPath(id)}>Back</Link>
           </div>
-          <span className="jp-hint">By paying you agree that unused money comes back when the study closes, or within 14 days if we can't approve your study.</span>
+          <span className="jp-hint">By paying you agree that unused money comes back when the study closes{view.payments.publishOnPayment ? "" : ", or within 14 days if we can't approve your study"}.</span>
         </>
       )}
 
@@ -339,7 +341,9 @@ export function LaunchStatus() {
   const paidLine = lastPaid
     ? `${lastPaid.method === "card" ? `Card${lastPaid.cardLast4 ? ` ending ${lastPaid.cardLast4}` : ""}` : lastPaid.method === "credit" ? "Credit" : "Bank transfer"} · ${new Date(lastPaid.paidAt || lastPaid.createdAt).toLocaleString()}`
     : "";
-  const steps: Step[] =
+  // Published on payment (PUBLISH_ON_PAYMENT): there were no checks or review, so those steps aren't shown.
+  const noCheck = !!view.payments?.publishOnPayment && checks.length === 0 && stage !== "changes-needed" && stage !== "rejected";
+  const allSteps: Step[] =
     stage === "awaiting-payment"
       ? [{ title: "Waiting for payment", text: pending ? `Invoice ${pending.number} sent.` : "", state: "now" }, { title: "Automatic checks", text: "Start when the money arrives.", state: "later" }, { title: "joinStudy review", text: "", state: "later" }, { title: "Live", text: "", state: "later" }]
       : [
@@ -348,6 +352,9 @@ export function LaunchStatus() {
           { title: stage === "changes-needed" ? "Changes needed" : stage === "rejected" ? "Not approved" : "joinStudy review", text: stage === "checking" ? "A person reads your study and tries your link." : stage === "changes-needed" ? "See the note above." : live ? "Approved." : "", state: stage === "checking" ? "now" : stage === "changes-needed" || stage === "rejected" ? "warn" : "done" },
           { title: "Live", text: live ? "Open to matching participants." : "", state: live ? "done" : "later" },
         ];
+  const steps = noCheck
+    ? allSteps.filter((x) => x.title !== "Automatic checks" && x.title !== "joinStudy review").map((x) => (x.title === "Live" && stage === "awaiting-payment" ? { ...x, text: "As soon as the money arrives." } : x))
+    : allSteps;
   const dot = (s: Step["state"]) =>
     s === "done" ? { background: "var(--night)", color: "var(--sun)", border: 0 } : s === "now" ? { border: "2px solid var(--ink)" } : s === "warn" ? { background: "var(--sun)", color: "var(--sun-ink)", border: 0, fontWeight: 700 } : {};
 
@@ -372,7 +379,7 @@ export function LaunchStatus() {
             <span className="jp-mono" style={{ color: "var(--sun)" }}>{stage === "awaiting-payment" ? "Invoice" : "Payment"}</span>
             <span className="r"><span>Held for this study</span><span>{formatMoney(view.paidIn, cur)}</span></span>
             <span style={{ fontSize: 13.5, color: "var(--on-night-2)", lineHeight: 1.45 }}>
-              {stage === "awaiting-payment" ? "Nothing is held until the transfer arrives." : "If we can't approve your study, you get all of it back within 14 days."}
+              {stage === "awaiting-payment" ? "Nothing is held until the transfer arrives." : noCheck ? "Unused money comes back when the study closes." : "If we can't approve your study, you get all of it back within 14 days."}
             </span>
             {paid.map((f) => (
               <button key={f.fundingId} type="button" className="jp-link" style={{ color: "var(--sun)", textAlign: "left" }} onClick={() => openFundingDocument(f.fundingId)}>Receipt {f.number}</button>
