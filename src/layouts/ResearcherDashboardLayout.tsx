@@ -26,6 +26,7 @@ const NAV = [
   { to: "/dashboard/researcher/messages", label: "Messages", unread: true, d: "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4z" },
   { to: "/dashboard/researcher/estimate", label: "Cost estimate", d: "M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M8 18h2M12 18h4" },
   { to: "/dashboard/researcher/wallet", label: "Payments", d: "M5 6h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM3 10h18M7 15h4" },
+  { to: "/dashboard/researcher/refer", label: "Refer a friend", refer: true, d: "M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8M2 8h20v4H2zM12 21V8M12 8H8.5a2.5 2.5 0 1 1 0-5C11 3 12 8 12 8zM12 8h3.5a2.5 2.5 0 1 0 0-5C13 3 12 8 12 8z" },
   { to: "/dashboard/researcher/workspace-team", label: "Team", d: "M9 12.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6M17 10.4a2.4 2.4 0 1 0 0-4.8 2.4 2.4 0 0 0 0 4.8zM16 13.6c2.2 0 3.9 1.3 4.5 3.9" },
   { to: "/dashboard/researcher/support", label: "Help", d: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 17h.01" },
 ];
@@ -106,7 +107,7 @@ export default function ResearcherDashboardLayout() {
           </Link>
         )}
         <nav aria-label="Main" className="ja-navlist">
-          {NAV.map((n) => (
+          {NAV.filter((n) => !("refer" in n) || h?.referral).map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `ja-nv${isActive ? " on" : ""}`}>
               <Icon d={n.d} />
               {n.label}

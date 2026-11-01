@@ -5,6 +5,9 @@ import MyBookings from "@/pages/participant/MyBookings";
 import { useGetParticipantHomeQuery, useSetStudyEmailsMutation, useUnhideStudyMutation, type ParticipantHome, type StudyCard } from "@/redux/api/participantApi";
 import { DeclineSheet, HiddenToast, StudyCardView } from "./parts";
 import { DISPLAY, heldLabel, studyPath } from "./studyText";
+import CopyLink from "@/components/referral/CopyLink";
+import { useGetParticipantReferralsQuery } from "@/redux/api/referralApi";
+import { inviteMessage, whatsappShare } from "@/lib/referral";
 
 /** Participant canvas 3.1: one home that knows where each person is. */
 export default function Home() {
@@ -43,6 +46,7 @@ export default function Home() {
       )}
       {h && (
         <>
+          {h.situation === "waitlist" && <OnWaitlist h={h} />}
           {h.situation === "profile" && <GetReady h={h} />}
           {h.verification.message && (
             <div role="status" className="rounded-[20px] bg-gray-100 px-4 py-4 text-[15px] leading-snug">{h.verification.message}</div>
@@ -140,6 +144,41 @@ function GetReady({ h }: { h: ParticipantHome }) {
       <Link to={done ? `/participate/about?part=${next}` : "/participate/about"} className="flex h-[50px] items-center justify-center rounded-full bg-[#f0c93a] font-semibold text-[#251d00] no-underline">
         {done ? "Carry on" : "Tell us about you"}
       </Link>
+    </section>
+  );
+}
+
+/** Refer a friend: on the waitlist for their country. Invites move them up. */
+function OnWaitlist({ h }: { h: ParticipantHome }) {
+  const { data } = useGetParticipantReferralsQuery();
+  const r = data?.data && data.data.on ? data.data : null;
+  const w = h.waitlist;
+  return (
+    <section aria-labelledby="h-waitlist" className="flex flex-col gap-3.5 rounded-[20px] bg-[#120e22] p-[18px] text-white">
+      <span className="font-mono text-[12px] text-[#f0c93a]">Waitlist{w ? ` · ${w.country}` : ""}</span>
+      <h2 id="h-waitlist" style={DISPLAY} className="m-0 text-[26px] font-bold leading-tight tracking-tight">
+        {w ? `You're #${w.position} of ${w.total}` : "You're on the waitlist"}
+      </h2>
+      <p className="m-0 text-[15px] leading-normal text-[#bdb6de]">
+        We let people in as researchers open more places, so everyone who joins can find studies. We'll email you the moment there's room.
+      </p>
+      <p className="m-0 text-[15px] leading-normal">
+        <b>Move up the list:</b> invite friends. Each one who joins moves you up, and more when they get verified.
+      </p>
+      {r && (
+        <>
+          <CopyLink link={r.link} dark />
+          <div className="ref-share">
+            <a className="wa" href={whatsappShare(inviteMessage(r.link))} target="_blank" rel="noreferrer">Invite on WhatsApp</a>
+            <Link to="/dashboard/participant/invite" className="!border-[#2a2250] !bg-transparent !text-white">See your invites</Link>
+          </div>
+        </>
+      )}
+      {!h.profile.complete && (
+        <p className="m-0 text-[14px] text-[#bdb6de]">
+          Meanwhile, <Link to="/participate/about" className="text-[#f0c93a]">tell us about you</Link>, so studies fit you from your first day.
+        </p>
+      )}
     </section>
   );
 }

@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { readProblem } from "@/lib/session";
+import "@/styles/referral.css";
+import { useGetParticipantReferralsQuery } from "@/redux/api/referralApi";
 import { useDisconnectLinkedinMutation, useGetParticipantHomeQuery, useGetProfileQuery, useSetStudyEmailsMutation, useStartLinkedinMutation, type ParticipantProfile } from "@/redux/api/participantApi";
 
 /** Participant canvas 2.5: everything they told us, the trust level, and the optional LinkedIn link. */
@@ -13,7 +15,10 @@ export default function Profile() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <h1 className="m-0 text-[32px] font-bold leading-none tracking-tight text-gray-950">Your profile</h1>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h1 className="m-0 text-[32px] font-bold leading-none tracking-tight text-gray-950">Your profile</h1>
+          <TrustedBadge />
+        </div>
         <p className="m-0 text-[15px] leading-relaxed text-gray-600">Used only to match you to studies. Researchers never see it; they see only your answers to their own questions.</p>
       </div>
       {params.get("saved") && <div role="status" className="rounded-2xl bg-gray-100 px-4 py-3 text-[15px]">Saved. Changes apply to studies you start from now on.</div>}
@@ -165,5 +170,17 @@ function StudyEmails() {
         <span className={`absolute top-[3px] h-[22px] w-[22px] rounded-full transition-all ${on ? "right-[3px] bg-[#f0c93a]" : "left-[3px] bg-white"}`} />
       </button>
     </section>
+  );
+}
+
+/** Refer a friend: shown once a friend they invited is verified. */
+function TrustedBadge() {
+  const { data } = useGetParticipantReferralsQuery();
+  const r = data?.data;
+  if (!r?.on || !r.trustedMember) return null;
+  return (
+    <Link to="/dashboard/participant/invite" className="ref-badge no-underline" title="A friend you invited is verified">
+      ★ Trusted member
+    </Link>
   );
 }

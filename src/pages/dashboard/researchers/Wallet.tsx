@@ -47,7 +47,13 @@ export default function Wallet() {
         <div className="ja-card ja-stat" style={{ gap: 6 }}>
           <span className="ja-muted">Credit</span>
           <span className="big">{isLoading ? "…" : formatMoney(w?.credit ?? 0, cur)}</span>
-          <span className="ja-small">Money back from closed studies; used when you pay for the next one</span>
+          <span className="ja-small">
+            {w?.referralCredit
+              ? `Includes ${formatMoney(w.referralCredit, cur)} referral credit, used first.`
+              : "Money back from closed studies; used when you pay for the next one."}
+            {w?.creditExpiry && ` ${formatMoney(w.creditExpiry.amount, cur)} expires ${new Date(w.creditExpiry.at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}.`}
+            {" "}<Link to="/dashboard/researcher/refer" style={{ color: "var(--ink)" }}>Earn more</Link>
+          </span>
         </div>
         {(closed?.refundsOnTheWay ?? 0) > 0 && (
           <div className="ja-card ja-stat" style={{ gap: 6 }}>

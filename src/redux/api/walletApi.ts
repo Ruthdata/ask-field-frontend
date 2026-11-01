@@ -37,6 +37,9 @@ export interface ResearcherWallet {
   feeRate: number;
   /** Stage 5: money back from closed studies, to use on the next one. */
   credit: number;
+  /** Refer a friend: referral credit (spent first) and the next amount to expire. */
+  referralCredit?: number;
+  creditExpiry?: { amount: number; at: string } | null;
   /** Stage 5: payments made for studies (card, invoice or credit). */
   fundings: import("./launchApi").Funding[];
   transactions: LedgerLine[];

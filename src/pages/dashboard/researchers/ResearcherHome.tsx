@@ -8,6 +8,7 @@ import { ROUTES, SUPPORT_EMAIL } from "@/lib/site";
 import MethodPicker from "@/components/researcher/MethodPicker";
 import Stepper from "@/components/researcher/Stepper";
 import StudiesTable from "@/components/researcher/StudiesTable";
+import ReferCard from "@/components/referral/ReferCard";
 
 /** 3.1 Researcher home: plan a first study, or see what needs you. Only real figures. */
 export default function ResearcherHome() {
@@ -71,6 +72,7 @@ function FirstVisit({ h }: { h: HomeSummary }) {
         </div>
       </div>
       <FoundingCard status={h.founding} />
+      {h.referral?.show && <ReferCard offer={h.referral} currency={h.money.currency} />}
     </div>
   );
 }
@@ -274,10 +276,11 @@ function Returning({ h }: { h: HomeSummary }) {
           <div className="ja-card ja-stat" style={{ gap: 6 }}>
             <span className="ja-muted">Credit</span>
             <span className="big">{formatMoney(h.money.credit, cur)}</span>
-            <span className="ja-small">Money back from closed studies, ready for your next one</span>
+            <span className="ja-small">Money back and referral credit, ready for your next study</span>
           </div>
         )}
       </section>
+      {h.referral?.show && <ReferCard offer={h.referral} currency={cur} />}
     </div>
   );
 }

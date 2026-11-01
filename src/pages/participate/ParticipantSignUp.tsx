@@ -8,6 +8,8 @@ import Turnstile from "@components/auth/Turnstile";
 import { EMAIL_RE, readProblem, saveSession, type Session } from "@/lib/session";
 import { PARTICIPANT_COUNTRIES, useSignUpParticipantMutation } from "@/redux/api/participantApi";
 import { ParticipantSide } from "./JoinCountry";
+import InvitedBanner from "@/components/referral/InvitedBanner";
+import { clearInvite, inviteCodeFor } from "@/lib/referral";
 
 type Field = "firstName" | "lastName" | "email" | "password" | "agree";
 type Errors = Partial<Record<Field, string>>;
@@ -57,7 +59,8 @@ export default function ParticipantSignUp() {
       return;
     }
     try {
-      await signUp({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), password, country, agree, receivesUpdates: updates, turnstileToken: bot }).unwrap();
+      await signUp({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), password, country, agree, receivesUpdates: updates, turnstileToken: bot, ref: inviteCodeFor("participant") }).unwrap();
+      clearInvite();
       navigate(`/participate/check-email?email=${encodeURIComponent(email.trim().toLowerCase())}`);
     } catch (err) {
       const p = readProblem(err);
@@ -70,6 +73,7 @@ export default function ParticipantSignUp() {
     <AuthShell side={<ParticipantSide step={2} />}>
       <form className="auth-form" onSubmit={submit} noValidate>
         <div style={{ display: "grid", gap: 10 }}>
+          <InvitedBanner type="participant" />
           <h1>Create your account</h1>
           <p className="sub" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
             <span className="chip">Living in <b>{country}</b></span>

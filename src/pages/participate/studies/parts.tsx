@@ -4,6 +4,7 @@ import { readProblem } from "@/lib/session";
 import { HIDE_REASONS, useHideStudyMutation, type HideReason, type StudyCard } from "@/redux/api/participantApi";
 import { DISPLAY, metaLine, startLabel, studyPath } from "./studyText";
 import { formatMoney } from "@/lib/study";
+import ResearcherBadges from "@/components/referral/Badges";
 
 /** Participant Stage 3 (canvas 3.1–3.3): pieces shared by home, the study list and the study page. */
 
@@ -19,9 +20,12 @@ export function StudyCardView({ s, ready, onDecline }: { s: StudyCard; ready: bo
       </div>
       <span className="text-[14px] text-[#4b4664]">{metaLine(s)}</span>
       {s.researcher && (
-        <span className="text-[13.5px] text-[#646080]">
-          By {s.researcher.name}
-          {s.researcher.organization ? `, ${s.researcher.organization}` : ""}
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13.5px] text-[#646080]">
+          <span>
+            By {s.researcher.name}
+            {s.researcher.organization ? `, ${s.researcher.organization}` : ""}
+          </span>
+          <ResearcherBadges badges={s.researcher.badges} />
         </span>
       )}
       <div className="flex gap-2">

@@ -1,0 +1,50 @@
+/* Refer a friend: the sign-up banner, the copy box, share buttons and the Refer / Invite pages.
+   Plain colours, so it works on the auth pages, the researcher dashboard and the participant dashboard. */
+
+.ref-banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#fff8dc;border:1.5px solid #f0c93a;color:#120e22;font-size:15px;line-height:1.35}
+.ref-banner[data-tone="dark"]{background:#1c1634;border-color:#2a2250;color:#fff}
+.ref-banner-dot{flex:none;width:34px;height:34px;border-radius:50%;background:#120e22;color:#f0c93a;display:flex;align-items:center;justify-content:center;font-weight:700}
+.ref-banner-offer{display:block;font-size:13.5px;color:#4b4664;margin-top:2px}
+.ref-banner[data-tone="dark"] .ref-banner-offer{color:#bdb6de}
+
+.ref-copy{display:flex;gap:8px;align-items:stretch;min-width:0}
+.ref-copy input{flex:1 1 auto;min-width:0;height:50px;box-sizing:border-box;padding:0 16px;border-radius:999px;border:1.5px solid #ebe9f2;background:#fff;color:#120e22;font:inherit;font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:14px;text-overflow:ellipsis}
+.ref-copy button{flex:none;height:50px;padding:0 20px;border-radius:999px;border:0;background:#f0c93a;color:#251d00;font:inherit;font-weight:600;font-size:15px;cursor:pointer;white-space:nowrap}
+.ref-copy button:hover{background:#ffe17a}
+.ref-copy[data-dark] input{background:#1c1634;border-color:#2a2250;color:#fff}
+@media (max-width:420px){.ref-copy{flex-direction:column}.ref-copy button{width:100%}}
+
+.ref-share{display:flex;flex-wrap:wrap;gap:8px}
+.ref-share a{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;border:1.5px solid #ebe9f2;background:#fff;color:#120e22;font-size:14.5px;font-weight:500;text-decoration:none}
+.ref-share a:hover{border-color:#120e22}
+.ref-share a.wa{background:#1f7a4d;border-color:#1f7a4d;color:#fff}
+.ref-share a.wa:hover{background:#17603c}
+
+.ref-steps{list-style:none;margin:0;padding:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.ref-steps li{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:18px;background:#f6f5fa}
+.ref-steps .n{width:28px;height:28px;border-radius:50%;background:#120e22;color:#f0c93a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.ref-steps b{font-size:15.5px}
+.ref-steps span{font-size:14px;color:#4b4664;line-height:1.45}
+
+.ref-stats{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.ref-stat{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:18px;border:1px solid #ebe9f2;background:#fff}
+.ref-stat .k{font-size:13.5px;color:#646080}
+.ref-stat .v{font-family:'Bricolage Grotesque','Arial Narrow',system-ui,sans-serif;font-weight:700;font-size:28px;letter-spacing:-.04em;color:#120e22}
+.ref-stat .s{font-size:13px;color:#646080}
+
+.ref-friends{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ref-friends li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #f1eff6;font-size:15px}
+.ref-friends li:first-child{border-top:0}
+.ref-friends .who{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ref-friends .when{font-size:13px;color:#646080}
+.ref-tag{flex:none;display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-size:12px;white-space:nowrap}
+.ref-tag.joined{background:#f1eff6;color:#4b4664}
+.ref-tag.qualified{background:#120e22;color:#f0c93a}
+.ref-tag.not-eligible{background:#fff;color:#646080;border:1px solid #ebe9f2}
+
+.ref-badge{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:#120e22;color:#f0c93a;font-size:13px;font-weight:600;white-space:nowrap}
+.ref-badge.light{background:#fff8dc;color:#4a3b00;border:1px solid #f0c93a}
+.ref-fine{font-size:13.5px;color:#646080;line-height:1.5;margin:0}
+.ref-fine a{color:#120e22}
+.ja-card.dark .ref-share a{color:#120e22}
+.ja-card.dark .ref-share a.wa{color:#fff}

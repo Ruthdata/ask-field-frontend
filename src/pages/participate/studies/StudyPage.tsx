@@ -9,6 +9,7 @@ import { DeclineSheet } from "./parts";
 import { ReportLink } from "../account/ui";
 import { Held, LeaveSheet } from "./takePart";
 import { DEVICE_LABEL, DISPLAY, METHOD_LABEL, closesLabel } from "./studyText";
+import ResearcherBadges from "@/components/referral/Badges";
 
 type ScreenQuestion = { text: string; answers: string[] };
 
@@ -82,6 +83,7 @@ export default function StudyPage() {
           {s.researcher && (
             <Block title="Who's asking">
               <p className="m-0">{s.researcher.name}{s.researcher.organization ? `, ${s.researcher.organization}` : ""}.</p>
+              {!!s.researcher.badges?.length && <div className="mt-2"><ResearcherBadges badges={s.researcher.badges} /></div>}
               {s.ethics && (
                 <span className="mt-2 flex items-center gap-2 text-[14px] text-green-800">
                   <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#dcfce7" /><path d="m4.8 8.2 2 2 4.4-4.4" fill="none" stroke="#166534" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -155,6 +157,13 @@ function StatusNote({ s }: { s: StudyDetail }) {
       </div>
     );
   if (s.state === "blocked") return <div role="status" className={box}>{s.verification.message}</div>;
+  if (s.state === "waitlist")
+    return (
+      <div role="status" className={box}>
+        <b className="text-[#120e22]">You're on the waitlist.</b> You can take studies once there's room in your country; we'll email you. Invite friends to move up.{" "}
+        <Link to="/dashboard/participant/invite" className="text-[#120e22]">Invite friends</Link>
+      </div>
+    );
   if (s.myStatus === "timed-out" || s.myStatus === "left")
     return (
       <div role="note" className={box}>

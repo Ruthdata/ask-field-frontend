@@ -47,6 +47,8 @@ export interface HomeSummary {
   needsYou: NeedsYou[];
   money: { paid: number; held: number; credit: number; currency: string };
   founding: "none" | "applied" | "dismissed";
+  /** Refer a friend: the dashboard card (null when referrals are off). */
+  referral?: { show: boolean; friendFeeRate: number; share: number; friendCap: number } | null;
 }
 
 export interface StartStudyPayload {

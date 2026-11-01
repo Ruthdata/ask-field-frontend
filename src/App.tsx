@@ -40,6 +40,9 @@ import FinishLink from "./pages/landing/FinishLink";
 import Projects from "./pages/dashboard/researchers/Projects";
 import Project from "./pages/dashboard/researchers/Project";
 import Wallet from "./pages/dashboard/researchers/Wallet";
+import Refer from "./pages/dashboard/researchers/Refer";
+import Invite from "./pages/participate/Invite";
+import InviteLanding from "./pages/access/InviteLanding";
 import WorkspaceTeam from "./pages/dashboard/researchers/WorkspaceTeam";
 import ResearcherSupport from "./pages/dashboard/researchers/HelpSupport";
 import ResearcherMessages from "./pages/dashboard/researchers/Messages";
@@ -105,6 +108,8 @@ export default function App() {
         <Route path="/auth/researcher/check-email" element={<CheckEmail />} />
         <Route path="/auth/researcher/verify-email" element={<ConfirmEmail />} />
         <Route path="/join/:token" element={<JoinPage />} />
+        {/* Refer a friend: an invite link */}
+        <Route path="/r/:code" element={<InviteLanding />} />
         <Route path="/settings/confirm-email" element={<ConfirmEmailChange />} />
         <Route path="/terms" element={<LegalPending title="Terms of Service" />} />
         <Route path="/privacy" element={<LegalPending title="Privacy Policy" />} />
@@ -160,6 +165,7 @@ export default function App() {
             <Route path="surveys" element={<Navigate to="/dashboard/participant/studies" replace />} />
             {/* Participant Stage 6: get paid */}
             <Route path="earnings" element={<Money />} />
+            <Route path="invite" element={<Invite />} />
             <Route path="earnings/method" element={<PayoutMethodPage />} />
             <Route path="earnings/cash-out" element={<CashOut />} />
             <Route path="earnings/payouts/:id" element={<PayoutStatus />} />
@@ -204,6 +210,7 @@ export default function App() {
             <Route path="ai-task-builder" element={<Navigate to="/dashboard/researcher/new?method=ai-evaluation" replace />} />
             <Route path="pricing-calculator" element={<Navigate to="/dashboard/researcher/estimate" replace />} />
             <Route path="wallet" element={<Wallet />} />
+            <Route path="refer" element={<Refer />} />
             <Route path="survey-actions" element={<SurveyActions />} />
             <Route path="workspace-team" element={<WorkspaceTeam />} />
             <Route path="support" element={<ResearcherSupport />} />

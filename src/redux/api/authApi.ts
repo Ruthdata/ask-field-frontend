@@ -7,7 +7,7 @@ export const authApi = apiSlice.injectEndpoints({
   endpoints: (b) => ({
     signUpResearcher: b.mutation<
       ApiSuccess<{ email: string; firstName: string }>,
-      { fullName: string; email: string; password: string; receivesUpdates: boolean; method?: string; source?: string }
+      { fullName: string; email: string; password: string; receivesUpdates: boolean; method?: string; source?: string; ref?: string }
     >({
       query: (body) => ({ url: "/researchers/auth/register", method: "POST", body }),
     }),
@@ -20,7 +20,7 @@ export const authApi = apiSlice.injectEndpoints({
     signIn: b.mutation<ApiSuccess<Session | NeedsChoice>, { email: string; password: string; intent?: AccountType; accountType?: AccountType }>({
       query: (body) => ({ url: "/auth/login", method: "POST", body }),
     }),
-    googleSignIn: b.mutation<ApiSuccess<Session | NeedsChoice>, { token: string; intent?: AccountType; accountType?: AccountType; method?: string; country?: string; agree?: boolean }>({
+    googleSignIn: b.mutation<ApiSuccess<Session | NeedsChoice>, { token: string; intent?: AccountType; accountType?: AccountType; method?: string; country?: string; agree?: boolean; ref?: string }>({
       query: (body) => ({ url: "/auth/google", method: "POST", body }),
     }),
     sendResetCode: b.mutation<ApiSuccess<object>, { email: string }>({

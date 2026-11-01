@@ -5,6 +5,8 @@ import GoogleButton from "@components/auth/GoogleButton";
 import AccountChoice from "@components/auth/AccountChoice";
 import TextField from "@components/auth/TextField";
 import PasswordField from "@components/auth/PasswordField";
+import InvitedBanner from "@/components/referral/InvitedBanner";
+import { clearInvite, inviteCodeFor } from "@/lib/referral";
 import { useGoogleSignInMutation, useSignUpResearcherMutation } from "@/redux/api/authApi";
 import { EMAIL_RE, METHOD_LABELS, readProblem, saveSession, dashboardFor, type NeedsChoice, type Session, type AccountType } from "@/lib/session";
 
@@ -52,7 +54,9 @@ export default function ResearcherSignUp() {
         receivesUpdates: updates,
         method: methodLabel ? method : undefined,
         source: source || undefined,
+        ref: inviteCodeFor("researcher", params.get("ref")),
       }).unwrap();
+      clearInvite();
       navigate(`/auth/researcher/check-email?email=${encodeURIComponent(email.trim().toLowerCase())}`);
     } catch (err) {
       const p = readProblem(err);
@@ -94,6 +98,7 @@ export default function ResearcherSignUp() {
               Starting with: <b>{methodLabel}</b>
             </span>
           )}
+          <InvitedBanner type="researcher" />
           <h1>Create your researcher account</h1>
           <p className="sub">
             Already have an account? <Link to={`/sign-in?intent=researcher${email ? `&email=${encodeURIComponent(email)}` : ""}`}>Sign in</Link>

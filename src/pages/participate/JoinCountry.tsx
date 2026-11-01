@@ -5,6 +5,7 @@ import TextField from "@components/auth/TextField";
 import { EMAIL_RE, readProblem } from "@/lib/session";
 import { PARTICIPANT_COUNTRIES, useJoinWaitlistMutation } from "@/redux/api/participantApi";
 import "@/styles/marketing.css";
+import InvitedBanner from "@/components/referral/InvitedBanner";
 
 /** Participant canvas 1.1: where you live comes first, so nobody makes an account we can't pay out to. */
 const NOTES: Record<string, string> = {
@@ -73,6 +74,7 @@ export default function JoinCountry() {
       {!waitlist ? (
         <form className="auth-form" onSubmit={next} noValidate>
           <div style={{ display: "grid", gap: 10 }}>
+            <InvitedBanner type="participant" />
             <h1>Where do you live?</h1>
             <p className="sub">
               Already have an account? <Link to="/sign-in?intent=participant">Sign in</Link>

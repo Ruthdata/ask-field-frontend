@@ -11,6 +11,7 @@ import {
   UserRound,
   ClipboardList,
   Settings,
+  Gift,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { LogoMark } from "@components/marketing/Logo";
@@ -30,6 +31,7 @@ const navigation = [
     icon: DollarSign,
   },
   { name: "Profile", href: "/dashboard/participant/profile", icon: UserRound },
+  { name: "Invite friends", href: "/dashboard/participant/invite", icon: Gift },
   {
     name: "Messages",
     href: "/dashboard/participant/messages",
@@ -40,7 +42,7 @@ const navigation = [
 ];
 
 // Pages that show their own verify prompt (Stage 3), or don't need one.
-const OWN_PROMPT = /^\/dashboard\/participant(\/(studies.*|my-studies.*|earnings.*|profile|settings.*|help))?\/?$/;
+const OWN_PROMPT = /^\/dashboard\/participant(\/(studies.*|my-studies.*|earnings.*|profile|invite|settings.*|help))?\/?$/;
 
 export default function ParticipantDashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -27,6 +27,8 @@ export interface Verification {
 }
 
 export interface ParticipantSignUp {
+  /** Refer a friend: the invite code. */
+  ref?: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -64,7 +66,8 @@ export interface ParticipantProfile {
 
 
 /** Participant Stage 3: finding studies. Pay is in the study's currency (USD by default). */
-export type HomeSituation = "profile" | "waiting" | "verify" | "ready" | "all-set";
+/** "waitlist": on the queue for their country (Refer a friend); no studies until there's room. */
+export type HomeSituation = "profile" | "waiting" | "verify" | "ready" | "all-set" | "waitlist";
 export type StudyMethod = "survey" | "interview" | "focus-group" | "product-test" | "ai-evaluation";
 export interface StudyCard {
   id: string;
@@ -80,9 +83,11 @@ export interface StudyCard {
   closesAt: string | null;
   books: boolean;
   devices: string[];
-  researcher: { name: string; organization: string } | null;
+  /** badges: "founding-lab" and "trusted-researcher" (Refer a friend). */
+  researcher: { name: string; organization: string; badges?: ResearcherBadge[] } | null;
   publishedAt: string | null;
 }
+export type ResearcherBadge = "founding-lab" | "trusted-researcher";
 export interface ParticipantHome {
   firstName: string;
   situation: HomeSituation;
@@ -95,8 +100,10 @@ export interface ParticipantHome {
   doneCount: number;
   alerts: { email: boolean };
   money: { currency: string; waiting: number; ready: number; minPayout: number };
+  /** Refer a friend: their place in the queue while waiting. */
+  waitlist?: { status: "waiting"; country: string; position: number; total: number; score: number; since: string } | null;
 }
-export type StudyState = "start" | "verify" | "blocked" | "not-for-you" | "in-progress" | "done" | "closed" | "full";
+export type StudyState = "start" | "verify" | "blocked" | "not-for-you" | "in-progress" | "done" | "closed" | "full" | "waitlist";
 /** Participant Stage 4: how a finished attempt went, for the thank-you page. */
 export type FinishOutcome = "paid" | "review" | "late" | "late-over";
 export type LeaveReason = "longer" | "link-broken" | "came-up" | "uncomfortable" | "other";

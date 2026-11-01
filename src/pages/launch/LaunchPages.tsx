@@ -12,7 +12,7 @@ import {
   type Receipt,
 } from "@/redux/api/launchApi";
 import { useGetResearcherQuery } from "@/redux/api/slices/userSlice";
-import { formatMoney, methodById, RECEIPT_COUNTRIES } from "@/lib/study";
+import { formatMoney, methodById, percent, RECEIPT_COUNTRIES } from "@/lib/study";
 import { useGetBillingQuery } from "@/redux/api/accountApi";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { readProblem } from "@/lib/session";
@@ -20,6 +20,7 @@ import { SUPPORT_EMAIL } from "@/lib/site";
 import { launchPath, planPath } from "@/pages/plan/steps";
 import { StripeCard } from "@/components/payments/StripeCard";
 import "@/styles/app.css";
+import { useGetHomeQuery } from "@/redux/api/homeApi";
 
 /** Stage 5: check everything once → pay (card, invoice or credit) → our check → live. */
 const STEPS = ["Review", "Pay", "Our check", "Live"];
@@ -437,6 +438,25 @@ export function LaunchStatus() {
         {live ? <Link className="jp-btn" to={`/dashboard/researcher/studies/${id}`}>Open the study</Link> : <Link className="jp-btn2" to="/dashboard/researcher">Back to home</Link>}
         {!live && stage !== "rejected" && <span className="jp-hint">We'll email you at each step.</span>}
       </div>
+      {live && <ReferPrompt currency={cur} />}
     </Shell>
+  );
+}
+
+/** Refer a friend: after a study goes live, a nudge to invite another researcher. */
+function ReferPrompt({ currency }: { currency: string }) {
+  const { data } = useGetHomeQuery();
+  const offer = data?.data.referral;
+  if (!offer) return null;
+  return (
+    <section className="jp-sec" aria-labelledby="refer-live" style={{ gap: 10, background: "var(--sun-soft)", border: "1.5px solid var(--sun)" }}>
+      <h2 id="refer-live" style={{ fontFamily: "var(--body)", fontWeight: 600, fontSize: 17, letterSpacing: 0 }}>Know someone who'd use joinStudy?</h2>
+      <p style={{ margin: 0, fontSize: 15, color: "var(--ink-2)", lineHeight: 1.5 }}>
+        Their first study is at the {percent(offer.friendFeeRate)} fee, and you get {percent(offer.share)} of their fees as credit, up to {formatMoney(offer.friendCap, currency)} per friend.
+      </p>
+      <div className="jp-actions">
+        <Link className="jp-btn2" to="/dashboard/researcher/refer">Get your invite link</Link>
+      </div>
+    </section>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { GoogleIcon } from "@components/icons";
 import { useGoogleSignInMutation } from "@/redux/api/authApi";
 import { readProblem, type AccountType, type NeedsChoice, type Session } from "@/lib/session";
+import { clearInvite, readInvite } from "@/lib/referral";
 
 interface Props {
   /** Participant sign-up: a new participant account also needs the country and the 18+/terms agreement. */
@@ -37,10 +38,14 @@ export default function GoogleButton({ extra, beforeOpen, intent, method, accoun
       }
       const result = await signInWithPopup(auth, googleProvider);
       const token = await result.user.getIdToken();
-      const res = await googleSignIn({ token, intent, method, accountType, ...extra }).unwrap();
+      // Refer a friend: the invite counts only if this makes a new account of the invite's kind (the server checks).
+      const res = await googleSignIn({ token, intent, method, accountType, ...extra, ref: readInvite()?.code }).unwrap();
       const data = res.data;
       if ("needsChoice" in data) onChoice(data, token);
-      else onSession(data);
+      else {
+        clearInvite();
+        onSession(data);
+      }
     } catch (err) {
       const code = (err as { code?: string })?.code;
       if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request" || code === "auth/user-cancelled") return;
