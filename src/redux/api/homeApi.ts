@@ -49,6 +49,7 @@ export interface HomeSummary {
   needsYou: NeedsYou[];
   money: { paid: number; held: number; credit: number; currency: string };
   founding: "none" | "applied" | "dismissed";
+  referral: boolean;
 }
 
 export interface StartStudyPayload {
