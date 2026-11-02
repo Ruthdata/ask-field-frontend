@@ -18,7 +18,7 @@ export interface HomeStudy {
   spent: number;
   missing: string[];
   /** Stage 5: where a draft is in launching. */
-  stage: "none" | "awaiting-payment" | "checking" | "changes-needed" | "rejected";
+  stage: "none" | "awaiting-payment" | "checking" | "changes-needed" | "ready" | "rejected";
   funded: number;
   updatedAt: string;
   /** For the row's ⋯ menu. */
@@ -30,7 +30,9 @@ export interface HomeStudy {
 export type NeedsYou =
   | { kind: "changes"; surveyId: string; projectId: string; name: string; count: number; note: string }
   | { kind: "review"; surveyId: string; projectId: string; name: string; count: number }
-  | { kind: "draft"; surveyId: string; projectId: string; name: string; count: number; missing: string[] };
+  | { kind: "draft"; surveyId: string; projectId: string; name: string; count: number; missing: string[] }
+  /** Paid and waiting for "Publish now". */
+  | { kind: "publish"; surveyId: string; projectId: string; name: string; count: number };
 
 export interface HomeSummary {
   firstName: string;
@@ -47,8 +49,6 @@ export interface HomeSummary {
   needsYou: NeedsYou[];
   money: { paid: number; held: number; credit: number; currency: string };
   founding: "none" | "applied" | "dismissed";
-  /** Refer a friend: the dashboard card (null when referrals are off). */
-  referral?: { show: boolean; friendFeeRate: number; share: number; friendCap: number } | null;
 }
 
 export interface StartStudyPayload {

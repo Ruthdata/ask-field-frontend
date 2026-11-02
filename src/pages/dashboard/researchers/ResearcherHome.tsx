@@ -8,7 +8,6 @@ import { ROUTES, SUPPORT_EMAIL } from "@/lib/site";
 import MethodPicker from "@/components/researcher/MethodPicker";
 import Stepper from "@/components/researcher/Stepper";
 import StudiesTable from "@/components/researcher/StudiesTable";
-import ReferCard from "@/components/referral/ReferCard";
 
 /** 3.1 Researcher home: plan a first study, or see what needs you. Only real figures. */
 export default function ResearcherHome() {
@@ -72,7 +71,6 @@ function FirstVisit({ h }: { h: HomeSummary }) {
         </div>
       </div>
       <FoundingCard status={h.founding} />
-      {h.referral?.show && <ReferCard offer={h.referral} currency={h.money.currency} />}
     </div>
   );
 }
@@ -222,8 +220,13 @@ function Returning({ h }: { h: HomeSummary }) {
           <div className="ja-grid">
             {h.needsYou.map((n) => (
               <Link key={`${n.kind}-${n.surveyId}`} to={needsYouLink(n)} className={`ja-need${n.kind === "draft" ? "" : " hot"}`}>
-                <span className="k">{n.kind === "review" ? "Review" : n.kind === "changes" ? "Before launch" : "Draft"} · {n.name}</span>
-                {n.kind === "changes" ? (
+                <span className="k">{n.kind === "review" ? "Review" : n.kind === "changes" ? "Before launch" : n.kind === "publish" ? "Paid" : "Draft"} · {n.name}</span>
+                {n.kind === "publish" ? (
+                  <>
+                    <span className="t">Ready to publish</span>
+                    <span className="d">Participants can't see it until you click Publish now.</span>
+                  </>
+                ) : n.kind === "changes" ? (
                   <>
                     <span className="t">We asked for a change</span>
                     <span className="d">{n.note.length > 120 ? `${n.note.slice(0, 117)}…` : n.note}</span>
@@ -276,11 +279,10 @@ function Returning({ h }: { h: HomeSummary }) {
           <div className="ja-card ja-stat" style={{ gap: 6 }}>
             <span className="ja-muted">Credit</span>
             <span className="big">{formatMoney(h.money.credit, cur)}</span>
-            <span className="ja-small">Money back and referral credit, ready for your next study</span>
+            <span className="ja-small">Money back from closed studies, ready for your next one</span>
           </div>
         )}
       </section>
-      {h.referral?.show && <ReferCard offer={h.referral} currency={cur} />}
     </div>
   );
 }

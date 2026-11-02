@@ -28,7 +28,7 @@ export interface PlanView {
   method: StudyMethod;
   status: "draft" | "live" | "closed";
   /** Stage 5: where it is in launching. */
-  launchStage: "none" | "awaiting-payment" | "checking" | "changes-needed" | "rejected";
+  launchStage: "none" | "awaiting-payment" | "checking" | "changes-needed" | "ready" | "rejected";
   name: string;
   plan: Plan;
   missing: Record<PlanStep, string[]>;

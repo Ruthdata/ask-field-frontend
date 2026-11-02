@@ -1,18 +1,20 @@
 import { useState, type ReactNode } from "react";
-import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   openFundingDocument,
   useCancelInvoiceMutation,
   useConfirmTestPaymentMutation,
   useGetLaunchQuery,
   usePayForStudyMutation,
+  usePublishStudyMutation,
+  useRefundStudyMutation,
   useResubmitStudyMutation,
   type LaunchView,
   type PayResult,
   type Receipt,
 } from "@/redux/api/launchApi";
 import { useGetResearcherQuery } from "@/redux/api/slices/userSlice";
-import { formatMoney, methodById, percent, RECEIPT_COUNTRIES } from "@/lib/study";
+import { formatMoney, methodById, RECEIPT_COUNTRIES } from "@/lib/study";
 import { useGetBillingQuery } from "@/redux/api/accountApi";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { readProblem } from "@/lib/session";
@@ -20,12 +22,11 @@ import { SUPPORT_EMAIL } from "@/lib/site";
 import { launchPath, planPath } from "@/pages/plan/steps";
 import { StripeCard } from "@/components/payments/StripeCard";
 import "@/styles/app.css";
-import { useGetHomeQuery } from "@/redux/api/homeApi";
 
-/** Stage 5: check everything once → pay (card, invoice or credit) → our check → live. */
-const STEPS = ["Review", "Pay", "Our check", "Live"];
-/** With PUBLISH_ON_PAYMENT on, there's no check: a paid study goes straight to Live. */
-const STEPS_NO_CHECK = ["Review", "Pay", "Live"];
+/** Stage 5: check everything once → pay (card, invoice or credit) → the researcher publishes it. */
+const STEPS = ["Review", "Pay", "Publish"];
+/** With REVIEW_BEFORE_PUBLISH on, joinStudy checks it between paying and publishing. */
+const STEPS_WITH_CHECK = ["Review", "Pay", "Our check", "Publish"];
 
 function useLaunch(poll = false) {
   const { id = "" } = useParams();
@@ -42,7 +43,7 @@ function Shell({ view, step, children, aside }: { view: LaunchView; step: number
       </header>
       <nav aria-label="Launch steps" style={{ padding: "18px clamp(16px,3vw,32px) 0", maxWidth: 1400, margin: "0 auto" }}>
         <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", maxWidth: 760 }}>
-          {(view.payments?.publishOnPayment ? STEPS_NO_CHECK : STEPS).map((s, i, all) => (
+          {(view.payments?.reviewBeforePublish ? STEPS_WITH_CHECK : STEPS).map((s, i, all) => (
             <li key={s} aria-current={i === step ? "step" : undefined} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14.5, fontWeight: i === step ? 600 : 400, color: i <= step ? "var(--ink)" : "#8d89a3" }}>
               <span className={`jp-rn${i < step ? " done" : ""}`} aria-hidden="true" style={i === step ? { border: "2px solid var(--ink)", color: "var(--ink)" } : undefined}>{i < step ? "✓" : i + 1}</span>
               {s}
@@ -95,7 +96,8 @@ const Failed = ({ retry }: { retry: () => void }) => (
 
 /** Where a study in each stage should be looked at. */
 function routeFor(view: LaunchView, here: "review" | "pay" | "status") {
-  const toStatus = view.status !== "draft" || ["awaiting-payment", "checking", "rejected"].includes(view.launchStage) || (view.launchStage === "changes-needed" && here === "review" && view.due === 0);
+  // Ready to publish: the status page, unless changes added to the cost (then review and pay the difference).
+  const toStatus = view.status !== "draft" || ["awaiting-payment", "checking", "rejected"].includes(view.launchStage) || (view.launchStage === "changes-needed" && here === "review" && view.due === 0) || (view.launchStage === "ready" && view.due <= 0);
   if (here !== "status" && toStatus) return launchPath(view.surveyId, "status");
   return null;
 }
@@ -133,6 +135,7 @@ export function LaunchReview() {
       <h1 className="jp-h1">Check everything once</h1>
       <p className="jp-lede">This is what participants will see and what we'll check. Change anything now; after launch you can only add places or close early.</p>
       {view.launchStage === "changes-needed" && <div className="jp-note sun">Your changes add {formatMoney(view.due, cur)}. Pay the difference to send the study back to us.</div>}
+      {view.launchStage === "ready" && view.due > 0 && <div className="jp-note sun">Your changes add {formatMoney(view.due, cur)}. Pay the difference, then publish.</div>}
       <Sec id={view.surveyId} title="Basics" slug="basics">
         <Row k="Title">{p.basics?.title}</Row>
         <Row k="What they'll do">{p.basics?.description || "—"}</Row>
@@ -189,6 +192,7 @@ export function LaunchPay() {
   const ws = useWorkspace();
   const [picked, setMethod] = useState<"card" | "invoice">("card");
   const [useCredit, setUseCredit] = useState(false);
+  const [autoPublish, setAutoPublish] = useState(false);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [problem, setProblem] = useState("");
   const [started, setStarted] = useState<Extract<PayResult, { method: "card" }> | null>(null);
@@ -224,7 +228,7 @@ export function LaunchPay() {
   const submit = async () => {
     setProblem("");
     try {
-      const res = (await pay({ id, method: toPay === 0 ? "card" : method, useCredit, agree: true, receipt: rc }).unwrap()).data;
+      const res = (await pay({ id, method: toPay === 0 ? "card" : method, useCredit, agree: true, receipt: rc, publishWhenPaid: method === "invoice" && toPay > 0 && autoPublish }).unwrap()).data;
       if (res.method === "card" && res.status === "pending") setStarted(res);
       else navigate(launchPath(id, "status"));
     } catch (err) {
@@ -240,7 +244,6 @@ export function LaunchPay() {
       setProblem(readProblem(err).message);
     }
   };
-  console.log({cardsOff, view: view.payments})
 
   return (
     <Shell view={view} step={1} aside={<Order view={view} useCredit={useCredit} />}>
@@ -252,10 +255,10 @@ export function LaunchPay() {
             <h2 id="pm">How you'll pay</h2>
             <div role="radiogroup" aria-labelledby="pm" className="jp-opts">
               <button type="button" role="radio" aria-checked={method === "card"} className="jp-opt" disabled={cardsOff} onClick={() => setMethod("card")}>
-                <span className="jp-dot" aria-hidden="true" /><span className="jp-ot"><b>Card</b><span>{cardsOff ? `Not available yet. Choose invoice, or email ${SUPPORT_EMAIL}.` : view.payments.publishOnPayment ? "Paid now. Your study goes live straight away." : "Paid now. Our check starts straight away."}</span></span>
+                <span className="jp-dot" aria-hidden="true" /><span className="jp-ot"><b>Card</b><span>{cardsOff ? `Not available yet. Choose invoice, or email ${SUPPORT_EMAIL}.` : view.payments.reviewBeforePublish ? "Paid now. Our check starts straight away." : "Paid now. Then you publish it when you're ready."}</span></span>
               </button>
               <button type="button" role="radio" aria-checked={method === "invoice"} className="jp-opt" onClick={() => setMethod("invoice")}>
-                <span className="jp-dot" aria-hidden="true" /><span className="jp-ot"><b>Invoice or bank transfer</b><span>For universities and companies paying by purchase order. {view.payments.publishOnPayment ? "Your study goes live when the money arrives." : "We start our check when the money arrives."}</span></span>
+                <span className="jp-dot" aria-hidden="true" /><span className="jp-ot"><b>Invoice or bank transfer</b><span>For universities and companies paying by purchase order. {view.payments.reviewBeforePublish ? "We start our check when the money arrives." : "You can publish it once the money arrives."}</span></span>
               </button>
             </div>
             {view.credit > 0 && (
@@ -278,6 +281,12 @@ export function LaunchPay() {
             </div>
           </section>
           {method === "invoice" && toPay > 0 && <div className="jp-note sun">We'll email an invoice with joinStudy's bank details and a reference to quote. Bank transfers usually arrive in 1 to 5 working days; we email you when it does.</div>}
+          {method === "invoice" && toPay > 0 && !view.payments.reviewBeforePublish && (
+            <button type="button" role="checkbox" aria-checked={autoPublish} className="jp-check" style={{ alignItems: "flex-start", padding: "14px 16px", lineHeight: 1.45 }} onClick={() => setAutoPublish(!autoPublish)}>
+              <span className="jp-box" aria-hidden="true" style={{ marginTop: 1 }}>{autoPublish ? "✓" : ""}</span>
+              <span><b>Publish automatically when the payment arrives</b><br /><span className="jp-hint">Leave it unticked to publish it yourself.</span></span>
+            </button>
+          )}
           {problem && <div className="jp-note bad" role="alert">{problem}</div>}
           <div className="jp-actions">
             <button type="button" className="jp-btn" onClick={submit} disabled={payState.isLoading || (method === "card" && cardsOff && toPay > 0)}>
@@ -285,7 +294,7 @@ export function LaunchPay() {
             </button>
             <Link className="jp-btn2" to={launchPath(id)}>Back</Link>
           </div>
-          <span className="jp-hint">By paying you agree that unused money comes back when the study closes{view.payments.publishOnPayment ? "" : ", or within 14 days if we can't approve your study"}.</span>
+          <span className="jp-hint">Participants can't see your study until it's published. Unused money comes back when the study closes{view.payments.reviewBeforePublish ? ", or within 14 days if we can't approve your study" : ""}.</span>
         </>
       )}
 
@@ -316,8 +325,14 @@ export function LaunchPay() {
 export function LaunchStatus() {
   const { id, view, isLoading, isError, refetch } = useLaunch(true);
   const navigate = useNavigate();
+  const ws = useWorkspace();
+  const [params] = useSearchParams();
   const [resubmit, resubmitState] = useResubmitStudyMutation();
   const [cancelInvoice, cancelState] = useCancelInvoiceMutation();
+  const [publish, publishState] = usePublishStudyMutation();
+  const [refund, refundState] = useRefundStudyMutation();
+  // The ⋯ menu's "Publish now" opens this page with the confirmation showing.
+  const [confirming, setConfirming] = useState<"publish" | "refund" | null>(params.get("publish") ? "publish" : null);
   const [problem, setProblem] = useState("");
   if (isLoading) return <Loading />;
   if (isError || !view) return <Failed retry={refetch} />;
@@ -330,10 +345,12 @@ export function LaunchStatus() {
   const pending = view.fundings.find((f) => f.status === "pending" && f.method === "invoice");
   const lastPaid = paid[paid.length - 1];
   const checks = view.review.checks;
+  const reviewed = !!view.payments?.reviewBeforePublish || checks.length > 0;
   const H: Record<string, [string, string]> = {
-    "awaiting-payment": ["Your invoice is on its way", "Your study is saved. We'll check it as soon as the payment arrives."],
+    "awaiting-payment": ["Your invoice is on its way", view.publishWhenPaid ? "Your study is saved. It goes live as soon as the payment arrives." : "Your study is saved. You can publish it as soon as the payment arrives."],
     checking: ["We're checking your study", "Paid, and the automatic checks have run. A person on our team is reviewing it now. We'll email you either way."],
     "changes-needed": ["One thing to change", "We can't open your study yet. It's usually a quick fix."],
+    ready: ["Ready to publish", "It's paid for. Participants can't see it until you publish it."],
     rejected: ["We can't run this study", "Everything you paid is being refunded within 14 days."],
     live: ["Your study is live", "Matching participants can see it now. We'll email you as work comes in."],
     closed: ["This study is closed", ""],
@@ -342,45 +359,46 @@ export function LaunchStatus() {
   const paidLine = lastPaid
     ? `${lastPaid.method === "card" ? `Card${lastPaid.cardLast4 ? ` ending ${lastPaid.cardLast4}` : ""}` : lastPaid.method === "credit" ? "Credit" : "Bank transfer"} · ${new Date(lastPaid.paidAt || lastPaid.createdAt).toLocaleString()}`
     : "";
-  // Published on payment (PUBLISH_ON_PAYMENT): there were no checks or review, so those steps aren't shown.
-  const noCheck = !!view.payments?.publishOnPayment && checks.length === 0 && stage !== "changes-needed" && stage !== "rejected";
-  const allSteps: Step[] =
+  const publishStep: Step = { title: "Publish", text: live ? "Open to matching participants." : stage === "ready" ? "Waiting for you." : view.publishWhenPaid ? "Automatic, when the payment arrives." : "", state: live ? "done" : stage === "ready" ? "now" : "later" };
+  const steps: Step[] =
     stage === "awaiting-payment"
-      ? [{ title: "Waiting for payment", text: pending ? `Invoice ${pending.number} sent.` : "", state: "now" }, { title: "Automatic checks", text: "Start when the money arrives.", state: "later" }, { title: "joinStudy review", text: "", state: "later" }, { title: "Live", text: "", state: "later" }]
+      ? [{ title: "Waiting for payment", text: pending ? `Invoice ${pending.number} sent.` : "", state: "now" }, ...(reviewed ? [{ title: "joinStudy review", text: "Starts when the money arrives.", state: "later" as const }] : []), publishStep]
       : [
           { title: `Paid · ${formatMoney(view.paidIn, cur)}`, text: paidLine, state: "done" },
-          { title: "Automatic checks", text: checks.length ? checks.map((c) => `${c.ok ? "✓" : "!"} ${c.label}: ${c.note}`).join("\n") : "", state: checks.some((c) => !c.ok) ? "warn" : "done" },
-          { title: stage === "changes-needed" ? "Changes needed" : stage === "rejected" ? "Not approved" : "joinStudy review", text: stage === "checking" ? "A person reads your study and tries your link." : stage === "changes-needed" ? "See the note above." : live ? "Approved." : "", state: stage === "checking" ? "now" : stage === "changes-needed" || stage === "rejected" ? "warn" : "done" },
-          { title: "Live", text: live ? "Open to matching participants." : "", state: live ? "done" : "later" },
+          ...(reviewed
+            ? [{ title: stage === "changes-needed" ? "Changes needed" : stage === "rejected" ? "Not approved" : "joinStudy review", text: [checks.map((c) => `${c.ok ? "✓" : "!"} ${c.label}: ${c.note}`).join("\n"), stage === "checking" ? "A person reads your study and tries your link." : stage === "changes-needed" ? "See the note above." : stage === "rejected" ? "" : "Approved."].filter(Boolean).join("\n"), state: (stage === "checking" ? "now" : stage === "changes-needed" || stage === "rejected" ? "warn" : "done") as Step["state"] }]
+            : []),
+          ...(stage === "rejected" ? [] : [publishStep]),
         ];
-  const steps = noCheck
-    ? allSteps.filter((x) => x.title !== "Automatic checks" && x.title !== "joinStudy review").map((x) => (x.title === "Live" && stage === "awaiting-payment" ? { ...x, text: "As soon as the money arrives." } : x))
-    : allSteps;
   const dot = (s: Step["state"]) =>
     s === "done" ? { background: "var(--night)", color: "var(--sun)", border: 0 } : s === "now" ? { border: "2px solid var(--ink)" } : s === "warn" ? { background: "var(--sun)", color: "var(--sun-ink)", border: 0, fontWeight: 700 } : {};
+  const stepsNav = reviewed ? 4 : 3;
 
-  const sendBack = async () => {
+  const run = async (fn: () => Promise<unknown>) => {
     setProblem("");
     try {
-      await resubmit(id).unwrap();
+      await fn();
+      setConfirming(null);
     } catch (err) {
       const p = readProblem(err);
-      if (p.code === "top_up_needed") navigate(launchPath(id), { replace: false });
+      if (p.code === "top_up_needed") navigate(launchPath(id));
       else setProblem(p.message);
     }
   };
+  const sendBack = () => run(() => resubmit(id).unwrap());
+  const blocked = view.due > 0 ? "due" : view.closingPassed ? "closing" : null;
 
   return (
     <Shell
       view={view}
-      step={live ? 4 : stage === "awaiting-payment" ? 1 : 2}
+      step={live ? stepsNav : stage === "ready" ? stepsNav - 1 : stage === "awaiting-payment" ? 1 : 2}
       aside={
         <aside className="jp-aside" aria-label="Payment">
           <section className="jp-cost">
             <span className="jp-mono" style={{ color: "var(--sun)" }}>{stage === "awaiting-payment" ? "Invoice" : "Payment"}</span>
             <span className="r"><span>Held for this study</span><span>{formatMoney(view.paidIn, cur)}</span></span>
             <span style={{ fontSize: 13.5, color: "var(--on-night-2)", lineHeight: 1.45 }}>
-              {stage === "awaiting-payment" ? "Nothing is held until the transfer arrives." : noCheck ? "Unused money comes back when the study closes." : "If we can't approve your study, you get all of it back within 14 days."}
+              {stage === "awaiting-payment" ? "Nothing is held until the transfer arrives." : stage === "ready" ? "Not published yet? You can cancel and get all of it back." : reviewed && !live ? "If we can't approve your study, you get all of it back within 14 days." : "Unused money comes back when the study closes."}
             </span>
             {paid.map((f) => (
               <button key={f.fundingId} type="button" className="jp-link" style={{ color: "var(--sun)", textAlign: "left" }} onClick={() => openFundingDocument(f.fundingId)}>Receipt {f.number}</button>
@@ -391,6 +409,50 @@ export function LaunchStatus() {
     >
       <h1 className="jp-h1">{H[stage]?.[0]}</h1>
       <p className="jp-lede">{H[stage]?.[1]}</p>
+
+      {stage === "ready" && (
+        <section className="jp-sec" aria-labelledby="pub-h" style={{ border: "2px solid var(--ink)", gap: 14 }}>
+          <h2 id="pub-h">Publish your study</h2>
+          {blocked === "due" ? (
+            <div className="jp-note sun">Your changes add {formatMoney(view.due, cur)}. <Link to={launchPath(id)} style={{ color: "inherit", fontWeight: 600 }}>Pay the difference</Link>, then publish.</div>
+          ) : blocked === "closing" ? (
+            <div className="jp-note sun">The closing date has passed. <Link to={planPath(id, "pay")} style={{ color: "inherit", fontWeight: 600 }}>Choose a new date</Link>, then publish.</div>
+          ) : (
+            <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.55, color: "var(--ink-2)" }}>
+              When you publish, participants who fit can see it and start straight away. Check it first if you like: <Link to={planPath(id, "basics")} style={{ color: "var(--ink)", textDecoration: "underline" }}>see your plan and how participants will see it</Link>.
+            </p>
+          )}
+          {problem && <div className="jp-note bad" role="alert">{problem}</div>}
+          {!ws.canEdit ? (
+            <span className="jp-hint">Viewers can't publish. Ask someone who can edit studies in this workspace.</span>
+          ) : confirming === "publish" && !blocked ? (
+            <div role="group" aria-label="Confirm publishing" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <b style={{ fontSize: 16 }}>Publish “{view.plan.basics?.title || view.name}” now?</b>
+              <div className="jp-actions">
+                <button type="button" className="jp-btn" autoFocus disabled={publishState.isLoading} onClick={() => run(() => publish(id).unwrap())}>{publishState.isLoading ? "Publishing…" : "Yes, publish now"}</button>
+                <button type="button" className="jp-btn2" onClick={() => setConfirming(null)}>Not yet</button>
+              </div>
+            </div>
+          ) : (
+            <div className="jp-actions">
+              <button type="button" className="jp-btn" disabled={!!blocked} onClick={() => setConfirming("publish")}>Publish now</button>
+            </div>
+          )}
+          {ws.canPay && (
+            confirming === "refund" ? (
+              <div role="group" aria-label="Confirm cancelling" className="jp-note" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <span><b>Cancel and get your money back?</b> Card payments go back to the card (banks take 5 to 10 days); bank transfers and credit come back as credit straight away. The study stays as a draft.</span>
+                <div className="jp-actions">
+                  <button type="button" className="jp-btn2" disabled={refundState.isLoading} onClick={() => run(() => refund(id).unwrap().then(() => navigate(launchPath(id))))}>{refundState.isLoading ? "Cancelling…" : "Yes, cancel it"}</button>
+                  <button type="button" className="jp-btn2" onClick={() => setConfirming(null)}>Keep it</button>
+                </div>
+              </div>
+            ) : (
+              <button type="button" className="jp-link" style={{ alignSelf: "flex-start", color: "var(--ink-2)", fontSize: 14 }} onClick={() => setConfirming("refund")}>Changed your mind? Cancel and get your money back</button>
+            )
+          )}
+        </section>
+      )}
 
       {stage === "changes-needed" && (
         <section className="jp-sec" style={{ border: "2px solid var(--ink)", gap: 12 }} aria-label="Note from the joinStudy team">
@@ -436,27 +498,8 @@ export function LaunchStatus() {
       </section>
       <div className="jp-actions">
         {live ? <Link className="jp-btn" to={`/dashboard/researcher/studies/${id}`}>Open the study</Link> : <Link className="jp-btn2" to="/dashboard/researcher">Back to home</Link>}
-        {!live && stage !== "rejected" && <span className="jp-hint">We'll email you at each step.</span>}
+        {!live && stage !== "rejected" && stage !== "ready" && <span className="jp-hint">We'll email you at each step.</span>}
       </div>
-      {live && <ReferPrompt currency={cur} />}
     </Shell>
-  );
-}
-
-/** Refer a friend: after a study goes live, a nudge to invite another researcher. */
-function ReferPrompt({ currency }: { currency: string }) {
-  const { data } = useGetHomeQuery();
-  const offer = data?.data.referral;
-  if (!offer) return null;
-  return (
-    <section className="jp-sec" aria-labelledby="refer-live" style={{ gap: 10, background: "var(--sun-soft)", border: "1.5px solid var(--sun)" }}>
-      <h2 id="refer-live" style={{ fontFamily: "var(--body)", fontWeight: 600, fontSize: 17, letterSpacing: 0 }}>Know someone who'd use joinStudy?</h2>
-      <p style={{ margin: 0, fontSize: 15, color: "var(--ink-2)", lineHeight: 1.5 }}>
-        Their first study is at the {percent(offer.friendFeeRate)} fee, and you get {percent(offer.share)} of their fees as credit, up to {formatMoney(offer.friendCap, currency)} per friend.
-      </p>
-      <div className="jp-actions">
-        <Link className="jp-btn2" to="/dashboard/researcher/refer">Get your invite link</Link>
-      </div>
-    </section>
   );
 }

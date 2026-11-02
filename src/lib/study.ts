@@ -49,7 +49,7 @@ export const studyLink = (s: Pick<HomeStudy, "projectId" | "surveyId" | "status"
 export const needsYouLink = (n: NeedsYou) =>
   n.kind === "review"
     ? `/dashboard/researcher/studies/${n.surveyId}?tab=review`
-    : n.kind === "changes"
+    : n.kind === "changes" || n.kind === "publish"
       ? `/dashboard/researcher/studies/${n.surveyId}/launch/status`
       : studyLink({ ...n, status: "draft" });
 
