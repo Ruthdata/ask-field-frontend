@@ -11,6 +11,15 @@ export const PHONE_EXAMPLE: Record<string, string> = { Nigeria: "0803 555 0142",
 
 export type VerificationStatus = "none" | "phone" | "checking" | "verified" | "review" | "duplicate" | "rejected";
 export type SelfieOutcome = "verified" | "retry" | "review" | "duplicate";
+/** Smile ID's camera (SELFIE_PROVIDER=smileid): what the browser needs to open it. */
+export interface SelfieSdk {
+  provider: "smileid";
+  product: "smartselfie";
+  environment: "sandbox" | "production";
+  partnerId: string;
+  callbackUrl: string;
+  partner: { name: string; logoUrl: string; policyUrl: string };
+}
 export interface Verification {
   required: boolean;
   status: VerificationStatus;
@@ -280,7 +289,7 @@ export const participantApi = apiSlice.injectEndpoints({
       query: (body) => ({ url: "/participants/me/verification/phone/verify", method: "POST", body }),
       invalidatesTags: ["Verification"],
     }),
-    startSelfie: b.mutation<ApiSuccess<{ session: string | null; mode: "test" | "sdk" | "review"; clientToken?: string }>, void>({
+    startSelfie: b.mutation<ApiSuccess<{ session: string | null; mode: "test" | "sdk" | "review"; clientToken?: string; sdk?: SelfieSdk }>, void>({
       query: () => ({ url: "/participants/me/verification/selfie/start", method: "POST" }),
     }),
     completeSelfie: b.mutation<ApiSuccess<Verification>, { session: string; testOutcome?: SelfieOutcome }>({
